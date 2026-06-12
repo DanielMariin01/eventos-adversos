@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.scroll-teal::-webkit-scrollbar {
+    width: 6px;
+    /* ← esto faltaba para el scroll vertical */
+    height: 6px;
+}
+
+.scroll-teal::-webkit-scrollbar-track {
+    background: transparent;
+    /* opcional: se ve más limpio */
+}
+
+.scroll-teal::-webkit-scrollbar-thumb {
+    background: #0d9488;
+    border-radius: 9999px;
+}
