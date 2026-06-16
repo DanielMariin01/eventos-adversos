@@ -25,7 +25,7 @@ export default function ChatBot() {
             {abierto && (
                 <div className="bg-white shadow-xl rounded-lg w-96 mb-4">
                     {/* Header */}
-                    <div className="p-4 border-b bg-purple-600 text-white rounded-t-lg flex justify-between items-center">
+                    <div className="p-4 border-b bg-teal-600 text-white rounded-t-lg flex justify-between items-center">
                         <p className="text-sm font-semibold">Asistente Aurora</p>
                         <button onClick={() => setAbierto(false)} className="hover:text-gray-200">
                             <X className="w-5 h-5" />
@@ -36,7 +36,7 @@ export default function ChatBot() {
                     <div className="p-4 h-72 overflow-y-auto space-y-3">
                         {mensajes.map((msg, index) => (
                             <div key={index} className={`flex ${msg.tipo === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <p className={`rounded-lg py-2 px-4 text-sm max-w-xs ${msg.tipo === 'user' ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-700'}`}>
+                                <p className={`rounded-lg py-2 px-4 text-sm max-w-xs ${msg.tipo === 'user' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
                                     {msg.texto}
                                 </p>
                             </div>
@@ -55,7 +55,7 @@ export default function ChatBot() {
                         />
                         <button
                             onClick={enviar}
-                            className="bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-2 rounded-lg transition"
+                            className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg transition"
                         >
                             <Send className="w-4 h-4" />
                         </button>
@@ -66,7 +66,7 @@ export default function ChatBot() {
             {/* Botón flotante */}
             <button
                 onClick={() => setAbierto(!abierto)}
-                className="bg-purple-500 hover:bg-purple-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition"
+                className="bg-teal-600 hover:bg-teal-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition"
             >
                 <MessageCircle className="w-6 h-6" />
             </button>

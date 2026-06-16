@@ -5,7 +5,7 @@ export default function Dashboard() {
     return (
         <AuthenticatedLayout
 
-            header={<h2 className="text-xl font-semibold text-white">Navegación Oncologica</h2>}>
+            header={<h2 className="text-xl font-semibold text-white">Dashboard</h2>}>
             <Head title="Dashboard" />
 
 
