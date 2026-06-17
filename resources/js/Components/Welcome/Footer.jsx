@@ -5,7 +5,6 @@ export default function Footer() {
         <footer className="footer">
             © {year}{' '}
             <strong>Clínica Central del Eje</strong>
-            {' · '}Sistema de Reporte de Eventos Adversos
             {' · '}Todos los derechos reservados
         </footer>
     );

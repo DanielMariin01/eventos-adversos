@@ -1,14 +1,3 @@
-/* ─────────────────────────────────────────────
-   About.jsx
-   Para editar los puntos de la lista solo
-   toca el array CHECKPOINTS.
-───────────────────────────────────────────── */
-
-const STATS = [
-    { value: '+500', label: 'Eventos gestionados', sub: 'con acciones de mejora implementadas' },
-    { value: '98%', label: 'Tasa de resolución', sub: 'de reportes en los últimos 12 meses' },
-];
-
 const CHECKPOINTS = [
     'Proceso de reporte simple y sin barreras administrativas',
     'Equipo de calidad dedicado al análisis de cada evento',
@@ -20,7 +9,7 @@ function CheckIcon() {
     return (
         <span className="about__list-check" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
+                 stroke="currentColor">
                 <polyline points="20 6 9 17 4 12" />
             </svg>
         </span>
@@ -33,17 +22,14 @@ export default function About() {
             <div className="section-inner">
                 <div className="about__inner">
 
-                    {/* ── Tarjeta de estadísticas ── */}
+                    {/* ── Imagen circular ── */}
                     <div className="about__visual">
-                        <div className="about__card">
-                            {STATS.map(({ value, label, sub }, i) => (
-                                <div key={value}>
-                                    {i > 0 && <div className="about__card-divider" />}
-                                    <p className="about__card-number">{value}</p>
-                                    <p className="about__card-label">{label}</p>
-                                    <p className="about__card-sub">{sub}</p>
-                                </div>
-                            ))}
+                        <div className="about__img-wrapper">
+                            <img
+                                src="/imagenes/fondo6.png"
+                                alt="Profesional de la Clínica Central del Eje"
+                                className="about__img"
+                            />
                         </div>
                     </div>
 
