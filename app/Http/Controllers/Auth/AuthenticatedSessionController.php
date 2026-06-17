@@ -42,6 +42,9 @@ class AuthenticatedSessionController extends Controller
         if ($user->hasRole('jefe')) {
             return redirect()->route('dashboard');
         }
+        if ($user->hasRole('administrador')) {
+            return redirect()->route('dashboard');
+        }
 
         // reportante → va al formulario
         return redirect()->route('eventos.create');

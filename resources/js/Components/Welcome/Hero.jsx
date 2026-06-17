@@ -13,7 +13,13 @@ function ArrowIcon() {
 
 export default function Hero() {
     const { auth } = usePage().props;
-    const href = auth.user ? route('eventos.create') : route('login');
+
+    const getHref = () => {
+        if (!auth.user) return route('login');
+        if (auth.rol === 'administrador' || auth.rol === 'calidad') return route('dashboard');
+        if (auth.rol === 'jefe') return route('dashboard');
+        return route('eventos.create');
+    };
     return (
         <div className="hero-wrapper">
 
@@ -36,8 +42,8 @@ export default function Hero() {
                     </p>
 
                     <div className="hero__actions">
-                        <Link href={href} className="hero__btn-primary">
-                            Registrar un evento
+                        <Link href={getHref()} className="hero__btn-primary">
+                            {auth.user ? 'Ir al sistema' : 'Registrar un evento'}
                         </Link>
 
                         <a href="#features" className="hero__btn-secondary">
