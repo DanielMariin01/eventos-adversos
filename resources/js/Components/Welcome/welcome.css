@@ -292,7 +292,7 @@ body {
 /* ── FEATURES ── */
 .features {
     background: var(--color-slate-50);
-    padding: 6rem 0;
+     padding: 3rem 0 6rem;
 }
 
 .features__header {
@@ -320,7 +320,7 @@ body {
     padding: 2rem;
     border: none;
     box-shadow: var(--shadow-card);
-   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .feature-card:hover {
