@@ -1,7 +1,9 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Header() {
+    const { auth } = usePage().props;
+    const href = auth.user ? route('eventos.create') : route('login');
     return (
         <nav className="bg-white border-b border-gray-100 shadow-md sticky top-0 z-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -12,12 +14,11 @@ export default function Header() {
                         <ApplicationLogo className="h-14 w-auto" />
                     </Link>
 
-                    {/* Botón ingresar */}
                     <Link
-                        href={route('login')}
+                        href={auth.user ? route('eventos.create') : route('login')}
                         className="rounded-md bg-teal-500 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-600 transition"
                     >
-                        Ingresar
+                        {auth.user ? 'Ingresar' : 'Ingresar'}
                     </Link>
 
                 </div>
