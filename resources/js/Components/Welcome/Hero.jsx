@@ -1,4 +1,5 @@
-import { Link } from '@inertiajs/react';
+
+import { Link, usePage } from '@inertiajs/react';
 
 function ArrowIcon() {
     return (
@@ -11,6 +12,8 @@ function ArrowIcon() {
 }
 
 export default function Hero() {
+    const { auth } = usePage().props;
+    const href = auth.user ? route('eventos.create') : route('login');
     return (
         <div className="hero-wrapper">
 
@@ -33,7 +36,7 @@ export default function Hero() {
                     </p>
 
                     <div className="hero__actions">
-                        <Link href={route('login')} className="hero__btn-primary">
+                        <Link href={href} className="hero__btn-primary">
                             Registrar un evento
                         </Link>
 
