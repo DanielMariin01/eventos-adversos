@@ -16,9 +16,14 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Dashboard',
             url: route('dashboard'),
             icon: LayoutDashboard,
-            roles: ['administrador', 'navegador'],
+            roles: ['administrador', 'calidad', 'jefe'],
         },
-      
+        {
+            title: 'Usuarios',
+            url: route('usuarios.index'),
+            icon: Users,
+            roles: ['administrador'],
+        },
     ];
 
     return (
