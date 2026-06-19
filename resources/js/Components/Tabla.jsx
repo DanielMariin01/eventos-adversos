@@ -34,8 +34,8 @@ export default function Tabla({
     return (
         <div>
             {/* Tabla */}
-            <div className="bg-white border border-gray-200 rounded-sm shadow overflow-x-auto">
-                <table className="w-full text-sm">
+            <div className="bg-white border border-gray-200 rounded-sm shadow overflow-x-auto scroll-teal">
+                <table className="w-full text-sm tabla-rayada">
                     <thead className="bg-cyan-600 text-white">
                         <tr>
                             {columnas.map((col) => (
