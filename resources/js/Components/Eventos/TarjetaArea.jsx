@@ -14,18 +14,19 @@ export default function TarjetaArea({ area, seleccionada, onClick }) {
             type="button"
             onClick={onClick}
             className={`
-                w-full text-left p-5 rounded-xl border-2 transition duration-200
-                hover:shadow-md hover:border-teal-400
-                ${seleccionada
+        w-full text-left p-5 rounded-lg border-2 border-l-4 border-l-blue-500 shadow-lg transition duration-200
+       
+        hover:shadow-md hover:scale-[1.07]
+        ${seleccionada
                     ? 'border-teal-500 bg-teal-50 shadow-md'
-                    : 'border-gray-200 bg-white'}
-            `}
+                    : 'border-transparent bg-white'}
+    `}
         >
-            <h3 className={`text-sm font-bold mb-1 ${seleccionada ? 'text-teal-700' : 'text-gray-800'}`}>
+            <h3 className="text-sm text-blue-500  mb-1">
                 {area.nombre}
             </h3>
             {area.responsable && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-700">
                     {area.responsable}
                 </p>
             )}

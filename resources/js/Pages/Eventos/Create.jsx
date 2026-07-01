@@ -50,7 +50,6 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
     // ── Selección de categoría ──
     const seleccionarCategoria = async (idCategoria) => {
-        setData('fk_categoria', idCategoria);
         setCargandoAreas(true);
 
         try {
@@ -58,7 +57,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-XSRF-TOKEN': decodeURIComponent(document.cookie.split('; ').find(r => r.startsWith('XSRF-TOKEN='))?.split('=')[1] ?? ''),
                     'Accept': 'application/json',
                 },
                 body: JSON.stringify({ fk_categoria: idCategoria }),
@@ -66,8 +65,10 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
             const json = await response.json();
             setAreas(json.areas ?? []);
+            setData('fk_categoria', idCategoria);
             setEtapa('area');
-        } catch {
+        } catch (error) {
+            console.log('error:', error);
             Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar las áreas.' });
         } finally {
             setCargandoAreas(false);
@@ -144,7 +145,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {/* ── ETAPA 1: Selección de categoría ── */}
                 {etapa === 'categoria' && (
                     <div>
-                     
+
 
                         {cargandoAreas ? (
                             <div className="flex justify-center py-12">
@@ -169,8 +170,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {etapa === 'area' && (
                     <div>
                         <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">¿Cuál es el área responsable?</h2>
-                            <p className="text-gray-500 text-sm">Seleccione el área a la que pertenece el evento adverso</p>
+                            <h2 className="text-2xl font-bold text-teal-600 mb-2">¿Cuál es el área responsable del evento?</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
