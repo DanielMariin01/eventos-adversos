@@ -24,7 +24,7 @@ export default function TarjetaCategoria({ categoria, seleccionada, onClick }) {
             onClick={onClick}
             className={`
         w-full text-left p-8 rounded-lg border-2 border-l-4 border-l-blue-500 shadow-lg transition duration-200
-        flex items-center gap-6
+        flex items-center gap-4 sm:gap-6
         hover:shadow-md hover:scale-[1.07]
         ${seleccionada
                     ? 'border-teal-500 bg-teal-50 shadow-md'
@@ -46,11 +46,11 @@ export default function TarjetaCategoria({ categoria, seleccionada, onClick }) {
 
             {/* Icono al lado derecho */}
             {icono && (
-                <div className="w-28 h-28 flex-shrink-0 rounded-xl flex items-center justify-center p-3">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 flex-shrink-0 rounded-xl flex items-center justify-center p-3">
                     <img
                         src={icono}
                         alt={categoria.nombre}
-                        className="w-20 h-20 object-contain"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
                     />
                 </div>
             )}
