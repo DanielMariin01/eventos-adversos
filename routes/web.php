@@ -35,12 +35,12 @@ Route::middleware(['auth', 'role:administrador'])->group(function () {
     Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
     Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 });
-
 // ── Rutas de eventos adversos ──
 Route::middleware(['auth'])->group(function () {
 
     // Reportante — formulario de registro
     Route::get('/eventos/crear', [EventoController::class, 'create'])->name('eventos.create');
+    Route::post('/eventos/area', [EventoController::class, 'seleccionarArea'])->name('eventos.area');
     Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
 
     // Calidad — gestión de eventos

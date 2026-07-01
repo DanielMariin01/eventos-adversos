@@ -166,13 +166,13 @@ export default function Index({ usuarios, roles }) {
         <div className="flex gap-2 justify-center">
             <button
                 onClick={() => abrirEditar(fila)}
-                className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-sm transition"
+                className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full transition"
             >
                 Editar
             </button>
             <button
                 onClick={() => eliminar(fila.id)}
-                className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-4 py-1.5 rounded-sm transition"
+                className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full transition"
             >
                 Eliminar
             </button>
@@ -189,7 +189,7 @@ export default function Index({ usuarios, roles }) {
                 <div className="flex justify-end mb-6">
                     <button
                         onClick={() => setModalAbierto(true)}
-                        className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-5 py-2.5 rounded-sm transition"
+                        className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
                     >
                         + Crear usuario
                     </button>
