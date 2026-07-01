@@ -144,10 +144,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {/* ── ETAPA 1: Selección de categoría ── */}
                 {etapa === 'categoria' && (
                     <div>
-                        <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">¿Qué tipo de evento desea reportar?</h2>
-                            <p className="text-gray-500 text-sm">Seleccione la categoría que mejor describe el evento adverso</p>
-                        </div>
+                     
 
                         {cargandoAreas ? (
                             <div className="flex justify-center py-12">
