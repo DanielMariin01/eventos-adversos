@@ -25,7 +25,7 @@ export default function TarjetaCategoria({ categoria, seleccionada, onClick }) {
             className={`
         w-full text-left p-8 rounded-lg border-2 border-l-4 border-l-blue-500 shadow-lg transition duration-200
         flex items-center gap-6
-        hover:shadow-md hover:border-teal-400
+        hover:shadow-md hover:scale-[1.07]
         ${seleccionada
                     ? 'border-teal-500 bg-teal-50 shadow-md'
                     : 'border-transparent bg-white'}
