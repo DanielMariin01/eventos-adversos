@@ -13,7 +13,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
     // ── Estado de navegación ──
     const [etapa, setEtapa] = useState(areasProp ? 'area' : 'categoria'); // 'categoria' | 'area' | 'formulario'
-    const [paso, setPaso] = useState(1); 
+    const [paso, setPaso] = useState(1);
     const [areas, setAreas] = useState(areasProp ?? []);
     const [cargandoAreas, setCargandoAreas] = useState(false);
     const [erroresPaso, setErroresPaso] = useState({});
@@ -139,25 +139,6 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         }
 
         post(route('eventos.store'), {
-            onBefore: () => {
-                Swal.fire({
-                    title: 'Registrando evento...',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    html: `
-                        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0">
-                            <div style="display:flex;gap:12px;align-items:center;">
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
-                            </div>
-                            <p style="color:#9ca3af;font-size:12px;margin:0">Por favor espera un momento...</p>
-                        </div>
-                        <style>@keyframes bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-10px);opacity:1}}</style>
-                    `,
-                });
-            },
             onSuccess: () => {
                 reset();
                 setEtapa('categoria');
@@ -181,7 +162,31 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Reporte de Evento Adverso</h2>}>
             <Head title="Reportar Evento Adverso" />
-
+            {/* Loading overlay */}
+            {processing && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/70">
+                    <div className="relative w-[150px] h-[73px]">
+                        <svg
+                            viewBox="0 0 150 73"
+                            height="73px"
+                            width="150px"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <polyline
+                                points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
+                                strokeMiterlimit="10"
+                                strokeWidth="3"
+                                stroke="#009B9E"
+                                fill="none"
+                            />
+                        </svg>
+                        <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_2.5s_linear_infinite]"
+                            style={{ left: 0, right: 'auto' }} />
+                        <div className="absolute top-0 h-full bg-slate-100 animate-[heartRateOut_2.5s_linear_infinite]"
+                            style={{ width: '120%', left: '-120%' }} />
+                    </div>
+                </div>
+            )}
             <div className="max-w-4xl mx-auto py-10 px-6">
 
                 {/* ── ETAPA 1: Selección de categoría ── */}

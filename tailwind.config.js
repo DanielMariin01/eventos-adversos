@@ -15,8 +15,25 @@ export default {
             fontFamily: {
                 sans: ['Poppins', ...defaultTheme.fontFamily.sans],
             },
+            keyframes: {
+                heartRateIn: {
+                    '0%': { width: '100%' },
+                    '50%': { width: '0%' },
+                    '100%': { width: '0%' },
+                },
+                heartRateOut: {
+                    '0%': { right: '-120%' },
+                    '30%': { right: '-120%' },
+                    '100%': { right: '0' },
+                },
+            },
+            animation: {
+                'heartRateIn': 'heartRateIn 2.5s linear infinite',
+                'heartRateOut': 'heartRateOut 2.5s linear infinite',
+            },
         },
     },
+
 
     plugins: [forms],
 };
