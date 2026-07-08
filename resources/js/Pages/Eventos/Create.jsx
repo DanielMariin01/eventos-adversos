@@ -16,6 +16,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     const [paso, setPaso] = useState(1); // 1 | 2 | 3
     const [areas, setAreas] = useState(areasProp ?? []);
     const [cargandoAreas, setCargandoAreas] = useState(false);
+    const [erroresPaso, setErroresPaso] = useState({});
 
     const { data, setData, post, processing, errors, reset } = useForm({
         fk_categoria: fkCategoriaProp ?? '',
@@ -82,7 +83,34 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     };
 
     // ── Navegación entre pasos ──
-    const siguiente = () => setPaso(p => Math.min(p + 1, 3));
+    const siguiente = () => {
+        const nuevosErrores = {};
+
+        if (paso === 1) {
+            if (!data.rep_cedula) nuevosErrores.rep_cedula = 'La cédula es obligatoria';
+            if (!data.rep_nombres) nuevosErrores.rep_nombres = 'Los nombres son obligatorios';
+            if (!data.rep_apellidos) nuevosErrores.rep_apellidos = 'Los apellidos son obligatorios';
+        }
+
+        if (paso === 2) {
+            if (!data.pac_nombres) nuevosErrores.pac_nombres = 'Los nombres son obligatorios';
+            if (!data.pac_apellidos) nuevosErrores.pac_apellidos = 'Los apellidos son obligatorios';
+        }
+
+        if (Object.keys(nuevosErrores).length > 0) {
+            setErroresPaso(nuevosErrores);
+            Swal.fire({
+                icon: 'warning',
+                iconColor: '#3b82f6',
+                title: 'Campos obligatorios',
+                text: 'Por favor completa todos los campos requeridos.',
+            });
+            return;
+        }
+
+        setErroresPaso({});
+        setPaso(p => Math.min(p + 1, 3));
+    };
     const anterior = () => {
         if (paso === 1) {
             setEtapa('area');
@@ -95,6 +123,21 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     // ── Envío del formulario ──
     const submit = (e) => {
         e.preventDefault();
+
+        const nuevosErrores = {};
+        if (!data.fecha_evento) nuevosErrores.fecha_evento = 'La fecha del evento es obligatoria';
+        if (!data.descripcion) nuevosErrores.descripcion = 'La descripción es obligatoria';
+
+        if (Object.keys(nuevosErrores).length > 0) {
+            setErroresPaso(nuevosErrores);
+            Swal.fire({
+                icon: 'warning',
+                iconColor: '#3b82f6',
+                title: 'Campos obligatorios',
+                text: 'Por favor completa todos los campos requeridos.',
+            });
+            return;
+        }
 
         post(route('eventos.store'), {
             onBefore: () => {
@@ -145,8 +188,6 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {/* ── ETAPA 1: Selección de categoría ── */}
                 {etapa === 'categoria' && (
                     <div>
-
-
                         {cargandoAreas ? (
                             <div className="flex justify-center py-12">
                                 <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
@@ -202,13 +243,13 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
                         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-6">
                             {paso === 1 && (
-                                <PasoReportante data={data} setData={setData} errors={errors} />
+                                <PasoReportante data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
                             )}
                             {paso === 2 && (
-                                <PasoPaciente data={data} setData={setData} errors={errors} />
+                                <PasoPaciente data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
                             )}
                             {paso === 3 && (
-                                <PasoEvento data={data} setData={setData} errors={errors} />
+                                <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
                             )}
                         </div>
 

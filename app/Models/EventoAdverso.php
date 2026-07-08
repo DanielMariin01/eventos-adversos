@@ -14,14 +14,7 @@ class EventoAdverso extends Model
         'fk_categoria',
         'fk_area',
         'fk_reportante',
-
-        // Paciente
-        'pac_cedula',
-        'pac_nombres',
-        'pac_apellidos',
-        'pac_telefono',
-        'pac_edad',
-        'pac_entidad',
+        'fk_paciente',
 
         // Evento
         'fecha_evento',
@@ -57,6 +50,11 @@ class EventoAdverso extends Model
     public function reportante()
     {
         return $this->belongsTo(Reportante::class, 'fk_reportante');
+    }
+
+    public function paciente()
+    {
+        return $this->belongsTo(Paciente::class, 'fk_paciente');
     }
 
     public function usuario()

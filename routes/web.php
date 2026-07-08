@@ -38,18 +38,19 @@ Route::middleware(['auth', 'role:administrador'])->group(function () {
 // ── Rutas de eventos adversos ──
 Route::middleware(['auth'])->group(function () {
 
-    // Reportante — formulario de registro
+    // Rutas específicas primero
     Route::get('/eventos/crear', [EventoController::class, 'create'])->name('eventos.create');
     Route::post('/eventos/area', [EventoController::class, 'seleccionarArea'])->name('eventos.area');
-    Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
     Route::get('/eventos/reportante/{cedula}', [EventoController::class, 'buscarReportante'])->name('eventos.reportante');
+    Route::get('/eventos/paciente/{cedula}', [EventoController::class, 'buscarPaciente'])->name('eventos.paciente');
+    Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
 
-    // Calidad — gestión de eventos
+    // Rutas genéricas después
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::patch('/eventos/{evento}/estado', [EventoController::class, 'actualizarEstado'])->name('eventos.estado');
 
-    // Jefe — eventos asignados
+    // Jefe
     Route::get('/mis-eventos', [EventoController::class, 'misEventos'])->name('eventos.mis');
 });
 

@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\Categoria;
 use App\Models\EventoAdverso;
 use App\Models\Reportante;
+use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -51,40 +52,54 @@ class EventoController extends Controller
         ]);
     }
 
+    // ── Buscar paciente por cédula ──
+    public function buscarPaciente(string $cedula)
+    {
+        $paciente = Paciente::where('cedula', $cedula)->first();
+
+        if (!$paciente) {
+            return response()->json(null);
+        }
+
+        return response()->json([
+            'nombres'     => $paciente->nombres,
+            'apellidos'   => $paciente->apellidos,
+            'telefono'    => $paciente->telefono,
+            'edad'        => $paciente->edad,
+            'edad_unidad' => $paciente->edad_unidad,
+            'entidad'     => $paciente->entidad,
+        ]);
+    }
+
     // ── Guardar evento adverso ──
     public function store(Request $request)
     {
         $request->validate([
-            // Categoría y área
-            'fk_categoria'           => 'required|exists:categorias,id_categoria',
-            'fk_area'                => 'required|exists:areas,id_area',
+            'fk_categoria'  => 'required|exists:categorias,id_categoria',
+            'fk_area'       => 'required|exists:areas,id_area',
 
             // Reportante
-            'rep_cedula'             => 'required|string|max:20',
-            'rep_nombres'            => 'required|string|max:100',
-            'rep_apellidos'          => 'required|string|max:100',
-            'rep_cargo'              => 'nullable|string|max:100',
+            'rep_cedula'    => 'required|string|max:20',
+            'rep_nombres'   => 'required|string|max:100',
+            'rep_apellidos' => 'required|string|max:100',
+            'rep_cargo'     => 'nullable|string|max:100',
+            'rep_empresa'   => 'nullable|string|max:100',
 
             // Paciente
-            'pac_cedula'             => 'nullable|string|max:20',
-            'pac_nombres'            => 'nullable|string|max:100',
-            'pac_apellidos'          => 'nullable|string|max:100',
-            'pac_telefono'           => 'nullable|string|max:20',
-            'pac_edad'               => 'nullable|integer|min:0|max:120',
-            'pac_entidad'            => 'nullable|string|max:100',
+            'pac_cedula'    => 'nullable|string|max:20',
+            'pac_nombres'   => 'required|string|max:100',
+            'pac_apellidos' => 'required|string|max:100',
+            'pac_telefono'  => 'nullable|string|max:20',
+            'pac_edad'      => 'nullable|integer|min:0|max:120',
+            'pac_edad_unidad' => 'nullable|string|max:10',
+            'pac_entidad'   => 'nullable|string|max:100',
 
             // Evento
-            'fecha_evento'           => 'required|date',
-            'descripcion'            => 'required|string',
-            'barreras_vulneradas'    => 'nullable|array',
-            'factores_contributivos' => 'nullable|array',
-            'acciones_inseguras'     => 'nullable|array',
-            'clasificacion'          => 'nullable|string|max:100',
-            'relacionado_con'        => 'nullable|string|max:255',
-            'categorizacion'         => 'nullable|string|max:100',
+            'fecha_evento'  => 'required|date',
+            'descripcion'   => 'required|string',
         ]);
 
-        // Crear o actualizar el reportante
+        // Crear o actualizar reportante
         $reportante = Reportante::updateOrCreate(
             ['cedula' => $request->rep_cedula],
             [
@@ -95,27 +110,29 @@ class EventoController extends Controller
             ]
         );
 
-        // Guardar el evento adverso
+        // Crear o actualizar paciente
+        $paciente = Paciente::updateOrCreate(
+            ['cedula' => $request->pac_cedula ?? uniqid('pac_')],
+            [
+                'nombres'     => $request->pac_nombres,
+                'apellidos'   => $request->pac_apellidos,
+                'telefono'    => $request->pac_telefono,
+                'edad'        => $request->pac_edad,
+                'edad_unidad' => $request->pac_edad_unidad ?? 'Años',
+                'entidad'     => $request->pac_entidad,
+            ]
+        );
+
+        // Guardar evento adverso
         EventoAdverso::create([
-            'fk_categoria'           => $request->fk_categoria,
-            'fk_area'                => $request->fk_area,
-            'fk_reportante'          => $reportante->id_reportante,
-            'pac_cedula'             => $request->pac_cedula,
-            'pac_nombres'            => $request->pac_nombres,
-            'pac_apellidos'          => $request->pac_apellidos,
-            'pac_telefono'           => $request->pac_telefono,
-            'pac_edad'               => $request->pac_edad,
-            'pac_entidad'            => $request->pac_entidad,
-            'fecha_evento'           => $request->fecha_evento,
-            'descripcion'            => $request->descripcion,
-            'barreras_vulneradas'    => $request->barreras_vulneradas,
-            'factores_contributivos' => $request->factores_contributivos,
-            'acciones_inseguras'     => $request->acciones_inseguras,
-            'clasificacion'          => $request->clasificacion,
-            'relacionado_con'        => $request->relacionado_con,
-            'categorizacion'         => $request->categorizacion,
-            'estado'                 => 'en_proceso',
-            'fk_usuario'             => Auth::id(),
+            'fk_categoria'  => $request->fk_categoria,
+            'fk_area'       => $request->fk_area,
+            'fk_reportante' => $reportante->id_reportante,
+            'fk_paciente'   => $paciente->id_paciente,
+            'fecha_evento'  => $request->fecha_evento,
+            'descripcion'   => $request->descripcion,
+            'estado'        => 'en_proceso',
+            'fk_usuario'    => Auth::id(),
         ]);
 
         return redirect()->route('eventos.create')
@@ -125,7 +142,7 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'usuario'])
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente', 'usuario'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -137,7 +154,7 @@ class EventoController extends Controller
     // ── Ver detalle de evento ──
     public function show(EventoAdverso $evento)
     {
-        $evento->load(['categoria', 'area', 'reportante', 'usuario']);
+        $evento->load(['categoria', 'area', 'reportante', 'paciente', 'usuario']);
 
         return Inertia::render('Eventos/Show', [
             'evento' => $evento,
@@ -163,7 +180,7 @@ class EventoController extends Controller
         $user  = Auth::user();
         $areas = Area::where('responsable', $user->name)->pluck('id_area');
 
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante'])
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('fk_area', $areas)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
