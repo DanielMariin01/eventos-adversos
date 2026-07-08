@@ -1,12 +1,10 @@
 /**
  * PasoReportante
  * Paso 1 del formulario — datos del reportante.
- *
- * Props:
- * - data: objeto con los valores del formulario
- * - setData: función para actualizar los valores
- * - errors: errores de validación
+ * Autocompleta los datos si la cédula ya existe en la BD.
  */
+
+import { useState } from 'react';
 
 const CARGOS = [
     'Médico',
@@ -47,17 +45,63 @@ function Campo({ label, error, children }) {
 }
 
 export default function PasoReportante({ data, setData, errors }) {
+    const [buscando, setBuscando] = useState(false);
+    const [autocompletado, setAutocompletado] = useState(false);
+
+    const buscarReportante = async (cedula) => {
+        if (!cedula || cedula.length < 5) return;
+
+        setBuscando(true);
+        setAutocompletado(false);
+
+        try {
+            const response = await fetch(route('eventos.reportante', cedula), {
+                headers: { 'Accept': 'application/json' },
+            });
+
+            const json = await response.json();
+
+            if (json) {
+                setData('rep_nombres', json.nombres ?? '');
+                setData('rep_apellidos', json.apellidos ?? '');
+                setData('rep_cargo', json.cargo ?? '');
+                setData('rep_empresa', json.empresa ?? '');
+                setAutocompletado(true);
+            }
+        } catch {
+            // Si falla la búsqueda no hace nada, el usuario llena manualmente
+        } finally {
+            setBuscando(false);
+        }
+    };
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
             <Campo label="Cédula *" error={errors.rep_cedula}>
-                <input
-                    type="number"
-                    value={data.rep_cedula}
-                    onChange={e => setData('rep_cedula', e.target.value)}
-                    placeholder="Ingrese la cédula"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                />
+                <div className="relative">
+                    <input
+                        type="number"
+                        value={data.rep_cedula}
+                        onChange={e => {
+                            setData('rep_cedula', e.target.value);
+                            setAutocompletado(false);
+                        }}
+                        onBlur={e => buscarReportante(e.target.value)}
+                        placeholder="Ingrese la cédula"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    />
+                    {buscando && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+                </div>
+                {autocompletado && (
+                    <p className="text-teal-600 text-xs mt-1 flex items-center gap-1">
+                        <span>✓</span> Datos autocompletados
+                    </p>
+                )}
             </Campo>
 
             <Campo label="Nombres *" error={errors.rep_nombres}>
@@ -93,18 +137,7 @@ export default function PasoReportante({ data, setData, errors }) {
                 </select>
             </Campo>
 
-            <Campo label="Empresa" error={errors.rep_empresa}>
-                <select
-                    value={data.rep_empresa}
-                    onChange={e => setData('rep_empresa', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                >
-                    <option value="">Seleccione la entidad...</option>
-                    {EMPRESAS.map(empresa => (
-                        <option key={empresa} value={empresa}>{empresa}</option>
-                    ))}
-                </select>
-            </Campo>
+
 
         </div>
     );

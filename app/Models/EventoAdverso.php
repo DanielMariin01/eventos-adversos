@@ -7,18 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class EventoAdverso extends Model
 {
     protected $table = 'eventos_adversos';
+
     protected $primaryKey = 'id_evento';
 
     protected $fillable = [
         'fk_categoria',
         'fk_area',
-
-        // Reportante
-        'rep_cedula',
-        'rep_nombres',
-        'rep_apellidos',
-        'rep_cargo',
-        'rep_empresa',
+        'fk_reportante',
 
         // Paciente
         'pac_cedula',
@@ -41,7 +36,6 @@ class EventoAdverso extends Model
         'fk_usuario',
     ];
 
-    // Convierte JSON automáticamente a array
     protected $casts = [
         'barreras_vulneradas'    => 'array',
         'factores_contributivos' => 'array',
@@ -58,6 +52,11 @@ class EventoAdverso extends Model
     public function area()
     {
         return $this->belongsTo(Area::class, 'fk_area');
+    }
+
+    public function reportante()
+    {
+        return $this->belongsTo(Reportante::class, 'fk_reportante');
     }
 
     public function usuario()

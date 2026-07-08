@@ -163,69 +163,6 @@ export default function PasoEvento({ data, setData, errors }) {
                 />
             </Campo>
 
-            <Campo label="Barreras vulneradas" error={errors.barreras_vulneradas}>
-                <CheckboxGrupo
-                    opciones={BARRERAS_VULNERADAS}
-                    valores={data.barreras_vulneradas ?? []}
-                    onChange={val => setData('barreras_vulneradas', val)}
-                />
-            </Campo>
-
-            <Campo label="Factores contributivos" error={errors.factores_contributivos}>
-                <CheckboxGrupo
-                    opciones={FACTORES_CONTRIBUTIVOS}
-                    valores={data.factores_contributivos ?? []}
-                    onChange={val => setData('factores_contributivos', val)}
-                />
-            </Campo>
-
-            <Campo label="Acciones inseguras" error={errors.acciones_inseguras}>
-                <CheckboxGrupo
-                    opciones={ACCIONES_INSEGURAS}
-                    valores={data.acciones_inseguras ?? []}
-                    onChange={val => setData('acciones_inseguras', val)}
-                />
-            </Campo>
-
-            <Campo label="Clasificación del evento" error={errors.clasificacion}>
-                <select
-                    value={data.clasificacion}
-                    onChange={e => setData('clasificacion', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                >
-                    <option value="">Seleccione la clasificación...</option>
-                    {CLASIFICACIONES.map(c => (
-                        <option key={c} value={c}>{c}</option>
-                    ))}
-                </select>
-            </Campo>
-
-            <Campo label="Relacionado con" error={errors.relacionado_con}>
-                <select
-                    value={data.relacionado_con}
-                    onChange={e => setData('relacionado_con', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                >
-                    <option value="">Seleccione...</option>
-                    {RELACIONADO_CON.map(r => (
-                        <option key={r} value={r}>{r}</option>
-                    ))}
-                </select>
-            </Campo>
-
-            <Campo label="Categorización" error={errors.categorizacion}>
-                <select
-                    value={data.categorizacion}
-                    onChange={e => setData('categorizacion', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                >
-                    <option value="">Seleccione la categorización...</option>
-                    {CATEGORIZACIONES.map(c => (
-                        <option key={c} value={c}>{c}</option>
-                    ))}
-                </select>
-            </Campo>
-
         </div>
     );
 }

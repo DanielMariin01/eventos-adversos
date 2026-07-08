@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Area;
 use App\Models\Categoria;
 use App\Models\EventoAdverso;
+use App\Models\Reportante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -33,6 +34,23 @@ class EventoController extends Controller
         return response()->json(['areas' => $areas]);
     }
 
+    // ── Buscar reportante por cédula ──
+    public function buscarReportante(string $cedula)
+    {
+        $reportante = Reportante::where('cedula', $cedula)->first();
+
+        if (!$reportante) {
+            return response()->json(null);
+        }
+
+        return response()->json([
+            'nombres'   => $reportante->nombres,
+            'apellidos' => $reportante->apellidos,
+            'cargo'     => $reportante->cargo,
+            'empresa'   => $reportante->empresa,
+        ]);
+    }
+
     // ── Guardar evento adverso ──
     public function store(Request $request)
     {
@@ -46,7 +64,6 @@ class EventoController extends Controller
             'rep_nombres'            => 'required|string|max:100',
             'rep_apellidos'          => 'required|string|max:100',
             'rep_cargo'              => 'nullable|string|max:100',
-            'rep_empresa'            => 'nullable|string|max:100',
 
             // Paciente
             'pac_cedula'             => 'nullable|string|max:20',
@@ -67,32 +84,38 @@ class EventoController extends Controller
             'categorizacion'         => 'nullable|string|max:100',
         ]);
 
+        // Crear o actualizar el reportante
+        $reportante = Reportante::updateOrCreate(
+            ['cedula' => $request->rep_cedula],
+            [
+                'nombres'   => $request->rep_nombres,
+                'apellidos' => $request->rep_apellidos,
+                'cargo'     => $request->rep_cargo,
+                'empresa'   => $request->rep_empresa,
+            ]
+        );
+
+        // Guardar el evento adverso
         EventoAdverso::create([
-            ...$request->only([
-                'fk_categoria',
-                'fk_area',
-                'rep_cedula',
-                'rep_nombres',
-                'rep_apellidos',
-                'rep_cargo',
-                'rep_empresa',
-                'pac_cedula',
-                'pac_nombres',
-                'pac_apellidos',
-                'pac_telefono',
-                'pac_edad',
-                'pac_entidad',
-                'fecha_evento',
-                'descripcion',
-                'barreras_vulneradas',
-                'factores_contributivos',
-                'acciones_inseguras',
-                'clasificacion',
-                'relacionado_con',
-                'categorizacion',
-            ]),
-            'estado'     => 'en_proceso',
-            'fk_usuario' => Auth::id(),
+            'fk_categoria'           => $request->fk_categoria,
+            'fk_area'                => $request->fk_area,
+            'fk_reportante'          => $reportante->id_reportante,
+            'pac_cedula'             => $request->pac_cedula,
+            'pac_nombres'            => $request->pac_nombres,
+            'pac_apellidos'          => $request->pac_apellidos,
+            'pac_telefono'           => $request->pac_telefono,
+            'pac_edad'               => $request->pac_edad,
+            'pac_entidad'            => $request->pac_entidad,
+            'fecha_evento'           => $request->fecha_evento,
+            'descripcion'            => $request->descripcion,
+            'barreras_vulneradas'    => $request->barreras_vulneradas,
+            'factores_contributivos' => $request->factores_contributivos,
+            'acciones_inseguras'     => $request->acciones_inseguras,
+            'clasificacion'          => $request->clasificacion,
+            'relacionado_con'        => $request->relacionado_con,
+            'categorizacion'         => $request->categorizacion,
+            'estado'                 => 'en_proceso',
+            'fk_usuario'             => Auth::id(),
         ]);
 
         return redirect()->route('eventos.create')
@@ -102,7 +125,7 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
-        $eventos = EventoAdverso::with(['categoria', 'area', 'usuario'])
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'usuario'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -114,7 +137,7 @@ class EventoController extends Controller
     // ── Ver detalle de evento ──
     public function show(EventoAdverso $evento)
     {
-        $evento->load(['categoria', 'area', 'usuario']);
+        $evento->load(['categoria', 'area', 'reportante', 'usuario']);
 
         return Inertia::render('Eventos/Show', [
             'evento' => $evento,
@@ -140,7 +163,7 @@ class EventoController extends Controller
         $user  = Auth::user();
         $areas = Area::where('responsable', $user->name)->pluck('id_area');
 
-        $eventos = EventoAdverso::with(['categoria', 'area'])
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante'])
             ->whereIn('fk_area', $areas)
             ->orderBy('created_at', 'desc')
             ->paginate(10);

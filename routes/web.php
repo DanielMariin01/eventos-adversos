@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eventos/crear', [EventoController::class, 'create'])->name('eventos.create');
     Route::post('/eventos/area', [EventoController::class, 'seleccionarArea'])->name('eventos.area');
     Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
+    Route::get('/eventos/reportante/{cedula}', [EventoController::class, 'buscarReportante'])->name('eventos.reportante');
 
     // Calidad — gestión de eventos
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
