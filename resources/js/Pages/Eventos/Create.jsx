@@ -13,7 +13,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
     // ── Estado de navegación ──
     const [etapa, setEtapa] = useState(areasProp ? 'area' : 'categoria'); // 'categoria' | 'area' | 'formulario'
-    const [paso, setPaso] = useState(1); // 1 | 2 | 3
+    const [paso, setPaso] = useState(1); 
     const [areas, setAreas] = useState(areasProp ?? []);
     const [cargandoAreas, setCargandoAreas] = useState(false);
     const [erroresPaso, setErroresPaso] = useState({});
@@ -122,8 +122,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
     // ── Envío del formulario ──
     const submit = (e) => {
-        e.preventDefault();
-
+        if (e && e.preventDefault) e.preventDefault();
         const nuevosErrores = {};
         if (!data.fecha_evento) nuevosErrores.fecha_evento = 'La fecha del evento es obligatoria';
         if (!data.descripcion) nuevosErrores.descripcion = 'La descripción es obligatoria';
@@ -237,23 +236,15 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
 
                 {/* ── ETAPA 3: Formulario de 3 pasos ── */}
                 {etapa === 'formulario' && (
-                    <form onSubmit={submit}>
-
+                    <div>
                         <PasoIndicador pasoActual={paso} />
 
                         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-6">
-                            {paso === 1 && (
-                                <PasoReportante data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
-                            )}
-                            {paso === 2 && (
-                                <PasoPaciente data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
-                            )}
-                            {paso === 3 && (
-                                <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
-                            )}
+                            {paso === 1 && <PasoReportante data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
+                            {paso === 2 && <PasoPaciente data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
+                            {paso === 3 && <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
                         </div>
 
-                        {/* Botones de navegación */}
                         <div className="flex justify-between">
                             <button
                                 type="button"
@@ -273,7 +264,8 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                 </button>
                             ) : (
                                 <button
-                                    type="submit"
+                                    type="button"
+                                    onClick={submit}
                                     disabled={processing}
                                     className="px-6 py-2.5 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-50"
                                 >
@@ -281,8 +273,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                 </button>
                             )}
                         </div>
-
-                    </form>
+                    </div>
                 )}
 
             </div>
