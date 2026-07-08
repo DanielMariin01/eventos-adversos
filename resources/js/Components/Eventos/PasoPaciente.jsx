@@ -7,7 +7,7 @@
 import { useState } from 'react';
 
 const ENTIDADES = [
-    'Sura',
+
     'Sanitas',
     'SOS',
     'Asmet',
@@ -163,18 +163,20 @@ export default function PasoPaciente({ data, setData, errors }) {
                     </select>
                 </div>
             </Campo>
-
             <Campo label="Entidad" error={errors.pac_entidad}>
-                <select
+                <input
+                    type="text"
+                    list="entidades-list"
                     value={data.pac_entidad}
                     onChange={e => setData('pac_entidad', e.target.value)}
+                    placeholder="Buscar o escribir entidad..."
                     className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                >
-                    <option value="">Seleccione la entidad...</option>
+                />
+                <datalist id="entidades-list">
                     {ENTIDADES.map(entidad => (
-                        <option key={entidad} value={entidad}>{entidad}</option>
+                        <option key={entidad} value={entidad} />
                     ))}
-                </select>
+                </datalist>
             </Campo>
 
         </div>
