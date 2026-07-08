@@ -14,30 +14,36 @@ const PASOS = [
 
 export default function PasoIndicador({ pasoActual }) {
     return (
-        <div className="grid grid-cols-3 gap-3 mb-8">
-            {PASOS.map(({ numero, label }) => {
+        <div className="flex items-center justify-center gap-2 mb-8">
+            {PASOS.map(({ numero, label }, index) => {
                 const activo = pasoActual === numero;
                 const completado = pasoActual > numero;
 
                 return (
-                    <div
-                        key={numero}
-                        className={`
-                            flex items-center gap-3 px-5 py-3 rounded-lg font-semibold text-sm transition
-                            ${activo ? 'bg-teal-600 text-white shadow-md' : ''}
-                            ${completado ? 'bg-teal-100 text-teal-700' : ''}
-                            ${!activo && !completado ? 'bg-gray-100 text-gray-400' : ''}
-                        `}
-                    >
-                        <span className={`
-                            w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0
-                            ${activo ? 'bg-white text-teal-600' : ''}
-                            ${completado ? 'bg-teal-500 text-white' : ''}
-                            ${!activo && !completado ? 'bg-gray-300 text-gray-500' : ''}
-                        `}>
-                            {completado ? '✓' : numero}
-                        </span>
-                        {label}
+                    <div key={numero} className="flex items-center">
+                        {/* Círculo con número */}
+                        <div className="flex flex-col items-center gap-1">
+                            <div className={`
+                                w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition
+                                ${activo ? 'bg-teal-600 text-white shadow-md' : ''}
+                                ${completado ? 'bg-teal-100 text-teal-700' : ''}
+                                ${!activo && !completado ? 'bg-gray-100 text-gray-400' : ''}
+                            `}>
+                                {completado ? '✓' : numero}
+                            </div>
+                            <span className={`text-xs font-medium hidden sm:block
+                                ${activo ? 'text-teal-600' : ''}
+                                ${completado ? 'text-teal-500' : ''}
+                                ${!activo && !completado ? 'text-gray-400' : ''}
+                            `}>
+                                {label}
+                            </span>
+                        </div>
+
+                        {/* Línea conectora */}
+                        {index < PASOS.length - 1 && (
+                            <div className={`w-12 sm:w-20 h-0.5 mx-2 ${completado ? 'bg-teal-400' : 'bg-gray-200'}`} />
+                        )}
                     </div>
                 );
             })}
