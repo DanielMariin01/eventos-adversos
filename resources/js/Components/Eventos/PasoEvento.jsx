@@ -61,14 +61,17 @@ export default function PasoEvento({ data, setData, errors }) {
     return (
         <div className="space-y-6">
 
-            <Campo label="Fecha del Evento *" error={errors.fecha_evento}>
-                <input
-                    type="datetime-local"
-                    value={data.fecha_evento}
-                    onChange={e => setData('fecha_evento', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                />
-            </Campo>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Campo label="Fecha del Evento *" error={errors.fecha_evento}>
+                    <input
+                        type="date"
+                        value={data.fecha_evento}
+                        onChange={e => setData('fecha_evento', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    />
+                </Campo>
+
+            </div>
 
             <Campo label="Descripción del evento *" error={errors.descripcion}>
                 <div className="relative">
@@ -77,7 +80,7 @@ export default function PasoEvento({ data, setData, errors }) {
                         onChange={e => setData('descripcion', e.target.value)}
                         placeholder="Describa detalladamente lo que ocurrió o use el micrófono..."
                         rows={5}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-none"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-none scroll-teal"
                     />
                     <button
                         type="button"
