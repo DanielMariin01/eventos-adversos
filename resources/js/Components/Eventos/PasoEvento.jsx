@@ -7,100 +7,8 @@
  * - setData: función para actualizar los valores
  * - errors: errores de validación
  */
-
-const BARRERAS_VULNERADAS = [
-    'Administrativa',
-    'Física',
-    'Humana',
-    'Natural',
-    'No hay barrera vulnerable',
-    'Tecnológicas',
-];
-
-const FACTORES_CONTRIBUTIVOS = [
-    'Ambiente',
-    'Contexto institucional',
-    'Equipo',
-    'Individuo',
-    'Organización y gerencia',
-    'Paciente',
-    'Tarea y tecnología',
-];
-
-const ACCIONES_INSEGURAS = [
-    'No hay acción insegura',
-    'Por acción',
-    'Por omisión',
-];
-
-const CLASIFICACIONES = [
-    'Atención segura',
-    'Complicación',
-    'Evento adverso no prevenible',
-    'Evento adverso prevenible',
-    'Evento centinela',
-    'Incidente',
-];
-
-const RELACIONADO_CON = [
-    'Alergias',
-    'Asalto sexual en la institución',
-    'Agresiones físicas por condiciones de la patología del paciente a él mismo y los demás',
-    'Administración equivocada de medicamentos',
-    'Acciones relacionadas a trasfusiones',
-    'Autolesion instrainstitucional',
-    'Autoretiro de dispositivos',
-    'Atención inoportuna de los pacientes de consulta externa',
-    'Cirugía o procedimiento en parte equivocada o en paciente equivocado',
-    'Cirugía o procedimiento cancelado por factores atribuibles a la institución',
-    'Caídas intrainstitucionales',
-    'Complicación quirúrgica',
-    'Deficiencia en la comunicación',
-    'Demoras en la atención',
-    'Dispositivos y equipos biomédicos',
-    'Divulgación no autorizada de la información relacionada con los resultados de pruebas de laboratorio',
-    'Daño de la muestra por recolección en tubo incorrecto',
-    'Entrega incorrecta de imágenes diagnosticas',
-    'Entrega incorrecta de resultados de laboratorio',
-    'Entrega incorrecta de historia clínica',
-    'Errores en la verificación de identificación de paciente',
-    'Egreso inseguro',
-    'Fallas en agendamiento de citas',
-    'Fallas en manejo medico',
-    'Flebitis mecánica',
-    'Fuga de pacientes',
-    'Infecciones de sitio quirúrgico',
-    'Infecciones del torrente sanguíneo o bacteriemias asociado a dispositivo medico',
-    'Infecciones del tracto urinario asociada a sonda vesical',
-    'Infecciones asociadas a la atención en salud (IAAS)',
-    'Identificación errónea del paciente',
-    'Ingreso no programado a UCI luego de procedimiento quirurgico',
-    'Inadecuada toma y recepción de muestras de laboratorio de los pacientes',
-    'Lesiones de piel',
-    'Neumonías asociadas a la atención en salud',
-    'No realizar el análisis de laboratorio requerido',
-    'Perdida de pacientes menores de edad durante su atención',
-    'Reacción adversa a medicamentos',
-    'Reingreso a urgencias',
-    'Reingreso a hospitalización por la misma causa',
-    'Reingreso a UCI por la misma causa',
-    'Rotulación incorrecta de tubos de muestras de laboratorio',
-    'Situación de vulneración de la privacidad o dignidad del usuario',
-    'Suicidio de paciente internado',
-    'Traslado inseguro',
-    'Toma de muestra al paciente equivocado',
-    'Ulceras por presión',
-    'Venopunción (neumotórax, hemotórax, extravasación)',
-];
-
-const CATEGORIZACIONES = [
-    'Daño permanente al paciente',
-    'Daño temporal al paciente',
-    'Evento cercano a la muerte',
-    'Muerte',
-    'Requiere hospitalización',
-    'Requiere tratamiento e intervención medica',
-];
+import { useState, useRef } from 'react';
+import { Mic, MicOff } from 'lucide-react';
 
 function Campo({ label, error, children }) {
     return (
@@ -114,33 +22,42 @@ function Campo({ label, error, children }) {
     );
 }
 
-function CheckboxGrupo({ opciones, valores, onChange }) {
-    const toggle = (opcion) => {
-        if (valores.includes(opcion)) {
-            onChange(valores.filter(v => v !== opcion));
-        } else {
-            onChange([...valores, opcion]);
+export default function PasoEvento({ data, setData, errors }) {
+    const [grabando, setGrabando] = useState(false);
+    const recognitionRef = useRef(null);
+
+    const toggleGrabacion = () => {
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+            alert('Tu navegador no soporta reconocimiento de voz.');
+            return;
         }
+
+        if (grabando) {
+            recognitionRef.current?.stop();
+            setGrabando(false);
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-CO';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(r => r[0].transcript)
+                .join(' ');
+            setData('descripcion', data.descripcion + ' ' + transcript);
+        };
+
+        recognition.onend = () => setGrabando(false);
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setGrabando(true);
     };
 
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-            {opciones.map(opcion => (
-                <label key={opcion} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={valores.includes(opcion)}
-                        onChange={() => toggle(opcion)}
-                        className="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
-                    />
-                    <span className="text-sm text-gray-700">{opcion}</span>
-                </label>
-            ))}
-        </div>
-    );
-}
-
-export default function PasoEvento({ data, setData, errors }) {
     return (
         <div className="space-y-6">
 
@@ -154,13 +71,31 @@ export default function PasoEvento({ data, setData, errors }) {
             </Campo>
 
             <Campo label="Descripción del evento *" error={errors.descripcion}>
-                <textarea
-                    value={data.descripcion}
-                    onChange={e => setData('descripcion', e.target.value)}
-                    placeholder="Describa detalladamente lo que ocurrió..."
-                    rows={5}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-none"
-                />
+                <div className="relative">
+                    <textarea
+                        value={data.descripcion}
+                        onChange={e => setData('descripcion', e.target.value)}
+                        placeholder="Describa detalladamente lo que ocurrió o use el micrófono..."
+                        rows={5}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-none"
+                    />
+                    <button
+                        type="button"
+                        onClick={toggleGrabacion}
+                        className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabando
+                            ? 'bg-red-500 text-white animate-pulse'
+                            : 'bg-teal-500 text-white hover:bg-teal-600'
+                            }`}
+                    >
+                        {grabando ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                </div>
+                {grabando && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse inline-block" />
+                        Grabando... habla ahora
+                    </p>
+                )}
             </Campo>
 
         </div>
