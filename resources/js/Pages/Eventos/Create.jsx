@@ -8,6 +8,7 @@ import PasoReportante from '@/Components/Eventos/PasoReportante';
 import PasoPaciente from '@/Components/Eventos/PasoPaciente';
 import PasoEvento from '@/Components/Eventos/PasoEvento';
 import Swal from 'sweetalert2';
+import { Search } from 'lucide-react';
 
 export default function Create({ categorias, areas: areasProp = null, fk_categoria: fkCategoriaProp = null }) {
 
@@ -17,6 +18,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     const [areas, setAreas] = useState(areasProp ?? []);
     const [cargandoAreas, setCargandoAreas] = useState(false);
     const [erroresPaso, setErroresPaso] = useState({});
+    const [busquedaArea, setBusquedaArea] = useState('');
 
     const { data, setData, post, processing, errors, reset } = useForm({
         fk_categoria: fkCategoriaProp ?? '',
@@ -81,6 +83,10 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         setData('fk_area', idArea);
         setEtapa('formulario');
     };
+    // ── Buscar area ──
+    const areasFiltradas = areas.filter(area =>
+        area.nombre.toLowerCase().includes(busquedaArea.toLowerCase())
+    );
 
     // ── Navegación entre pasos ──
     const siguiente = () => {
@@ -216,6 +222,31 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                     <div>
                         <div className="mb-8 text-center">
                             <h2 className="text-2xl font-bold text-teal-600 mb-2">¿Cuál es el área responsable del evento?</h2>
+                        </div>
+
+                        {/* Buscador */}
+                        {/* Buscador */}
+                        <div className="mb-6 flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
+                            <div className="bg-cyan-500 px-3 py-2.5 flex items-center justify-center border-r border-cyan-500">
+                                <Search className="w-5 h-5 text-white" />
+                            </div>
+                            <input
+                                type="text"
+                                value={busquedaArea}
+                                onChange={e => setBusquedaArea(e.target.value)}
+                                placeholder="Buscar área..."
+                                className="flex-1 px-4 py-2.5 text-sm focus:outline-none"
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            {areasFiltradas.map(area => (
+                                <TarjetaArea
+                                    key={area.id_area}
+                                    area={area}
+                                    seleccionada={data.fk_area === area.id_area}
+                                    onClick={() => seleccionarArea(area.id_area)}
+                                />
+                            ))}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
