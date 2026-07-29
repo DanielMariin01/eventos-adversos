@@ -21,12 +21,16 @@ const LABEL_ESTADO = {
     cancelado: 'Cancelado',
 };
 
-export default function Index({ eventos, categorias }) {
 
+
+export default function Index({ eventos, categorias }) {
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [busqueda, setBusqueda] = useState('');
     const [modalAnalisis, setModalAnalisis] = useState(false);
     const [modalTipo, setModalTipo] = useState(false);
+    const [busquedaEvento, setBusquedaEvento] = useState('');
+    const [busquedaReportante, setBusquedaReportante] = useState('');
+    const [busquedaPaciente, setBusquedaPaciente] = useState('');
 
     // ── Acciones ──
     const abrirAnalisis = () => {
@@ -165,13 +169,18 @@ export default function Index({ eventos, categorias }) {
     const eventosFiltrados = {
         ...eventos,
         data: eventos.data.filter(e =>
-            e.reportante?.nombres?.toLowerCase().includes(busqueda.toLowerCase()) ||
-            e.reportante?.cedula?.includes(busqueda) ||
-            e.paciente?.nombres?.toLowerCase().includes(busqueda.toLowerCase()) ||
-            e.paciente?.cedula?.includes(busqueda) ||
-            String(e.id_eventoAdverso).includes(busqueda)
+            (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
+            (busquedaReportante === '' ||
+                e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
+                e.reportante?.cedula?.includes(busquedaReportante)) &&
+            (busquedaPaciente === '' ||
+                e.paciente?.nombres?.toLowerCase().includes(busquedaPaciente.toLowerCase()) ||
+                e.paciente?.cedula?.includes(busquedaPaciente))
         ),
     };
+
+
+
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Gestión de Eventos Adversos</h2>}>
@@ -219,16 +228,44 @@ export default function Index({ eventos, categorias }) {
                 </div>
 
                 {/* ── Buscador ── */}
-                <div className="mb-4 flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
-                    <input
-                        type="text"
-                        value={busqueda}
-                        onChange={e => setBusqueda(e.target.value)}
-                        placeholder="Buscar por evento, reportante o paciente..."
-                        className="flex-1 px-4 py-2.5 text-sm focus:outline-none"
-                    />
-                    <div className="bg-cyan-500 px-3 py-2.5 flex items-center justify-center">
-                        <Search className="w-5 h-5 text-white" />
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                        <input
+                            type="text"
+                            value={busquedaEvento}
+                            onChange={e => setBusquedaEvento(e.target.value)}
+                            placeholder="Buscar evento..."
+                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none"
+                        />
+                        <div className="bg-cyan-500 px-3 py-2.5">
+                            <Search className="w-4 h-4 text-white" />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                        <input
+                            type="text"
+                            value={busquedaReportante}
+                            onChange={e => setBusquedaReportante(e.target.value)}
+                            placeholder="Buscar reportante..."
+                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none"
+                        />
+                        <div className="bg-cyan-500 px-3 py-2.5">
+                            <Search className="w-4 h-4 text-white" />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                        <input
+                            type="text"
+                            value={busquedaPaciente}
+                            onChange={e => setBusquedaPaciente(e.target.value)}
+                            placeholder="Buscar paciente..."
+                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none"
+                        />
+                        <div className="bg-cyan-500 px-3 py-2.5">
+                            <Search className="w-4 h-4 text-white" />
+                        </div>
                     </div>
                 </div>
 
