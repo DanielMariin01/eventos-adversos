@@ -28,8 +28,8 @@ export default {
                 },
             },
             animation: {
-                'heartRateIn': 'heartRateIn 2.5s linear infinite',
-                'heartRateOut': 'heartRateOut 2.5s linear infinite',
+                'heartRateIn': 'heartRateIn 1s linear infinite',
+                'heartRateOut': 'heartRateOut 1s linear infinite',
             },
         },
     },

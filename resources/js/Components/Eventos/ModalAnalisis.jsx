@@ -85,13 +85,17 @@ export default function ModalAnalisis({ evento, onClose }) {
     };
 
     const submit = () => {
+        setCargando(true);
+
         post(route('eventos.analisis', evento.id_eventoAdverso), {
             forceFormData: true,
             onSuccess: () => {
+                setCargando(false);
                 onClose();
                 Swal.fire({ icon: 'success', title: 'Análisis guardado correctamente.' });
             },
             onError: () => {
+                setCargando(false);
                 Swal.fire({ icon: 'error', title: 'Error al guardar el análisis.' });
             },
         });
@@ -166,8 +170,31 @@ export default function ModalAnalisis({ evento, onClose }) {
         setGrabandoBarrera(true);
     };
 
+    const [cargando, setCargando] = useState(false);
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+
+            {/* Loading overlay */}
+            {cargando && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/85">
+                    <div className="relative w-[150px] h-[73px]">
+                        <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
+                            <polyline
+                                points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
+                                strokeMiterlimit="10"
+                                strokeWidth="3"
+                                stroke="#009B9E"
+                                fill="none"
+                            />
+                        </svg>
+                        <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_2.5s_linear_infinite]"
+                            style={{ left: 0, right: 'auto' }} />
+                        <div className="absolute top-0 h-full bg-slate-100 animate-[heartRateOut_2.5s_linear_infinite]"
+                            style={{ width: '120%', left: '-120%' }} />
+                    </div>
+                </div>
+            )}
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
