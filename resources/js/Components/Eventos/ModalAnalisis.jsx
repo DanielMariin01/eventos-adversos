@@ -253,8 +253,8 @@ export default function ModalAnalisis({ evento, onClose }) {
                                         type="button"
                                         onClick={toggleGrabacionBarrera}
                                         className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabandoBarrera
-                                                ? 'bg-red-500 text-white animate-pulse'
-                                                : 'bg-teal-500 text-white hover:bg-teal-600'
+                                            ? 'bg-red-500 text-white animate-pulse'
+                                            : 'bg-teal-500 text-white hover:bg-teal-600'
                                             }`}
                                     >
                                         {grabandoBarrera ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -372,18 +372,20 @@ export default function ModalAnalisis({ evento, onClose }) {
                                         ))}
                                     </select>
                                 </Campo>
-
                                 <Campo label="Relación" error={errors.relacionado_con}>
-                                    <select
+                                    <input
+                                        type="text"
+                                        list="relacionado-list"
                                         value={data.relacionado_con}
                                         onChange={e => setData('relacionado_con', e.target.value)}
+                                        placeholder="Buscar o escribir relación..."
                                         className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
-                                    >
-                                        <option value="">Seleccione la relación...</option>
+                                    />
+                                    <datalist id="relacionado-list">
                                         {RELACIONADO_CON.map(r => (
-                                            <option key={r} value={r}>{r}</option>
+                                            <option key={r} value={r} />
                                         ))}
-                                    </select>
+                                    </datalist>
                                 </Campo>
 
                                 <Campo label="Categorización" error={errors.categorizacion}>

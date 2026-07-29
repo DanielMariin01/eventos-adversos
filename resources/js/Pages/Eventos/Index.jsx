@@ -8,10 +8,10 @@ import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 
 const BADGE_ESTADO = {
-    en_proceso: 'bg-yellow-100 text-yellow-700',
-    analizado: 'bg-blue-100 text-blue-700',
-    procesado: 'bg-green-100 text-green-700',
-    cancelado: 'bg-red-100 text-red-700',
+    en_proceso: 'bg-yellow-500 text-white',
+    analizado: 'bg-blue-500 text-white',
+    procesado: 'bg-green-500 text-white',
+    cancelado: 'bg-red-500 text-white',
 };
 
 const LABEL_ESTADO = {
@@ -154,7 +154,7 @@ export default function Index({ eventos, categorias }) {
             label: 'Estado',
             key: 'estado',
             render: (fila) => (
-                <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${BADGE_ESTADO[fila.estado] ?? 'bg-gray-100 text-gray-600'}`}>
+                <span className={`px-2 py-1.5 rounded-md text-xs font-bold uppercase ${BADGE_ESTADO[fila.estado] ?? 'bg-gray-100 text-gray-600'}`}>
                     {LABEL_ESTADO[fila.estado] ?? fila.estado}
                 </span>
             ),
