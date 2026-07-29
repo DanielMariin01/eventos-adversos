@@ -1,0 +1,358 @@
+/**
+ * ModalAnalisis
+ * Modal de análisis de eventos adversos para el rol de calidad.
+ * Tiene dos pestañas: Datos Básicos y Clasificación.
+ */
+
+import { useState } from 'react';
+import { useForm } from '@inertiajs/react';
+import { X, User, Building2, Paperclip, Save } from 'lucide-react';
+import Swal from 'sweetalert2';
+
+const BARRERAS = [
+    'Administrativa', 'Física', 'Humana', 'Natural',
+    'No hay barrera vulnerable', 'Tecnológicas',
+];
+
+const FACTORES = [
+    'Ambiente', 'Contexto institucional', 'Equipo', 'Individuo',
+    'Organización y gerencia', 'Paciente', 'Tarea y tecnología',
+];
+
+const ACCIONES = [
+    'No hay acción insegura', 'Por acción', 'Por omisión',
+];
+
+const CLASIFICACIONES = [
+    'Atención segura', 'Complicación', 'Evento adverso no prevenible',
+    'Evento adverso prevenible', 'Evento centinela', 'Incidente',
+];
+
+const RELACIONADO_CON = [
+    'Alergias', 'Asalto sexual en la institución',
+    'Administración equivocada de medicamentos',
+    'Caídas intrainstitucionales', 'Complicación quirúrgica',
+    'Deficiencia en la comunicación', 'Demoras en la atención',
+    'Dispositivos y equipos biomédicos', 'Egreso inseguro',
+    'Fallas en agendamiento de citas', 'Fallas en manejo medico',
+    'Flebitis mecánica', 'Fuga de pacientes',
+    'Infecciones de sitio quirúrgico',
+    'Infecciones asociadas a la atención en salud (IAAS)',
+    'Identificación errónea del paciente', 'Lesiones de piel',
+    'Reacción adversa a medicamentos', 'Reingreso a urgencias',
+    'Traslado inseguro', 'Ulceras por presión',
+];
+
+const CATEGORIZACIONES = [
+    'Daño permanente al paciente', 'Daño temporal al paciente',
+    'Evento cercano a la muerte', 'Muerte',
+    'Requiere hospitalización', 'Requiere tratamiento e intervención medica',
+];
+
+function Campo({ label, error, children }) {
+    return (
+        <div>
+            <label className="block text-sm font-semibold text-gray-600 mb-1">{label}</label>
+            {children}
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+        </div>
+    );
+}
+
+export default function ModalAnalisis({ evento, onClose }) {
+    const [pestana, setPestana] = useState('basicos');
+
+    const { data, setData, post, processing, errors } = useForm({
+        barreras_vulneradas: evento.barreras_vulneradas ?? [],
+        barreras_descripcion: evento.barreras_descripcion ?? '',
+        acciones_inseguras: evento.acciones_inseguras ?? [],
+        acciones_descripcion: evento.acciones_descripcion ?? '',
+        factores_contributivos: evento.factores_contributivos ?? [],
+        factores_descripcion: evento.factores_descripcion ?? '',
+        descripcion_analisis: evento.descripcion_analisis ?? '',
+        clasificacion: evento.clasificacion ?? '',
+        relacionado_con: evento.relacionado_con ?? '',
+        categorizacion: evento.categorizacion ?? '',
+        archivos: [],
+    });
+
+    const toggleArray = (campo, valor) => {
+        const actual = data[campo] ?? [];
+        setData(campo, actual.includes(valor)
+            ? actual.filter(v => v !== valor)
+            : [...actual, valor]
+        );
+    };
+
+    const submit = () => {
+        post(route('eventos.analisis', evento.id_eventoAdverso), {
+            forceFormData: true,
+            onSuccess: () => {
+                onClose();
+                Swal.fire({ icon: 'success', title: 'Análisis guardado correctamente.' });
+            },
+            onError: () => {
+                Swal.fire({ icon: 'error', title: 'Error al guardar el análisis.' });
+            },
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+
+                {/* Header */}
+                <div className="bg-teal-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                    <h2 className="text-white font-bold text-lg">
+                        Análisis Evento {evento.categoria?.nombre} N°: {evento.id_eventoAdverso}
+                    </h2>
+                    <button onClick={onClose} className="text-white hover:text-teal-200 transition">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Pestañas */}
+                <div className="flex border-b border-gray-200 flex-shrink-0">
+                    <button
+                        onClick={() => setPestana('basicos')}
+                        className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold transition border-b-2 ${pestana === 'basicos'
+                            ? 'border-teal-500 text-teal-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pestana === 'basicos' ? 'bg-teal-500' : 'bg-gray-200'}`}>
+                            <User className={`w-4 h-4 ${pestana === 'basicos' ? 'text-white' : 'text-gray-500'}`} />
+                        </div>
+                        <div className="text-left">
+                            <p className="text-xs font-bold">Datos Básicos</p>
+                            <p className="text-xs text-gray-400">Información del evento</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => setPestana('clasificacion')}
+                        className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold transition border-b-2 ${pestana === 'clasificacion'
+                            ? 'border-teal-500 text-teal-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pestana === 'clasificacion' ? 'bg-teal-500' : 'bg-gray-200'}`}>
+                            <Building2 className={`w-4 h-4 ${pestana === 'clasificacion' ? 'text-white' : 'text-gray-500'}`} />
+                        </div>
+                        <div className="text-left">
+                            <p className="text-xs font-bold">Clasificación</p>
+                            <p className="text-xs text-gray-400">Información de la Clasificación</p>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Contenido */}
+                <div className="flex-1 overflow-y-auto p-6 scroll-teal">
+
+                    {/* ── Pestaña Datos Básicos ── */}
+                    {pestana === 'basicos' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <Campo label="Barreras Vulneradas" error={errors.barreras_vulneradas}>
+                                <select
+                                    onChange={e => toggleArray('barreras_vulneradas', e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-2 scroll-teal"
+                                    value=""
+                                >
+                                    <option value="">Seleccione la barrera...</option>
+                                    {BARRERAS.map(b => (
+                                        <option key={b} value={b}>{b}</option>
+                                    ))}
+                                </select>
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                    {(data.barreras_vulneradas ?? []).map(b => (
+                                        <span key={b} onClick={() => toggleArray('barreras_vulneradas', b)}
+                                            className="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
+                                            {b} ✕
+                                        </span>
+                                    ))}
+                                </div>
+                                <textarea
+                                    value={data.barreras_descripcion}
+                                    onChange={e => setData('barreras_descripcion', e.target.value)}
+                                    placeholder="Ingrese la descripción de la barrera..."
+                                    rows={3}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                />
+                            </Campo>
+
+                            <Campo label="Acciones Inseguras" error={errors.acciones_inseguras}>
+                                <select
+                                    onChange={e => toggleArray('acciones_inseguras', e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-2 scroll-teal"
+                                    value=""
+                                >
+                                    <option value="">Seleccione la acción...</option>
+                                    {ACCIONES.map(a => (
+                                        <option key={a} value={a}>{a}</option>
+                                    ))}
+                                </select>
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                    {(data.acciones_inseguras ?? []).map(a => (
+                                        <span key={a} onClick={() => toggleArray('acciones_inseguras', a)}
+                                            className="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
+                                            {a} ✕
+                                        </span>
+                                    ))}
+                                </div>
+                                <textarea
+                                    value={data.acciones_descripcion}
+                                    onChange={e => setData('acciones_descripcion', e.target.value)}
+                                    placeholder="Ingrese la descripción de la acción..."
+                                    rows={3}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
+                                />
+                            </Campo>
+
+                            <Campo label="Factores Contributivos" error={errors.factores_contributivos}>
+                                <select
+                                    onChange={e => toggleArray('factores_contributivos', e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-2 scroll-teal"
+                                    value=""
+                                >
+                                    <option value="">Seleccione el factor...</option>
+                                    {FACTORES.map(f => (
+                                        <option key={f} value={f}>{f}</option>
+                                    ))}
+                                </select>
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                    {(data.factores_contributivos ?? []).map(f => (
+                                        <span key={f} onClick={() => toggleArray('factores_contributivos', f)}
+                                            className="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
+                                            {f} ✕
+                                        </span>
+                                    ))}
+                                </div>
+                                <textarea
+                                    value={data.factores_descripcion}
+                                    onChange={e => setData('factores_descripcion', e.target.value)}
+                                    placeholder="Ingrese la descripción del factor..."
+                                    rows={3}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
+                                />
+                            </Campo>
+
+                            <Campo label="Descripción del Análisis" error={errors.descripcion_analisis}>
+                                <textarea
+                                    value={data.descripcion_analisis}
+                                    onChange={e => setData('descripcion_analisis', e.target.value)}
+                                    placeholder="Ingrese la descripción del análisis..."
+                                    rows={10}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
+                                />
+                            </Campo>
+
+                        </div>
+                    )}
+
+                    {/* ── Pestaña Clasificación ── */}
+                    {pestana === 'clasificacion' && (
+                        <div className="space-y-5">
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <Campo label="Clasificación" error={errors.clasificacion}>
+                                    <select
+                                        value={data.clasificacion}
+                                        onChange={e => setData('clasificacion', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                    >
+                                        <option value="">Seleccione la clasificación...</option>
+                                        {CLASIFICACIONES.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </Campo>
+
+                                <Campo label="Relación" error={errors.relacionado_con}>
+                                    <select
+                                        value={data.relacionado_con}
+                                        onChange={e => setData('relacionado_con', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                    >
+                                        <option value="">Seleccione la relación...</option>
+                                        {RELACIONADO_CON.map(r => (
+                                            <option key={r} value={r}>{r}</option>
+                                        ))}
+                                    </select>
+                                </Campo>
+
+                                <Campo label="Categorización" error={errors.categorizacion}>
+                                    <select
+                                        value={data.categorizacion}
+                                        onChange={e => setData('categorizacion', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                    >
+                                        <option value="">Seleccione la categorización...</option>
+                                        {CATEGORIZACIONES.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </Campo>
+                            </div>
+
+                            <Campo label="Adjuntar Evidencia (PDF, JPG, PNG)" error={errors.archivos}>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={data.archivos.length > 0 ? `${data.archivos.length} archivo(s) seleccionado(s)` : ''}
+                                        placeholder="Seleccione el archivo (Opcional)"
+                                        className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500"
+                                    />
+                                    <label className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition">
+                                        <Paperclip className="w-4 h-4" />
+                                        Examinar
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept=".pdf,.jpg,.jpeg,.png"
+                                            className="hidden"
+                                            onChange={e => setData('archivos', Array.from(e.target.files))}
+                                        />
+                                    </label>
+                                </div>
+                            </Campo>
+
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex justify-between items-center px-6 py-4 border-t border-gray-200 flex-shrink-0">
+                    {pestana === 'clasificacion' ? (
+                        <button
+                            type="button"
+                            onClick={() => setPestana('basicos')}
+                            className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition"
+                        >
+                            ← Atrás
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setPestana('clasificacion')}
+                            className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition"
+                        >
+                            Siguiente →
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={submit}
+                        disabled={processing}
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-50"
+                    >
+                        <Save className="w-4 h-4" />
+                        Guardar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    );
+}

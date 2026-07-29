@@ -5,25 +5,25 @@ import { router } from '@inertiajs/react';
  *
  * Props:
  * - columnas: array de { label, key, render? }
- *   - label: texto del encabezado
- *   - key: clave del objeto (para acceso simple)
- *   - render: función opcional (fila) => JSX para columnas personalizadas
- * - datos: array de objetos o objeto paginado de Laravel { data, from, to, total, prev_page_url, next_page_url }
- * - acciones: función opcional (fila) => JSX para la columna de acciones
- * - porPagina: número actual de registros por página (opcional)
+ * - datos: array o objeto paginado de Laravel
+ * - acciones: función opcional (fila) => JSX
+ * - onRowClick: función opcional (fila) => void — al hacer clic en una fila
+ * - filaSeleccionada: id de la fila seleccionada
+ * - porPagina: número actual de registros por página
  * - onPorPaginaCambio: función opcional para cambiar registros por página
- * - mensajeVacio: texto cuando no hay datos (opcional)
+ * - mensajeVacio: texto cuando no hay datos
  */
 
 export default function Tabla({
     columnas = [],
     datos = [],
     acciones = null,
+    onRowClick = null,
+    filaSeleccionada = null,
     porPagina = null,
     onPorPaginaCambio = null,
     mensajeVacio = 'No hay registros disponibles.',
 }) {
-    // Detecta si los datos son paginados (objeto de Laravel) o un array simple
     const esPaginado = datos && typeof datos === 'object' && !Array.isArray(datos) && 'data' in datos;
     const filas = esPaginado ? datos.data : datos;
 
@@ -34,20 +34,20 @@ export default function Tabla({
     return (
         <div>
             {/* Tabla */}
-            <div className="bg-white border border-gray-200 rounded-sm shadow overflow-x-auto scroll-teal">
-                <table className="w-full text-sm tabla-rayada">
-                    <thead className="bg-cyan-600 text-white">
+            <div className="bg-white border border-gray-200 rounded-sm shadow overflow-x-auto">
+                <table className="w-full text-sm">
+                    <thead className="bg-teal-600 text-white">
                         <tr>
                             {columnas.map((col) => (
                                 <th
                                     key={col.key ?? col.label}
-                                    className="px-4 py-3 text-center whitespace-nowrap uppercase text-sm font-semibold tracking-wider"
+                                    className="px-4 py-3 text-left whitespace-nowrap uppercase text-xs font-semibold tracking-wider"
                                 >
                                     {col.label}
                                 </th>
                             ))}
                             {acciones && (
-                                <th className="px-4 py-3 text-center whitespace-nowrap uppercase text-sm font-semibold tracking-wider">
+                                <th className="px-4 py-3 text-left whitespace-nowrap uppercase text-xs font-semibold tracking-wider">
                                     Acciones
                                 </th>
                             )}
@@ -64,38 +64,48 @@ export default function Tabla({
                                 </td>
                             </tr>
                         ) : (
-                            filas.map((fila, index) => (
-                                <tr
-                                    key={fila.id ?? index}
-                                    className="border-b border-gray-100 hover:bg-gray-50 transition"
-                                >
-                                    {columnas.map((col) => (
-                                        <td
-                                            key={col.key ?? col.label}
-                                            className="px-4 py-3 whitespace-nowrap text-center"
-                                        >
-                                            {col.render
-                                                ? col.render(fila)
-                                                : fila[col.key] ?? '—'}
-                                        </td>
-                                    ))}
-                                    {acciones && (
-                                        <td className="px-4 py-3 whitespace-nowrap text-center">
-                                            {acciones(fila)}
-                                        </td>
-                                    )}
-                                </tr>
-                            ))
+                            filas.map((fila, index) => {
+                                const idFila = fila.id ?? fila.id_eventoAdverso ?? fila.id_usuario ?? index;
+                                const seleccionada = filaSeleccionada === idFila;
+
+                                return (
+                                    <tr
+                                        key={idFila}
+                                        onClick={() => onRowClick?.(fila)}
+                                        className={`
+                                            border-b border-gray-100 transition
+                                            ${onRowClick ? 'cursor-pointer' : ''}
+                                            ${seleccionada
+                                                ? 'bg-teal-50 border-l-4 border-l-teal-500'
+                                                : 'hover:bg-gray-50'}
+                                        `}
+                                    >
+                                        {columnas.map((col) => (
+                                            <td
+                                                key={col.key ?? col.label}
+                                                className="px-4 py-3"
+                                            >
+                                                {col.render
+                                                    ? col.render(fila)
+                                                    : fila[col.key] ?? '—'}
+                                            </td>
+                                        ))}
+                                        {acciones && (
+                                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                                                {acciones(fila)}
+                                            </td>
+                                        )}
+                                    </tr>
+                                );
+                            })
                         )}
                     </tbody>
                 </table>
             </div>
 
-            {/* Paginación — solo si los datos son paginados */}
+            {/* Paginación */}
             {esPaginado && (
                 <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
-
-                    {/* Registros por página */}
                     {onPorPaginaCambio && (
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">Mostrar</span>
@@ -113,12 +123,10 @@ export default function Tabla({
                         </div>
                     )}
 
-                    {/* Contador */}
                     <p className="text-sm text-gray-500">
                         Mostrando {datos.from ?? 0} – {datos.to ?? 0} de {datos.total} registros
                     </p>
 
-                    {/* Botones anterior/siguiente */}
                     <div className="flex gap-2">
                         <button
                             onClick={() => cambiarPagina(datos.prev_page_url)}

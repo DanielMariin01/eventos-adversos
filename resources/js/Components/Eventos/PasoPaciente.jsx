@@ -84,6 +84,9 @@ export default function PasoPaciente({ data, setData, errors }) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="col-span-1 md:col-span-2 bg-teal-500 rounded-lg px-4 py-3">
+                <h3 className="text-white font-semibold text-xs uppercase">Datos de identificación del paciente</h3>
+            </div>
 
             <Campo label="Cédula" error={errors.pac_cedula}>
                 <div className="relative">

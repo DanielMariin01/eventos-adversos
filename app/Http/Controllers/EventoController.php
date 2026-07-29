@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\Archivo;
 use App\Models\Categoria;
 use App\Models\EventoAdverso;
 use App\Models\Reportante;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class EventoController extends Controller
@@ -40,9 +42,7 @@ class EventoController extends Controller
     {
         $reportante = Reportante::where('cedula', $cedula)->first();
 
-        if (!$reportante) {
-            return response()->json(null);
-        }
+        if (!$reportante) return response()->json(null);
 
         return response()->json([
             'nombres'   => $reportante->nombres,
@@ -57,9 +57,7 @@ class EventoController extends Controller
     {
         $paciente = Paciente::where('cedula', $cedula)->first();
 
-        if (!$paciente) {
-            return response()->json(null);
-        }
+        if (!$paciente) return response()->json(null);
 
         return response()->json([
             'nombres'     => $paciente->nombres,
@@ -75,31 +73,24 @@ class EventoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fk_categoria'  => 'required|exists:categorias,id_categoria',
-            'fk_area'       => 'required|exists:areas,id_area',
-
-            // Reportante
-            'rep_cedula'    => 'required|string|max:20',
-            'rep_nombres'   => 'required|string|max:100',
-            'rep_apellidos' => 'required|string|max:100',
-            'rep_cargo'     => 'nullable|string|max:100',
-            'rep_empresa'   => 'nullable|string|max:100',
-
-            // Paciente
-            'pac_cedula'    => 'nullable|string|max:20',
-            'pac_nombres'   => 'required|string|max:100',
-            'pac_apellidos' => 'required|string|max:100',
-            'pac_telefono'  => 'nullable|string|max:20',
-            'pac_edad'      => 'nullable|integer|min:0|max:120',
+            'fk_categoria'    => 'required|exists:categorias,id_categoria',
+            'fk_area'         => 'required|exists:areas,id_area',
+            'rep_cedula'      => 'required|string|max:20',
+            'rep_nombres'     => 'required|string|max:100',
+            'rep_apellidos'   => 'required|string|max:100',
+            'rep_cargo'       => 'nullable|string|max:100',
+            'rep_empresa'     => 'nullable|string|max:100',
+            'pac_cedula'      => 'nullable|string|max:20',
+            'pac_nombres'     => 'required|string|max:100',
+            'pac_apellidos'   => 'required|string|max:100',
+            'pac_telefono'    => 'nullable|string|max:20',
+            'pac_edad'        => 'nullable|integer|min:0|max:120',
             'pac_edad_unidad' => 'nullable|string|max:10',
-            'pac_entidad'   => 'nullable|string|max:100',
-
-            // Evento
-            'fecha_evento'  => 'required|date',
-            'descripcion'   => 'required|string',
+            'pac_entidad'     => 'nullable|string|max:100',
+            'fecha_evento'    => 'required|date',
+            'descripcion'     => 'required|string',
         ]);
 
-        // Crear o actualizar reportante
         $reportante = Reportante::updateOrCreate(
             ['cedula' => $request->rep_cedula],
             [
@@ -110,7 +101,6 @@ class EventoController extends Controller
             ]
         );
 
-        // Crear o actualizar paciente
         $paciente = Paciente::updateOrCreate(
             ['cedula' => $request->pac_cedula ?? uniqid('pac_')],
             [
@@ -123,7 +113,6 @@ class EventoController extends Controller
             ]
         );
 
-        // Guardar evento adverso
         EventoAdverso::create([
             'fk_categoria'  => $request->fk_categoria,
             'fk_area'       => $request->fk_area,
@@ -142,36 +131,116 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente', 'usuario'])
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $categorias = Categoria::where('activo', 1)->get();
+
         return Inertia::render('Eventos/Index', [
-            'eventos' => $eventos,
+            'eventos'    => $eventos,
+            'categorias' => $categorias,
         ]);
     }
 
     // ── Ver detalle de evento ──
     public function show(EventoAdverso $evento)
     {
-        $evento->load(['categoria', 'area', 'reportante', 'paciente', 'usuario']);
+        $evento->load(['categoria', 'area', 'reportante', 'paciente', 'usuario', 'archivos']);
 
         return Inertia::render('Eventos/Show', [
             'evento' => $evento,
         ]);
     }
 
-    // ── Actualizar estado (calidad) ──
-    public function actualizarEstado(Request $request, EventoAdverso $evento)
+    // ── Guardar análisis (calidad) ──
+    public function guardarAnalisis(Request $request, EventoAdverso $evento)
     {
         $request->validate([
-            'estado' => 'required|in:en_proceso,analizado,procesado',
+            'barreras_vulneradas'    => 'nullable|array',
+            'barreras_descripcion'   => 'nullable|string',
+            'acciones_inseguras'     => 'nullable|array',
+            'acciones_descripcion'   => 'nullable|string',
+            'factores_contributivos' => 'nullable|array',
+            'factores_descripcion'   => 'nullable|string',
+            'descripcion_analisis'   => 'nullable|string',
+            'clasificacion'          => 'nullable|string|max:100',
+            'relacionado_con'        => 'nullable|string|max:255',
+            'categorizacion'         => 'nullable|string|max:100',
+            'archivos.*'             => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
-        $evento->update(['estado' => $request->estado]);
+        $evento->update([
+            'barreras_vulneradas'    => $request->barreras_vulneradas,
+            'barreras_descripcion'   => $request->barreras_descripcion,
+            'acciones_inseguras'     => $request->acciones_inseguras,
+            'acciones_descripcion'   => $request->acciones_descripcion,
+            'factores_contributivos' => $request->factores_contributivos,
+            'factores_descripcion'   => $request->factores_descripcion,
+            'descripcion_analisis'   => $request->descripcion_analisis,
+            'clasificacion'          => $request->clasificacion,
+            'relacionado_con'        => $request->relacionado_con,
+            'categorizacion'         => $request->categorizacion,
+            'estado'                 => 'analizado',
+            'fk_usuario_calidad'     => Auth::id(),
+            'fecha_analisis'         => now(),
+        ]);
 
-        return redirect()->back()
-            ->with('success', 'Estado actualizado correctamente.');
+        // Guardar archivos
+        if ($request->hasFile('archivos')) {
+            foreach ($request->file('archivos') as $file) {
+                $ruta = $file->store('eventos/calidad', 'public');
+                Archivo::create([
+                    'fk_evento'  => $evento->id_eventoAdverso,
+                    'fk_usuario' => Auth::id(),
+                    'tipo'       => 'calidad',
+                    'nombre'     => $file->getClientOriginalName(),
+                    'ruta'       => $ruta,
+                    'extension'  => $file->getClientOriginalExtension(),
+                ]);
+            }
+        }
+
+        return redirect()->route('eventos.index')
+            ->with('success', 'Análisis guardado correctamente.');
+    }
+
+    // ── Cerrar análisis ──
+    public function cerrarAnalisis(EventoAdverso $evento)
+    {
+        $evento->update([
+            'estado'       => 'procesado',
+            'fecha_cierre' => now(),
+        ]);
+
+        return redirect()->route('eventos.index')
+            ->with('success', 'Evento cerrado correctamente.');
+    }
+
+    // ── Cancelar evento ──
+    public function cancelarEvento(EventoAdverso $evento)
+    {
+        $evento->update(['estado' => 'cancelado']);
+
+        return redirect()->route('eventos.index')
+            ->with('success', 'Evento cancelado correctamente.');
+    }
+
+    // ── Cambiar tipo de evento ──
+    public function cambiarTipo(Request $request, EventoAdverso $evento)
+    {
+        $request->validate([
+            'fk_categoria' => 'required|exists:categorias,id_categoria',
+            'observacion'  => 'nullable|string',
+        ]);
+
+        $evento->update([
+            'fk_categoria'    => $request->fk_categoria,
+            'observacion_tipo' => $request->observacion,
+        ]);
+
+        return redirect()->route('eventos.index')
+            ->with('success', 'Tipo de evento actualizado correctamente.');
     }
 
     // ── Eventos del jefe ──
@@ -188,5 +257,30 @@ class EventoController extends Controller
         return Inertia::render('Eventos/MisEventos', [
             'eventos' => $eventos,
         ]);
+    }
+
+    // ── Subir evidencia jefe ──
+    public function subirEvidencia(Request $request, EventoAdverso $evento)
+    {
+        $request->validate([
+            'archivos.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        if ($request->hasFile('archivos')) {
+            foreach ($request->file('archivos') as $file) {
+                $ruta = $file->store('eventos/jefe', 'public');
+                Archivo::create([
+                    'fk_evento'  => $evento->id_eventoAdverso,
+                    'fk_usuario' => Auth::id(),
+                    'tipo'       => 'jefe',
+                    'nombre'     => $file->getClientOriginalName(),
+                    'ruta'       => $ruta,
+                    'extension'  => $file->getClientOriginalExtension(),
+                ]);
+            }
+        }
+
+        return redirect()->back()
+            ->with('success', 'Evidencia subida correctamente.');
     }
 }

@@ -24,6 +24,12 @@ export default function AuthenticatedLayout({ header, children }) {
             icon: Users,
             roles: ['administrador'],
         },
+        {
+            title: 'Eventos Adversos',
+            url: route('eventos.index'),
+            icon: FileText,
+            roles: ['administrador', 'calidad'],
+        },
     ];
 
     return (

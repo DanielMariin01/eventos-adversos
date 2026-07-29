@@ -8,7 +8,7 @@ class EventoAdverso extends Model
 {
     protected $table = 'eventos_adversos';
 
-    protected $primaryKey = 'id_evento';
+    protected $primaryKey = 'id_eventoAdverso';
 
     protected $fillable = [
         'fk_categoria',

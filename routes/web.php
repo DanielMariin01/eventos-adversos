@@ -50,6 +50,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::patch('/eventos/{evento}/estado', [EventoController::class, 'actualizarEstado'])->name('eventos.estado');
 
+
+    Route::post('/eventos/{evento}/analisis', [EventoController::class, 'guardarAnalisis'])->name('eventos.analisis');
+    Route::patch('/eventos/{evento}/cerrar', [EventoController::class, 'cerrarAnalisis'])->name('eventos.cerrar');
+    Route::patch('/eventos/{evento}/cancelar', [EventoController::class, 'cancelarEvento'])->name('eventos.cancelar');
+    Route::patch('/eventos/{evento}/tipo', [EventoController::class, 'cambiarTipo'])->name('eventos.tipo');
+    Route::post('/eventos/{evento}/evidencia', [EventoController::class, 'subirEvidencia'])->name('eventos.evidencia');
+
     // Jefe
     Route::get('/mis-eventos', [EventoController::class, 'misEventos'])->name('eventos.mis');
 });

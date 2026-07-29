@@ -60,7 +60,9 @@ export default function PasoEvento({ data, setData, errors }) {
 
     return (
         <div className="space-y-6">
-
+            <div className="col-span-1 md:col-span-2 bg-teal-500 rounded-lg px-4 py-3">
+                <h3 className="text-white font-semibold text-xs uppercase">Información del evento adverso</h3>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Campo label="Fecha del Evento *" error={errors.fecha_evento}>
                     <input
