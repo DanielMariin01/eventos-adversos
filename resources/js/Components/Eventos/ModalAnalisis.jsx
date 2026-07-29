@@ -4,9 +4,9 @@
  * Tiene dos pestañas: Datos Básicos y Clasificación.
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
-import { X, User, Building2, Paperclip, Save } from 'lucide-react';
+import { X, User, Building2, Paperclip, Save, Mic, MicOff } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const BARRERAS = [
@@ -97,6 +97,75 @@ export default function ModalAnalisis({ evento, onClose }) {
         });
     };
 
+    const [grabando, setGrabando] = useState(false);
+    const recognitionRef = useRef(null);
+
+    const toggleGrabacion = () => {
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+            alert('Tu navegador no soporta reconocimiento de voz.');
+            return;
+        }
+
+        if (grabando) {
+            recognitionRef.current?.stop();
+            setGrabando(false);
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-CO';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(r => r[0].transcript)
+                .join(' ');
+            setData('descripcion_analisis', data.descripcion_analisis + ' ' + transcript);
+        };
+
+        recognition.onend = () => setGrabando(false);
+        recognitionRef.current = recognition;
+        recognition.start();
+        setGrabando(true);
+    };
+
+
+    const [grabandoBarrera, setGrabandoBarrera] = useState(false);
+    const recognitionBarreraRef = useRef(null);
+
+    const toggleGrabacionBarrera = () => {
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+            alert('Tu navegador no soporta reconocimiento de voz.');
+            return;
+        }
+
+        if (grabandoBarrera) {
+            recognitionBarreraRef.current?.stop();
+            setGrabandoBarrera(false);
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-CO';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(r => r[0].transcript)
+                .join(' ');
+            setData('barreras_descripcion', data.barreras_descripcion + ' ' + transcript);
+        };
+
+        recognition.onend = () => setGrabandoBarrera(false);
+        recognitionBarreraRef.current = recognition;
+        recognition.start();
+        setGrabandoBarrera(true);
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
@@ -172,13 +241,31 @@ export default function ModalAnalisis({ evento, onClose }) {
                                         </span>
                                     ))}
                                 </div>
-                                <textarea
-                                    value={data.barreras_descripcion}
-                                    onChange={e => setData('barreras_descripcion', e.target.value)}
-                                    placeholder="Ingrese la descripción de la barrera..."
-                                    rows={3}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
-                                />
+                                <div className="relative">
+                                    <textarea
+                                        value={data.barreras_descripcion}
+                                        onChange={e => setData('barreras_descripcion', e.target.value)}
+                                        placeholder="Ingrese la descripción de la barrera..."
+                                        rows={3}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={toggleGrabacionBarrera}
+                                        className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabandoBarrera
+                                                ? 'bg-red-500 text-white animate-pulse'
+                                                : 'bg-teal-500 text-white hover:bg-teal-600'
+                                            }`}
+                                    >
+                                        {grabandoBarrera ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {grabandoBarrera && (
+                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse inline-block" />
+                                        Grabando... habla ahora
+                                    </p>
+                                )}
                             </Campo>
 
                             <Campo label="Acciones Inseguras" error={errors.acciones_inseguras}>
@@ -238,13 +325,31 @@ export default function ModalAnalisis({ evento, onClose }) {
                             </Campo>
 
                             <Campo label="Descripción del Análisis" error={errors.descripcion_analisis}>
-                                <textarea
-                                    value={data.descripcion_analisis}
-                                    onChange={e => setData('descripcion_analisis', e.target.value)}
-                                    placeholder="Ingrese la descripción del análisis..."
-                                    rows={10}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
-                                />
+                                <div className="relative">
+                                    <textarea
+                                        value={data.descripcion_analisis}
+                                        onChange={e => setData('descripcion_analisis', e.target.value)}
+                                        placeholder="Ingrese la descripción del análisis o use el micrófono..."
+                                        rows={10}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={toggleGrabacion}
+                                        className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabando
+                                            ? 'bg-red-500 text-white animate-pulse'
+                                            : 'bg-teal-500 text-white hover:bg-teal-600'
+                                            }`}
+                                    >
+                                        {grabando ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {grabando && (
+                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse inline-block" />
+                                        Grabando... habla ahora
+                                    </p>
+                                )}
                             </Campo>
 
                         </div>
