@@ -20,13 +20,20 @@ class EventoAdverso extends Model
         'fecha_evento',
         'descripcion',
         'barreras_vulneradas',
+        'barreras_descripcion',
         'factores_contributivos',
         'acciones_inseguras',
+        'acciones_descripcion',
+        'descripcion_analisis',
         'clasificacion',
         'relacionado_con',
         'categorizacion',
         'estado',
         'fk_usuario',
+        'fk_usuario_calidad',
+        'fecha_analisis',
+        'fecha_cierre',
+        'observacion_tipo',
     ];
 
     protected $casts = [
@@ -34,7 +41,14 @@ class EventoAdverso extends Model
         'factores_contributivos' => 'array',
         'acciones_inseguras'     => 'array',
         'fecha_evento'           => 'datetime',
+        'fecha_analisis'         => 'datetime',
+        'fecha_cierre'           => 'datetime',
     ];
+
+    public function archivos()
+    {
+        return $this->hasMany(Archivo::class, 'fk_evento', 'id_eventoAdverso');
+    }
 
     // ── Relaciones ──
     public function categoria()

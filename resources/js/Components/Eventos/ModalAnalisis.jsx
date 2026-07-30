@@ -67,8 +67,7 @@ export default function ModalAnalisis({ evento, onClose }) {
         barreras_descripcion: evento.barreras_descripcion ?? '',
         acciones_inseguras: evento.acciones_inseguras ?? [],
         acciones_descripcion: evento.acciones_descripcion ?? '',
-        factores_contributivos: evento.factores_contributivos ?? [],
-        factores_descripcion: evento.factores_descripcion ?? '',
+        factores_contributivos: evento.factores_contributivos ?? {},
         descripcion_analisis: evento.descripcion_analisis ?? '',
         clasificacion: evento.clasificacion ?? '',
         relacionado_con: evento.relacionado_con ?? '',
@@ -325,8 +324,15 @@ export default function ModalAnalisis({ evento, onClose }) {
 
                             <Campo label="Factores Contributivos" error={errors.factores_contributivos}>
                                 <select
-                                    onChange={e => toggleArray('factores_contributivos', e.target.value)}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-2 scroll-teal"
+                                    onChange={e => {
+                                        const factor = e.target.value;
+                                        if (!factor) return;
+                                        const actual = data.factores_contributivos ?? {};
+                                        if (!actual[factor]) {
+                                            setData('factores_contributivos', { ...actual, [factor]: '' });
+                                        }
+                                    }}
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-3 scroll-teal"
                                     value=""
                                 >
                                     <option value="">Seleccione el factor...</option>
@@ -334,21 +340,35 @@ export default function ModalAnalisis({ evento, onClose }) {
                                         <option key={f} value={f}>{f}</option>
                                     ))}
                                 </select>
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                    {(data.factores_contributivos ?? []).map(f => (
-                                        <span key={f} onClick={() => toggleArray('factores_contributivos', f)}
-                                            className="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
-                                            {f} ✕
-                                        </span>
-                                    ))}
-                                </div>
-                                <textarea
-                                    value={data.factores_descripcion}
-                                    onChange={e => setData('factores_descripcion', e.target.value)}
-                                    placeholder="Ingrese la descripción del factor..."
-                                    rows={3}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
-                                />
+
+                                {Object.entries(data.factores_contributivos ?? {}).map(([factor, descripcion]) => (
+                                    <div key={factor} className="mb-3 border border-gray-200 rounded-lg p-3">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-xs font-semibold text-teal-700">{factor}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const actual = { ...data.factores_contributivos };
+                                                    delete actual[factor];
+                                                    setData('factores_contributivos', actual);
+                                                }}
+                                                className="text-red-400 hover:text-red-600 text-xs"
+                                            >
+                                                ✕ Quitar
+                                            </button>
+                                        </div>
+                                        <textarea
+                                            value={descripcion}
+                                            onChange={e => setData('factores_contributivos', {
+                                                ...data.factores_contributivos,
+                                                [factor]: e.target.value,
+                                            })}
+                                            placeholder={`Descripción de ${factor}...`}
+                                            rows={2}
+                                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                        />
+                                    </div>
+                                ))}
                             </Campo>
 
                             <Campo label="Descripción del Análisis" error={errors.descripcion_analisis}>
