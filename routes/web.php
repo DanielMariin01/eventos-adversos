@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\PlanMejoraController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -59,6 +60,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Jefe
     Route::get('/mis-eventos', [EventoController::class, 'misEventos'])->name('eventos.mis');
+});
+
+// ── Rutas de planes de mejora ──
+Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
+    Route::get('/mejoras', [PlanMejoraController::class, 'index'])->name('mejoras.index');
+    Route::post('/mejoras/{evento}', [PlanMejoraController::class, 'store'])->name('mejoras.store');
+    Route::get('/mejoras/{evento}/revisiones', [PlanMejoraController::class, 'revisiones'])->name('mejoras.revisiones');
 });
 
 require __DIR__ . '/auth.php';

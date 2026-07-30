@@ -75,4 +75,13 @@ class EventoAdverso extends Model
     {
         return $this->belongsTo(User::class, 'fk_usuario');
     }
+    public function planMejora()
+    {
+        return $this->hasOne(PlanMejora::class, 'fk_evento', 'id_eventoAdverso');
+    }
+
+    public function revisiones()
+    {
+        return $this->hasMany(Revision::class, 'fk_evento', 'id_eventoAdverso');
+    }
 }

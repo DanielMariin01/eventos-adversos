@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Users, FileText, Menu, X, LogOut, UserCheck } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck } from 'lucide-react';
 import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -28,6 +28,12 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Eventos Adversos',
             url: route('eventos.index'),
             icon: FileText,
+            roles: ['administrador', 'calidad'],
+        },
+        {
+            title: 'Planes de Mejora',
+            url: route('mejoras.index'),
+            icon: ClipboardCheck,
             roles: ['administrador', 'calidad'],
         },
     ];
