@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+
 class PlanMejoraController extends Controller
 {
     // ── Lista de eventos analizado y en_mejora ──
@@ -109,6 +110,14 @@ class PlanMejoraController extends Controller
             'descripcion'     => $request->descripcion,
             'fecha_ejecucion' => $request->fecha_ejecucion,
             'fk_jefe'         => $request->fk_jefe,
+        ]);
+
+        // Registrar revisión
+        Revision::create([
+            'fk_evento'  => $plan->fk_evento,
+            'fk_usuario' => Auth::id(),
+            'tipo'       => 'Edición Plan de Mejora',
+            'observacion' => 'Se editó el plan de mejora del evento N° ' . $plan->fk_evento . ' el ' . now()->format('Y-m-d') . ' a las ' . now()->format('H:i'),
         ]);
 
         if ($request->hasFile('archivo')) {
