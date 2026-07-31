@@ -76,23 +76,24 @@ export default function PasoEvento({ data, setData, errors }) {
             </div>
 
             <Campo label="Descripción del evento *" error={errors.descripcion}>
-                <div className="relative">
+                <div className={`flex items-end gap-2 bg-white border rounded-2xl px-4 py-2 shadow-sm transition ${grabando ? 'border-red-400 ring-1 ring-red-400' : 'border-gray-300 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500'
+                    }`}>
                     <textarea
                         value={data.descripcion}
                         onChange={e => setData('descripcion', e.target.value)}
-                        placeholder="Describa detalladamente lo que ocurrió o use el micrófono..."
-                        rows={5}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-12 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-none scroll-teal"
+                        placeholder="Describa detalladamente lo que ocurrió..."
+                        rows={3}
+                        className="flex-1 resize-none text-sm text-gray-800 placeholder-gray-400 focus:outline-none scroll-teal bg-transparent py-1"
                     />
                     <button
                         type="button"
                         onClick={toggleGrabacion}
-                        className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabando
-                            ? 'bg-red-500 text-white animate-pulse'
-                            : 'bg-teal-500 text-white hover:bg-teal-600'
+                        className={`flex-shrink-0 mb-1 p-2 rounded-full transition ${grabando
+                                ? 'bg-red-500 text-white animate-pulse'
+                                : 'bg-teal-500 text-white hover:bg-teal-600'
                             }`}
                     >
-                        {grabando ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                        {grabando ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                     </button>
                 </div>
                 {grabando && (
