@@ -286,6 +286,12 @@ export default function Index({ eventos, categorias }) {
                         eventoSeleccionado?.id_eventoAdverso === fila.id_eventoAdverso ? null : fila
                     )}
                     filaSeleccionada={eventoSeleccionado?.id_eventoAdverso}
+                    renderExpansion={(fila) => (
+                        <p className="text-sm">
+                            <span className="font-bold">Descripción: </span>
+                            {fila.descripcion}
+                        </p>
+                    )}
                 />
 
                 {eventoSeleccionado && (

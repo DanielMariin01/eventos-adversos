@@ -1,3 +1,4 @@
+import React from 'react';
 import { router } from '@inertiajs/react';
 
 /**
@@ -7,8 +8,9 @@ import { router } from '@inertiajs/react';
  * - columnas: array de { label, key, render? }
  * - datos: array o objeto paginado de Laravel
  * - acciones: función opcional (fila) => JSX
- * - onRowClick: función opcional (fila) => void — al hacer clic en una fila
+ * - onRowClick: función opcional (fila) => void
  * - filaSeleccionada: id de la fila seleccionada
+ * - renderExpansion: función opcional (fila) => JSX para mostrar fila expandida
  * - porPagina: número actual de registros por página
  * - onPorPaginaCambio: función opcional para cambiar registros por página
  * - mensajeVacio: texto cuando no hay datos
@@ -20,6 +22,7 @@ export default function Tabla({
     acciones = null,
     onRowClick = null,
     filaSeleccionada = null,
+    renderExpansion = null,
     porPagina = null,
     onPorPaginaCambio = null,
     mensajeVacio = 'No hay registros disponibles.',
@@ -69,33 +72,46 @@ export default function Tabla({
                                 const seleccionada = filaSeleccionada === idFila;
 
                                 return (
-                                    <tr
-                                        key={idFila}
-                                        onClick={() => onRowClick?.(fila)}
-                                        className={`
-                                            border-b border-gray-100 transition
-                                            ${onRowClick ? 'cursor-pointer' : ''}
-                                            ${seleccionada
-                                                ? 'bg-teal-50 border-l-4 border-l-teal-500'
-                                                : 'hover:bg-gray-50'}
-                                        `}
-                                    >
-                                        {columnas.map((col) => (
-                                            <td
-                                                key={col.key ?? col.label}
-                                                className="px-4 py-3"
-                                            >
-                                                {col.render
-                                                    ? col.render(fila)
-                                                    : fila[col.key] ?? '—'}
-                                            </td>
-                                        ))}
-                                        {acciones && (
-                                            <td className="px-4 py-3 text-center whitespace-nowrap">
-                                                {acciones(fila)}
-                                            </td>
+                                    <React.Fragment key={idFila}>
+                                        <tr
+                                            onClick={() => onRowClick?.(fila)}
+                                            className={`
+                                                border-b border-gray-100 transition
+                                                ${onRowClick ? 'cursor-pointer' : ''}
+                                                ${seleccionada
+                                                    ? 'bg-teal-50 border-l-4 border-l-teal-500'
+                                                    : 'hover:bg-gray-50'}
+                                            `}
+                                        >
+                                            {columnas.map((col) => (
+                                                <td
+                                                    key={col.key ?? col.label}
+                                                    className="px-4 py-3"
+                                                >
+                                                    {col.render
+                                                        ? col.render(fila)
+                                                        : fila[col.key] ?? '—'}
+                                                </td>
+                                            ))}
+                                            {acciones && (
+                                                <td className="px-4 py-3 text-center whitespace-nowrap">
+                                                    {acciones(fila)}
+                                                </td>
+                                            )}
+                                        </tr>
+
+                                        {/* Fila expandida */}
+                                        {renderExpansion && seleccionada && (
+                                            <tr className="bg-blue-50 border-b border-blue-100">
+                                                <td
+                                                    colSpan={columnas.length + (acciones ? 1 : 0)}
+                                                    className="px-6 py-3"
+                                                >
+                                                    {renderExpansion(fila)}
+                                                </td>
+                                            </tr>
                                         )}
-                                    </tr>
+                                    </React.Fragment>
                                 );
                             })
                         )}
