@@ -23,11 +23,12 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
     const [cargando, setCargando] = useState(false);
     const [grabando, setGrabando] = useState(false);
     const recognitionRef = useRef(null);
+    const plan = evento.plan_mejora;
 
-    const { data, setData, post, errors } = useForm({
-        descripcion: '',
-        fecha_ejecucion: '',
-        fk_jefe: evento.area?.jefe?.id ?? '',
+    const { data, setData, post, patch, errors } = useForm({
+        descripcion: plan?.descripcion ?? '',
+        fecha_ejecucion: plan?.fecha_ejecucion ?? '',
+        fk_jefe: plan?.fk_jefe ?? evento.area?.jefe?.id ?? '',
         archivo: null,
     });
 
@@ -63,22 +64,36 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
         }
 
         setCargando(true);
-        post(route('mejoras.store', evento.id_eventoAdverso), {
-            forceFormData: true,
-            onSuccess: () => {
-                setCargando(false);
-                onClose();
-                Swal.fire({ icon: 'success', title: 'Plan de mejora creado correctamente.' });
-            },
-            onError: () => {
-                setCargando(false);
-                Swal.fire({ icon: 'error', title: 'Error al crear el plan de mejora.' });
-            },
-        });
+
+        if (plan) {
+            // Editar
+            patch(route('mejoras.update', plan.id_plan), {
+                onSuccess: () => {
+                    setCargando(false);
+                    onClose();
+                    Swal.fire({ icon: 'success', title: 'Plan de mejora actualizado correctamente.' });
+                },
+                onError: (errors) => {
+                    setCargando(false);
+                    Swal.fire({ icon: 'error', title: 'Error al actualizar el plan de mejora.' });
+                },
+            });
+        } else {
+            // Crear
+            post(route('mejoras.store', evento.id_eventoAdverso), {
+                forceFormData: true,
+                onSuccess: () => {
+                    setCargando(false);
+                    onClose();
+                    Swal.fire({ icon: 'success', title: 'Plan de mejora creado correctamente.' });
+                },
+                onError: () => {
+                    setCargando(false);
+                    Swal.fire({ icon: 'error', title: 'Error al crear el plan de mejora.' });
+                },
+            });
+        }
     };
-    console.log('area:', evento.area);
-    console.log('jefe:', evento.area?.jefe);
-    console.log('fk_jefe:', evento.area?.jefe?.id);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -102,7 +117,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 {/* Header */}
                 <div className="bg-teal-500 px-6 py-4 flex items-center justify-between rounded-t-md">
                     <h2 className="text-white font-bold text-lg">
-                        Plan de Mejora Evento N°: {evento.id_eventoAdverso}
+                        {plan ? 'Editar' : 'Crear'} Plan de Mejora Evento N°: {evento.id_eventoAdverso}
                     </h2>
                     <button onClick={onClose} className="text-white hover:text-teal-200 transition">
                         <X className="w-5 h-5" />

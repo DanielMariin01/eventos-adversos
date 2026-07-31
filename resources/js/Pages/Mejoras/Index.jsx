@@ -174,7 +174,7 @@ export default function Index({ eventos, jefes }) {
                         className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-teal-500 rounded-md hover:bg-teal-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <PlusCircle className="w-5 h-5" />
-                        Crear mejora
+                        Crear/Editar mejora
                     </button>
 
                     <button

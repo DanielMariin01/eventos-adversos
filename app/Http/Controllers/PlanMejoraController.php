@@ -95,4 +95,36 @@ class PlanMejoraController extends Controller
 
         return response()->json($revisiones);
     }
+
+    public function update(Request $request, PlanMejora $plan)
+    {
+        $request->validate([
+            'descripcion'     => 'required|string',
+            'fecha_ejecucion' => 'required|date',
+            'fk_jefe'         => 'required|exists:users,id',
+            'archivo'         => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        $plan->update([
+            'descripcion'     => $request->descripcion,
+            'fecha_ejecucion' => $request->fecha_ejecucion,
+            'fk_jefe'         => $request->fk_jefe,
+        ]);
+
+        if ($request->hasFile('archivo')) {
+            $file = $request->file('archivo');
+            $ruta = $file->store('mejoras', 'public');
+            Archivo::create([
+                'fk_evento'  => $plan->fk_evento,
+                'fk_usuario' => Auth::id(),
+                'tipo'       => 'calidad',
+                'nombre'     => $file->getClientOriginalName(),
+                'ruta'       => $ruta,
+                'extension'  => $file->getClientOriginalExtension(),
+            ]);
+        }
+
+        return redirect()->route('mejoras.index')
+            ->with('success', 'Plan de mejora actualizado correctamente.');
+    }
 }
