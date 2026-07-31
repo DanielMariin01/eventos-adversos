@@ -12,6 +12,7 @@ const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
     procesado: 'bg-green-500 text-white',
     cancelado: 'bg-red-500 text-white',
+    en_mejora: 'bg-teal-500 text-white',
 };
 
 const LABEL_ESTADO = {
@@ -19,8 +20,8 @@ const LABEL_ESTADO = {
     analizado: 'Analizado',
     procesado: 'Procesado',
     cancelado: 'Cancelado',
+    en_mejora: 'En Mejora',
 };
-
 
 
 export default function Index({ eventos, categorias }) {
