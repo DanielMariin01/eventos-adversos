@@ -1,11 +1,12 @@
 /**
  * ModalCrearMejora
- * Modal para crear un plan de mejora para un evento analizado.
+ * Modal para crear o editar un plan de mejora.
  */
 
 import { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import { X, Save, Paperclip, Mic, MicOff } from 'lucide-react';
+import { FaFilePdf, FaFileImage, FaFileAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import Editor from '@/Components/Editor';
 
@@ -19,17 +20,25 @@ function Campo({ label, error, children }) {
     );
 }
 
+const getIcono = (extension) => {
+    if (['pdf'].includes(extension?.toLowerCase())) return <FaFilePdf className="text-red-500 text-lg" />;
+    if (['jpg', 'jpeg', 'png'].includes(extension?.toLowerCase())) return <FaFileImage className="text-blue-500 text-lg" />;
+    return <FaFileAlt className="text-gray-500 text-lg" />;
+};
+
 export default function ModalCrearMejora({ evento, jefes, onClose }) {
+
+    const plan = evento.plan_mejora;
+    const archivosExistentes = evento.archivos?.filter(a => a.tipo === 'calidad') ?? [];
 
     const [cargando, setCargando] = useState(false);
     const [grabando, setGrabando] = useState(false);
     const recognitionRef = useRef(null);
-    const plan = evento.plan_mejora;
 
     const { data, setData, post, errors } = useForm({
         _method: 'POST',
         descripcion: plan?.descripcion ?? '',
-        fecha_ejecucion: plan?.fecha_ejecucion ?? '',
+        fecha_ejecucion: plan?.fecha_ejecucion?.split('T')[0] ?? '',
         fk_jefe: plan?.fk_jefe ?? evento.area?.jefe?.id ?? '',
         archivo: null,
     });
@@ -60,42 +69,30 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
     };
 
     const submit = () => {
-        console.log('data a enviar:', data);
         if (!data.descripcion || !data.fecha_ejecucion || !data.fk_jefe) {
             Swal.fire({ icon: 'warning', title: 'Campos obligatorios', text: 'Por favor completa todos los campos requeridos.' });
             return;
         }
 
         setCargando(true);
-        if (plan) {
-            post(route('mejoras.update', plan.id_plan), {
-                forceFormData: true,
-                onSuccess: () => {
-                    setCargando(false);
-                    onClose();
-                    Swal.fire({ icon: 'success', title: 'Plan de mejora actualizado correctamente.' });
-                },
-                onError: (errors) => {
-                    setCargando(false);
-                    console.log('errores:', errors);
-                    Swal.fire({ icon: 'error', title: 'Error al actualizar el plan de mejora.' });
-                },
-            });
-        } else {
-            // Crear
-            post(route('mejoras.store', evento.id_eventoAdverso), {
-                forceFormData: true,
-                onSuccess: () => {
-                    setCargando(false);
-                    onClose();
-                    Swal.fire({ icon: 'success', title: 'Plan de mejora creado correctamente.' });
-                },
-                onError: () => {
-                    setCargando(false);
-                    Swal.fire({ icon: 'error', title: 'Error al crear el plan de mejora.' });
-                },
-            });
-        }
+
+        const ruta = plan
+            ? route('mejoras.update', plan.id_plan)
+            : route('mejoras.store', evento.id_eventoAdverso);
+
+        post(ruta, {
+            forceFormData: true,
+            onSuccess: () => {
+                setCargando(false);
+                onClose();
+                Swal.fire({ icon: 'success', title: plan ? 'Plan actualizado correctamente.' : 'Plan creado correctamente.' });
+            },
+            onError: (errors) => {
+                setCargando(false);
+                console.log('errores:', errors);
+                Swal.fire({ icon: 'error', title: 'Error al guardar el plan de mejora.' });
+            },
+        });
     };
 
     return (
@@ -103,29 +100,22 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
 
             {/* Loading */}
             {cargando && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/85">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/70">
                     <div className="relative w-[150px] h-[73px]">
                         <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
-                            <polyline
-                                points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
-                                strokeMiterlimit="10"
-                                strokeWidth="3"
-                                stroke="#009B9E"
-                                fill="none"
-                            />
+                            <polyline points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
+                                strokeMiterlimit="10" strokeWidth="3" stroke="#009B9E" fill="none" />
                         </svg>
-                        <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_2.5s_linear_infinite]"
-                            style={{ left: 0, right: 'auto' }} />
-                        <div className="absolute top-0 h-full bg-slate-100 animate-[heartRateOut_2.5s_linear_infinite]"
-                            style={{ width: '120%', left: '-120%' }} />
+                        <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_0.8s_linear_infinite]" style={{ left: 0, right: 'auto' }} />
+                        <div className="absolute top-0 h-full bg-slate-100 animate-[heartRateOut_0.8s_linear_infinite]" style={{ width: '120%', left: '-120%' }} />
                     </div>
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <div className="bg-teal-500 px-6 py-4 flex items-center justify-between rounded-t-md">
+                <div className="bg-teal-600 px-6 py-4 flex items-center justify-between flex-shrink-0 rounded-t-xl">
                     <h2 className="text-white font-bold text-lg">
                         {plan ? 'Editar' : 'Crear'} Plan de Mejora Evento N°: {evento.id_eventoAdverso}
                     </h2>
@@ -135,7 +125,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 </div>
 
                 {/* Contenido */}
-                <div className="p-6 space-y-4 flex-1 overflow-y-auto scroll-teal">
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 scroll-teal">
 
                     <Campo label="Descripción *" error={errors.descripcion}>
                         <Editor
@@ -184,7 +174,34 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                         </Campo>
                     </div>
 
-                    <Campo label="Archivo Plan de Mejora (Opcional)" error={errors.archivo}>
+                    {/* Archivos existentes */}
+                    {archivosExistentes.length > 0 && (
+                        <Campo label="Archivos adjuntos anteriores">
+                            <div className="space-y-2">
+                                {archivosExistentes.map((archivo) => (
+                                    <a
+                                        key={archivo.id_archivo}
+                                        href={`/storage/${archivo.ruta}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-teal-50 hover:border-teal-300 transition group"
+                                    >
+                                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-100">
+                                            {getIcono(archivo.extension)}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-800 truncate">{archivo.nombre}</p>
+                                            <p className="text-xs text-gray-400 uppercase">{archivo.extension}</p>
+                                        </div>
+                                        <span className="text-xs text-teal-600 font-semibold">Ver →</span>
+                                    </a>
+                                ))}
+                            </div>
+                        </Campo>
+                    )}
+
+                    {/* Nuevo archivo */}
+                    <Campo label="Adjuntar nuevo archivo (Opcional)" error={errors.archivo}>
                         <div className="flex items-center gap-3">
                             <input
                                 type="text"
@@ -209,7 +226,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 flex-shrink-0">
                     <button onClick={onClose} className="px-5 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         Cancelar
                     </button>
