@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 import { Search, ClipboardList, XCircle, RefreshCw, Lock } from 'lucide-react';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
+import { HiOutlineSpeakerphone } from 'react-icons/hi';
+import { HiOutlineStop } from 'react-icons/hi';
 
 const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
@@ -286,12 +288,59 @@ export default function Index({ eventos, categorias }) {
                         eventoSeleccionado?.id_eventoAdverso === fila.id_eventoAdverso ? null : fila
                     )}
                     filaSeleccionada={eventoSeleccionado?.id_eventoAdverso}
-                    renderExpansion={(fila) => (
-                        <p className="text-sm">
-                            <span className="font-bold">Descripción: </span>
-                            {fila.descripcion}
-                        </p>
-                    )}
+                    renderExpansion={(fila) => {
+                        const leer = () => {
+                            if ('speechSynthesis' in window) {
+                                window.speechSynthesis.cancel();
+                                const utterance = new SpeechSynthesisUtterance(fila.descripcion);
+                                utterance.lang = 'es-CO';
+                                utterance.rate = 0.95;   // ligeramente por debajo de 1 suena menos robótico
+                                utterance.pitch = 1;     // 1 = tono natural (0 suena muy grave/artificial)
+                                utterance.volume = 1;
+
+                                const voces = window.speechSynthesis.getVoices();
+
+                                // Prioridad: voz local es-CO > voz local es-* > cualquier voz es-*
+                                const vozEspanol =
+                                    voces.find(v => v.lang === 'es-CO' && v.localService) ||
+                                    voces.find(v => v.lang.startsWith('es') && v.localService) ||
+                                    voces.find(v => v.lang.startsWith('es'));
+
+                                if (vozEspanol) utterance.voice = vozEspanol;
+
+                                window.speechSynthesis.speak(utterance);
+                            }
+                        };
+
+                        const detener = () => {
+                            if ('speechSynthesis' in window) {
+                                window.speechSynthesis.cancel();
+                            }
+                        };
+
+                        return (
+                            <div className="flex items-start gap-4">
+                                <div className="flex-1">
+                                    <span className="font-bold text-sm">Descripción: </span>
+                                    <span className="text-sm text-gray-700">{fila.descripcion}</span>
+                                </div>
+                                <div className="flex gap-2 flex-shrink-0">
+                                    <button
+                                        onClick={leer}
+                                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-teal-500 rounded-full hover:bg-teal-600 transition"
+                                    >
+                                        <HiOutlineSpeakerphone className="w-4 h-4" /> Leer
+                                    </button>
+                                    <button
+                                        onClick={detener}
+                                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-red-500 rounded-full hover:bg-red-600 transition"
+                                    >
+                                        <HiOutlineStop className="w-4 h-4" /> Detener
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    }}
                 />
 
                 {eventoSeleccionado && (
