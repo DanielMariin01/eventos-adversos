@@ -312,7 +312,7 @@ export default function Index({ eventos, categorias }) {
             )}
             {/* Loading overlay */}
             {cargando && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/95">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/85">
                     <div className="relative w-[150px] h-[73px]">
                         <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
                             <polyline
