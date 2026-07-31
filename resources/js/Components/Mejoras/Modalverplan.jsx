@@ -36,10 +36,13 @@ export default function ModalVerPlan({ evento, onClose }) {
                 <div className="p-6 space-y-3 text-sm">
                     <p><span className="font-bold">Análisis N°:</span> {plan?.id_plan ?? '—'}</p>
                     <p><span className="font-bold">Fecha:</span> {plan?.created_at?.replace('T', ' ').slice(0, 16) ?? '—'}</p>
-                    <p><span className="font-bold">Ejecución:</span> {plan?.fecha_ejecucion ?? '—'}</p>
+                    <p><span className="font-bold">Ejecución:</span> {plan?.fecha_ejecucion?.split('T')[0] ?? '—'}</p>
                     <div>
                         <span className="font-bold">Descripción:</span>
-                        <p className="text-gray-600 mt-1">{plan?.descripcion ?? '—'}</p>
+                        <div
+                            className=" mt-1 prose prose-sm max-w-none"
+                            dangerouslySetInnerHTML={{ __html: plan?.descripcion ?? '—' }}
+                        />
                     </div>
                     <p><span className="font-bold">Responsable:</span> {plan?.jefe?.name ?? '—'}</p>
                     <p>
