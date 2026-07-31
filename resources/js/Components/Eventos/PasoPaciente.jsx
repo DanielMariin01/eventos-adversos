@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import Select from 'react-select';
 
 const ENTIDADES = [
 
@@ -46,6 +47,8 @@ function Campo({ label, error, children }) {
         </div>
     );
 }
+
+const ENTIDADES_OPTIONS = ENTIDADES.map(e => ({ value: e, label: e }));
 
 export default function PasoPaciente({ data, setData, errors }) {
     const [buscando, setBuscando] = useState(false);
@@ -167,19 +170,31 @@ export default function PasoPaciente({ data, setData, errors }) {
                 </div>
             </Campo>
             <Campo label="Entidad" error={errors.pac_entidad}>
-                <input
-                    type="text"
-                    list="entidades-list"
-                    value={data.pac_entidad}
-                    onChange={e => setData('pac_entidad', e.target.value)}
+                <Select
+                    options={ENTIDADES_OPTIONS}
+                    value={ENTIDADES_OPTIONS.find(e => e.value === data.pac_entidad) ?? null}
+                    onChange={option => setData('pac_entidad', option?.value ?? '')}
                     placeholder="Buscar o escribir entidad..."
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    isClearable
+                    noOptionsMessage={() => 'No se encontraron opciones'}
+                    styles={{
+                        control: (base, state) => ({
+                            ...base,
+                            borderRadius: '0.5rem',
+                            borderColor: state.isFocused ? '#14b8a6' : '#d1d5db',
+                            boxShadow: state.isFocused ? '0 0 0 1px #14b8a6' : 'none',
+                            '&:hover': { borderColor: '#14b8a6' },
+                            fontSize: '0.875rem',
+                            minHeight: '42px',
+                        }),
+                        option: (base, state) => ({
+                            ...base,
+                            backgroundColor: state.isSelected ? '#14b8a6' : state.isFocused ? '#ccfbf1' : 'white',
+                            color: state.isSelected ? 'white' : '#374151',
+                            fontSize: '0.875rem',
+                        }),
+                    }}
                 />
-                <datalist id="entidades-list">
-                    {ENTIDADES.map(entidad => (
-                        <option key={entidad} value={entidad} />
-                    ))}
-                </datalist>
             </Campo>
 
         </div>
