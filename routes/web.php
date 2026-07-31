@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Jefe
     Route::get('/mis-eventos', [EventoController::class, 'misEventos'])->name('eventos.mis');
+    Route::post('/eventos/{evento}/evidencia', [EventoController::class, 'subirEvidencia'])->name('eventos.evidencia');
 });
 
 // ── Rutas de planes de mejora ──

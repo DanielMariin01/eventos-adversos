@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Models\Revision;
 
 class EventoController extends Controller
 {
@@ -132,6 +133,7 @@ class EventoController extends Controller
     public function index()
     {
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
+            ->whereNotIn('estado', ['en_mejora', 'radicado', 'procesado'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -246,11 +248,19 @@ class EventoController extends Controller
     // ── Eventos del jefe ──
     public function misEventos()
     {
-        $user  = Auth::user();
-        $areas = Area::where('responsable', $user->name)->pluck('id_area');
+        $user = Auth::user();
 
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
-            ->whereIn('fk_area', $areas)
+        $eventos = EventoAdverso::with([
+            'categoria',
+            'area',
+            'reportante',
+            'paciente',
+            'planMejora.jefe',
+            'archivos',
+            'revisiones.usuario',
+        ])
+            ->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
+            ->whereIn('estado', ['en_mejora', 'radicado'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -258,7 +268,6 @@ class EventoController extends Controller
             'eventos' => $eventos,
         ]);
     }
-
     // ── Subir evidencia jefe ──
     public function subirEvidencia(Request $request, EventoAdverso $evento)
     {
@@ -279,6 +288,22 @@ class EventoController extends Controller
                 ]);
             }
         }
+
+        // Cambiar estado del evento a radicado
+        $evento->update(['estado' => 'radicado']);
+
+        // Cambiar estado del plan de mejora a radicado
+        if ($evento->planMejora) {
+            $evento->planMejora->update(['estado' => 'radicado']);
+        }
+
+        // Registrar revisión
+        Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Evidencia Plan de Mejora',
+            'observacion' => 'El jefe subió evidencia del plan de mejora del evento N° ' . $evento->id_eventoAdverso . ' el ' . now()->format('Y-m-d') . ' a las ' . now()->format('H:i'),
+        ]);
 
         return redirect()->back()
             ->with('success', 'Evidencia subida correctamente.');

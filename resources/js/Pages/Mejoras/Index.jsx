@@ -12,11 +12,15 @@ import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
     en_mejora: 'bg-teal-500 text-white',
+    radicado: 'bg-purple-500 text-white',
+    procesado: 'bg-green-500 text-white',
 };
 
 const LABEL_ESTADO = {
     analizado: 'Analizado',
     en_mejora: 'En Mejora',
+    radicado: 'Radicado',
+    procesado: 'Procesado',
 };
 
 export default function Index({ eventos, jefes }) {
