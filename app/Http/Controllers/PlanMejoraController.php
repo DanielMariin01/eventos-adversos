@@ -18,7 +18,7 @@ class PlanMejoraController extends Controller
     {
         $eventos = EventoAdverso::with([
             'categoria',
-            'area',
+            'area.jefe',
             'reportante',
             'paciente',
             'planMejora.jefe',

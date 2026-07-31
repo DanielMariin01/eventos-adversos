@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin } from 'lucide-react';
 import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -17,6 +17,12 @@ export default function AuthenticatedLayout({ header, children }) {
             url: route('dashboard'),
             icon: LayoutDashboard,
             roles: ['administrador', 'calidad', 'jefe'],
+        },
+        {
+            title: 'Áreas',
+            url: route('areas.index'),
+            icon: MapPin,
+            roles: ['administrador'],
         },
         {
             title: 'Usuarios',

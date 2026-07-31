@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PlanMejoraController;
+use App\Http\Controllers\AreaController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -67,6 +68,12 @@ Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
     Route::get('/mejoras', [PlanMejoraController::class, 'index'])->name('mejoras.index');
     Route::post('/mejoras/{evento}', [PlanMejoraController::class, 'store'])->name('mejoras.store');
     Route::get('/mejoras/{evento}/revisiones', [PlanMejoraController::class, 'revisiones'])->name('mejoras.revisiones');
+});
+
+// ── Rutas de áreas (solo administrador) ──
+Route::middleware(['auth', 'role:administrador'])->group(function () {
+    Route::get('/areas', [AreaController::class, 'index'])->name('areas.index');
+    Route::patch('/areas/{area}', [AreaController::class, 'update'])->name('areas.update');
 });
 
 require __DIR__ . '/auth.php';

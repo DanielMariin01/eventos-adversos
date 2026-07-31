@@ -10,10 +10,10 @@ export default function ModalRevisiones({ evento, onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-md shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <div className="bg-teal-500 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                <div className="bg-lime-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <h2 className="text-white font-bold text-lg">
                         Revisiones Evento N° {evento.id_eventoAdverso}
                     </h2>
@@ -29,7 +29,7 @@ export default function ModalRevisiones({ evento, onClose }) {
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
-                                <thead className="bg-teal-600 text-white">
+                                <thead className="bg-lime-600 text-white">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-semibold uppercase">ID</th>
                                         <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Fecha</th>

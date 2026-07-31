@@ -32,7 +32,7 @@ class EventoController extends Controller
             'fk_categoria' => 'required|exists:categorias,id_categoria',
         ]);
 
-        $areas = Area::where('activo', 1)->get();
+        $areas = Area::with('jefe')->where('activo', 1)->get();
 
         return response()->json(['areas' => $areas]);
     }

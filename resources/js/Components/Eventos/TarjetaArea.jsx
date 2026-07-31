@@ -73,7 +73,7 @@ export default function TarjetaArea({ area, seleccionada, onClick }) {
                     {area.nombre}
                 </h3>
                 <p className="mt-1 text-xs text-[#78858F] text-center leading-snug">
-                    {area.responsable ?? 'Sin responsable asignado'}
+                    {area.jefe?.name ?? area.responsable ?? 'Sin responsable asignado'}
                 </p>
 
                 <div className="mt-3">

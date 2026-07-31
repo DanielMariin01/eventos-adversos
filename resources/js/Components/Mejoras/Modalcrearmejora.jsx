@@ -27,7 +27,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
     const { data, setData, post, errors } = useForm({
         descripcion: '',
         fecha_ejecucion: '',
-        fk_jefe: '',
+        fk_jefe: evento.area?.jefe?.id ?? '',
         archivo: null,
     });
 
@@ -76,6 +76,9 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
             },
         });
     };
+    console.log('area:', evento.area);
+    console.log('jefe:', evento.area?.jefe);
+    console.log('fk_jefe:', evento.area?.jefe?.id);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -94,10 +97,10 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl">
 
                 {/* Header */}
-                <div className="bg-teal-600 px-6 py-4 flex items-center justify-between rounded-t-md">
+                <div className="bg-teal-500 px-6 py-4 flex items-center justify-between rounded-t-md">
                     <h2 className="text-white font-bold text-lg">
                         Plan de Mejora Evento N°: {evento.id_eventoAdverso}
                     </h2>

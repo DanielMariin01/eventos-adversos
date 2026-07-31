@@ -12,6 +12,7 @@ class Area extends Model
     protected $fillable = [
         'nombre',
         'responsable',
+        'fk_jefe',
         'activo',
     ];
 
@@ -19,5 +20,9 @@ class Area extends Model
     public function eventosAdversos()
     {
         return $this->hasMany(EventoAdverso::class, 'fk_area');
+    }
+    public function jefe()
+    {
+        return $this->belongsTo(User::class, 'fk_jefe');
     }
 }

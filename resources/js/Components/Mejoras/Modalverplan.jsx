@@ -20,10 +20,10 @@ export default function ModalVerPlan({ evento, onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-md shadow-3xl w-full max-w-lg">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl">
 
                 {/* Header */}
-                <div className="bg-blue-600 px-6 py-4 flex items-center justify-between rounded-t-xl">
+                <div className="bg-blue-600 px-6 py-4 flex items-center justify-between rounded-t-md">
                     <h2 className="text-white font-bold text-lg">
                         Plan Mejora Evento N° {evento.id_eventoAdverso}
                     </h2>
