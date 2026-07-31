@@ -7,6 +7,7 @@ import { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import { X, Save, Paperclip, Mic, MicOff } from 'lucide-react';
 import Swal from 'sweetalert2';
+import Editor from '@/Components/Editor';
 
 function Campo({ label, error, children }) {
     return (
@@ -25,7 +26,8 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
     const recognitionRef = useRef(null);
     const plan = evento.plan_mejora;
 
-    const { data, setData, post, patch, errors } = useForm({
+    const { data, setData, post, errors } = useForm({
+        _method: 'POST',
         descripcion: plan?.descripcion ?? '',
         fecha_ejecucion: plan?.fecha_ejecucion ?? '',
         fk_jefe: plan?.fk_jefe ?? evento.area?.jefe?.id ?? '',
@@ -58,16 +60,16 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
     };
 
     const submit = () => {
+        console.log('data a enviar:', data);
         if (!data.descripcion || !data.fecha_ejecucion || !data.fk_jefe) {
             Swal.fire({ icon: 'warning', title: 'Campos obligatorios', text: 'Por favor completa todos los campos requeridos.' });
             return;
         }
 
         setCargando(true);
-
         if (plan) {
-            // Editar
-            patch(route('mejoras.update', plan.id_plan), {
+            post(route('mejoras.update', plan.id_plan), {
+                forceFormData: true,
                 onSuccess: () => {
                     setCargando(false);
                     onClose();
@@ -75,6 +77,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 },
                 onError: (errors) => {
                     setCargando(false);
+                    console.log('errores:', errors);
                     Swal.fire({ icon: 'error', title: 'Error al actualizar el plan de mejora.' });
                 },
             });
@@ -112,7 +115,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
                 <div className="bg-teal-500 px-6 py-4 flex items-center justify-between rounded-t-md">
@@ -125,25 +128,23 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                 </div>
 
                 {/* Contenido */}
-                <div className="p-6 space-y-4">
+                <div className="p-6 space-y-4 flex-1 overflow-y-auto scroll-teal">
 
                     <Campo label="Descripción *" error={errors.descripcion}>
-                        <div className="relative">
-                            <textarea
-                                value={data.descripcion}
-                                onChange={e => setData('descripcion', e.target.value)}
-                                placeholder="Describa el plan de mejora o use el micrófono..."
-                                rows={5}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
-                            />
-                            <button
-                                type="button"
-                                onClick={toggleGrabacion}
-                                className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabando ? 'bg-red-500 text-white animate-pulse' : 'bg-teal-500 text-white hover:bg-teal-600'}`}
-                            >
-                                {grabando ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                            </button>
-                        </div>
+                        <Editor
+                            value={data.descripcion}
+                            onChange={val => setData('descripcion', val)}
+                            placeholder="Describa el plan de mejora..."
+                            minHeight="200px"
+                        />
+                        <button
+                            type="button"
+                            onClick={toggleGrabacion}
+                            className={`mt-2 flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition ${grabando ? 'bg-red-500 text-white animate-pulse' : 'bg-teal-500 text-white hover:bg-teal-600'}`}
+                        >
+                            {grabando ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                            {grabando ? 'Detener grabación' : 'Usar micrófono'}
+                        </button>
                         {grabando && (
                             <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse inline-block" />

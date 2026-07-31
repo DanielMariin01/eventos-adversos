@@ -21,6 +21,9 @@
         "vite": "^6.0.11"
     },
     "dependencies": {
+        "@tiptap/pm": "^3.29.2",
+        "@tiptap/react": "^3.29.2",
+        "@tiptap/starter-kit": "^3.29.2",
         "boring-avatars": "^2.0.4",
         "lottie-react": "^2.4.1",
         "lucide-react": "^1.18.0",
