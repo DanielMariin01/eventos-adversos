@@ -84,8 +84,37 @@ export default function ModalAnalisis({ evento, onClose }) {
     };
 
     const submit = () => {
-        setCargando(true);
+        const errores = {};
 
+        if (!data.barreras_vulneradas || data.barreras_vulneradas.length === 0)
+            errores.barreras = 'Seleccione al menos una barrera vulnerada';
+        if (!data.barreras_descripcion)
+            errores.barreras_descripcion = 'La descripción de barreras es obligatoria';
+        if (!data.acciones_inseguras || data.acciones_inseguras.length === 0)
+            errores.acciones = 'Seleccione al menos una acción insegura';
+        if (!data.acciones_descripcion)
+            errores.acciones_descripcion = 'La descripción de acciones es obligatoria';
+        if (!data.factores_contributivos || Object.keys(data.factores_contributivos).length === 0)
+            errores.factores = 'Seleccione al menos un factor contributivo';
+        if (!data.descripcion_analisis)
+            errores.descripcion_analisis = 'La descripción del análisis es obligatoria';
+        if (!data.clasificacion)
+            errores.clasificacion = 'La clasificación es obligatoria';
+        if (!data.relacionado_con)
+            errores.relacionado_con = 'La relación es obligatoria';
+        if (!data.categorizacion)
+            errores.categorizacion = 'La categorización es obligatoria';
+
+        if (Object.keys(errores).length > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos obligatorios',
+                html: Object.values(errores).map(e => `• ${e}`).join('<br>'),
+            });
+            return;
+        }
+
+        setCargando(true);
         post(route('eventos.analisis', evento.id_eventoAdverso), {
             forceFormData: true,
             onSuccess: () => {
