@@ -42,7 +42,9 @@ export default function ModalRevisiones({ evento, onClose }) {
                                     {revisiones.map(revision => (
                                         <tr key={revision.id_revision} className="border-b border-gray-100 hover:bg-gray-50">
                                             <td className="px-4 py-3">{revision.id_revision}</td>
-                                            <td className="px-4 py-3 text-xs">{revision.created_at?.replace('T', ' ').slice(0, 16)}</td>
+                                            <td className="px-4 py-3 text-xs">
+                                                {revision.created_at ? new Date(revision.created_at).toLocaleString('es-CO', { timeZone: 'America/Bogota' }) : '—'}
+                                            </td>
                                             <td className="px-4 py-3">{revision.tipo}</td>
                                             <td className="px-4 py-3">{revision.observacion}</td>
                                             <td className="px-4 py-3">{revision.usuario?.name ?? '—'}</td>
