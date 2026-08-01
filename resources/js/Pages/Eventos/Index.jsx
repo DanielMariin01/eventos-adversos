@@ -8,7 +8,7 @@ import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
 import { HiOutlineStop } from 'react-icons/hi';
-import { HiOutlineSearch, HiOutlineClipboardList } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlineEye } from 'react-icons/hi';
 
 const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
@@ -162,37 +162,15 @@ export default function Index({ eventos, categorias }) {
                             title="Análisis"
                             className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
                         >
-                            <HiOutlineSearch className="w-4 h-4" />
+                            <HiOutlineEye className="w-5 h-5" />
                         </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalTipo(true); }}
                             title="Cambiar tipo"
-                            className="w-8 h-8 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-b-full bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
                         >
                             <RefreshCw className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setEventoSeleccionado(fila);
-                                setTimeout(() => cerrarAnalisis(), 0);
-                            }}
-                            title="Cerrar análisis"
-                            className="w-8 h-8 bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition"
-                        >
-                            <Lock className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setEventoSeleccionado(fila);
-                                setTimeout(() => cancelarEvento(), 0);
-                            }}
-                            title="Cancelar evento"
-                            className="w-8 h-8 rounded-b-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition"
-                        >
-                            <XCircle className="w-4 h-4" />
-                        </button>
+                        </button>                  
                     </div>
                 </div>
             ),
@@ -371,7 +349,7 @@ export default function Index({ eventos, categorias }) {
                                 <div className="flex gap-2 flex-shrink-0">
                                     <button
                                         onClick={leer}
-                                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-teal-500 rounded-full hover:bg-teal-600 transition"
+                                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-sky-400 rounded-full hover:bg-sky-600 transition"
                                     >
                                         <HiOutlineSpeakerphone className="w-4 h-4" /> Leer
                                     </button>
