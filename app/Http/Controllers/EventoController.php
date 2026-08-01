@@ -133,7 +133,7 @@ class EventoController extends Controller
     public function index()
     {
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
-            ->whereNotIn('estado', ['en_mejora', 'radicado'])
+            ->whereNotIn('estado', ['en_mejora', 'radicado', 'cancelado', 'cerrado'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
