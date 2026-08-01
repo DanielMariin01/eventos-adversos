@@ -12,6 +12,7 @@ export default function Index({ areas, jefes }) {
     const [fkJefe, setFkJefe] = useState('');
     const [cargando, setCargando] = useState(false);
 
+
     const abrirEditar = (area) => {
         setAreaSeleccionada(area);
         setFkJefe(area.fk_jefe ?? '');

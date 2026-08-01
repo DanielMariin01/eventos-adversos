@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, ClipboardList, XCircle, RefreshCw, Lock } from 'lucide-react';
+import { Search, ClipboardList, XCircle, RefreshCw, Lock,Filter } from 'lucide-react';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
@@ -36,6 +36,7 @@ export default function Index({ eventos, categorias }) {
     const [busquedaReportante, setBusquedaReportante] = useState('');
     const [busquedaPaciente, setBusquedaPaciente] = useState('');
     const [cargando, setCargando] = useState(false);
+    const [filtroEstado, setFiltroEstado] = useState('');
 
     // ── Acciones ──
     const abrirAnalisis = () => {
@@ -170,7 +171,7 @@ export default function Index({ eventos, categorias }) {
                             className="w-8 h-8 rounded-b-full bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
                         >
                             <RefreshCw className="w-4 h-4" />
-                        </button>                  
+                        </button>
                     </div>
                 </div>
             ),
@@ -202,6 +203,7 @@ export default function Index({ eventos, categorias }) {
     const eventosFiltrados = {
         ...eventos,
         data: eventos.data.filter(e =>
+            (filtroEstado === '' || e.estado === filtroEstado) &&
             (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
             (busquedaReportante === '' ||
                 e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
@@ -260,7 +262,7 @@ export default function Index({ eventos, categorias }) {
                 </div>
 
                 {/* ── Buscador ── */}
-                <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
                         <input
                             type="text"
@@ -297,6 +299,21 @@ export default function Index({ eventos, categorias }) {
                         />
                         <div className="bg-cyan-500 px-3 py-2.5">
                             <Search className="w-4 h-4 text-white" />
+                        </div>
+                    </div>
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                        <select
+                            value={filtroEstado}
+                            onChange={e => setFiltroEstado(e.target.value)}
+                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white"
+                        >
+                            <option value="">Todos los estados</option>
+                            <option value="en_proceso">En Proceso</option>
+                            <option value="procesado">Procesado</option>
+                     
+                        </select>
+                        <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
+                            <Filter className="w-4 h-4 text-white" />
                         </div>
                     </div>
                 </div>
