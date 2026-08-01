@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, PlusCircle, Eye, FileText, ClipboardList } from 'lucide-react';
+import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter } from 'lucide-react';
 import ModalCrearMejora from '@/Components/Mejoras/ModalCrearMejora';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
@@ -35,6 +35,7 @@ export default function Index({ eventos, jefes }) {
     const [modalPlan, setModalPlan] = useState(false);
     const [modalRevisiones, setModalRevisiones] = useState(false);
     const [cargando, setCargando] = useState(false);
+    const [filtroEstado, setFiltroEstado] = useState('');
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -168,6 +169,7 @@ export default function Index({ eventos, jefes }) {
     const eventosFiltrados = {
         ...eventos,
         data: eventos.data.filter(e =>
+            (filtroEstado === '' || e.estado === filtroEstado) &&
             (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
             (busquedaReportante === '' ||
                 e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
@@ -245,7 +247,7 @@ export default function Index({ eventos, jefes }) {
                 </div>
 
                 {/* ── Buscadores ── */}
-                <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
                         <input type="text" value={busquedaEvento} onChange={e => setBusquedaEvento(e.target.value)} placeholder="Buscar evento..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
                         <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
@@ -257,6 +259,21 @@ export default function Index({ eventos, jefes }) {
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
                         <input type="text" value={busquedaPaciente} onChange={e => setBusquedaPaciente(e.target.value)} placeholder="Buscar paciente..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
                         <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    </div>
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                        <select
+                            value={filtroEstado}
+                            onChange={e => setFiltroEstado(e.target.value)}
+                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white"
+                        >
+                            <option value="">Todos los estados</option>
+                            <option value="analizado">Analizado</option>
+                            <option value="en_mejora">En Mejora</option>
+                            <option value="radicado">Radicado</option>
+                        </select>
+                        <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
+                            <Filter className="w-4 h-4 text-white" />
+                        </div>
                     </div>
                 </div>
 
