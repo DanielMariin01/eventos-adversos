@@ -3,7 +3,7 @@ import { Head, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, Upload, ClipboardList, FileText, Eye } from 'lucide-react';
+import { Search, Upload, ClipboardList, FileText, Eye, Filter } from 'lucide-react';
 import { HiOutlineEye, HiOutlineClipboardList, HiOutlineUpload, HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
@@ -39,6 +39,7 @@ export default function MisEventos({ eventos }) {
     const [modalRevisiones, setModalRevisiones] = useState(false);
     const [modalEvidencia, setModalEvidencia] = useState(false);
     const [cargando, setCargando] = useState(false);
+    const [filtroEstado, setFiltroEstado] = useState('');
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -114,7 +115,7 @@ export default function MisEventos({ eventos }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
                             title="Ver análisis"
-                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-t-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineEye className="w-4 h-4" />
                         </button>
@@ -128,7 +129,7 @@ export default function MisEventos({ eventos }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
                             title="Subir evidencia"
-                            className="w-8 h-8 rounded-b-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-b-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineUpload className="w-4 h-4" />
                         </button>
@@ -169,6 +170,7 @@ export default function MisEventos({ eventos }) {
     const eventosFiltrados = {
         ...eventos,
         data: eventos.data.filter(e =>
+            (filtroEstado === '' || e.estado === filtroEstado) &&
             (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
             (busquedaReportante === '' ||
                 e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
@@ -241,7 +243,7 @@ export default function MisEventos({ eventos }) {
                 </div>
 
                 {/* ── Buscadores ── */}
-                <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
                         <input type="text" value={busquedaEvento} onChange={e => setBusquedaEvento(e.target.value)} placeholder="Buscar evento..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
                         <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
@@ -253,6 +255,20 @@ export default function MisEventos({ eventos }) {
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
                         <input type="text" value={busquedaPaciente} onChange={e => setBusquedaPaciente(e.target.value)} placeholder="Buscar paciente..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
                         <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    </div>
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                        <select
+                            value={filtroEstado}
+                            onChange={e => setFiltroEstado(e.target.value)}
+                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white"
+                        >
+                            <option value="">Todos los estados</option>
+                            <option value="en_mejora">En Mejora</option>
+                            <option value="radicado">Radicado</option>
+                        </select>
+                        <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
+                            <Filter className="w-4 h-4 text-white" />
+                        </div>
                     </div>
                 </div>
 
