@@ -8,6 +8,7 @@ import ModalCrearMejora from '@/Components/Mejoras/ModalCrearMejora';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
 import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
+import { HiOutlineEye, HiOutlineClipboardList, HiOutlinePencil, HiOutlineDocumentText } from 'react-icons/hi';
 
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
@@ -103,11 +104,40 @@ export default function Index({ eventos, jefes }) {
             label: 'Reportante',
             key: 'reportante',
             render: (fila) => (
-                <div className="text-xs space-y-0.5">
-                    <p><span className="font-semibold">Doc:</span> {fila.reportante?.cedula ?? '—'}</p>
-                    <p><span className="font-semibold">Nombre:</span> {fila.reportante?.nombres} {fila.reportante?.apellidos}</p>
-                    <p><span className="font-semibold">Cargo:</span> {fila.reportante?.cargo ?? '—'}</p>
-                    <p><span className="font-semibold">Empresa:</span> {fila.reportante?.empresa ?? '—'}</p>
+                <div className="flex gap-3 items-start">
+
+
+                    {/* Datos del reportante */}
+                    <div className="text-xs space-y-0.5">
+                        <p><span className="font-semibold">Doc:</span> {fila.reportante?.cedula ?? '—'}</p>
+                        <p><span className="font-semibold">Nombre:</span> {fila.reportante?.nombres} {fila.reportante?.apellidos}</p>
+                        <p><span className="font-semibold">Cargo:</span> {fila.reportante?.cargo ?? '—'}</p>
+                        <p><span className="font-semibold">Empresa:</span> {fila.reportante?.empresa ?? '—'}</p>
+                    </div>
+                    {/* Iconos apilados */}
+                    <div className="flex flex-col">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
+                            title="Ver análisis"
+                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineEye className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalPlan(true); }}
+                            title="Ver plan de mejora"
+                            className="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineClipboardList className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCrear(true); }}
+                            title="Crear/Editar mejora"
+                            className="w-8 h-8 bg-teal-700 rounded-b-full hover:bg-teal-800 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             ),
         },
