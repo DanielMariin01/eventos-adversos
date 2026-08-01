@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
 import { Search, Upload, ClipboardList, FileText, Eye } from 'lucide-react';
-import { HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineClipboardList, HiOutlineUpload, HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
 import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
@@ -108,10 +108,38 @@ export default function MisEventos({ eventos }) {
             label: 'Reportante',
             key: 'reportante',
             render: (fila) => (
-                <div className="text-xs space-y-0.5">
-                    <p><span className="font-semibold">Doc:</span> {fila.reportante?.cedula ?? '—'}</p>
-                    <p><span className="font-semibold">Nombre:</span> {fila.reportante?.nombres} {fila.reportante?.apellidos}</p>
-                    <p><span className="font-semibold">Cargo:</span> {fila.reportante?.cargo ?? '—'}</p>
+                <div className="flex gap-3 items-start">
+                    {/* Iconos apilados */}
+                    <div className="flex flex-col">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
+                            title="Ver análisis"
+                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineEye className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalPlan(true); }}
+                            title="Ver plan de mejora"
+                            className="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineClipboardList className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
+                            title="Subir evidencia"
+                            className="w-8 h-8 rounded-b-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineUpload className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Datos del reportante */}
+                    <div className="text-xs space-y-0.5">
+                        <p><span className="font-semibold">Doc:</span> {fila.reportante?.cedula ?? '—'}</p>
+                        <p><span className="font-semibold">Nombre:</span> {fila.reportante?.nombres} {fila.reportante?.apellidos}</p>
+                        <p><span className="font-semibold">Cargo:</span> {fila.reportante?.cargo ?? '—'}</p>
+                    </div>
                 </div>
             ),
         },
