@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas específicas primero
     Route::get('/eventos/crear', [EventoController::class, 'create'])->name('eventos.create');
+    Route::get('/eventos/cancelados', [EventoController::class, 'cancelados'])->name('eventos.cancelados');
     Route::post('/eventos/area', [EventoController::class, 'seleccionarArea'])->name('eventos.area');
     Route::get('/eventos/reportante/{cedula}', [EventoController::class, 'buscarReportante'])->name('eventos.reportante');
     Route::get('/eventos/paciente/{cedula}', [EventoController::class, 'buscarPaciente'])->name('eventos.paciente');
@@ -51,17 +52,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::patch('/eventos/{evento}/estado', [EventoController::class, 'actualizarEstado'])->name('eventos.estado');
-
-
     Route::post('/eventos/{evento}/analisis', [EventoController::class, 'guardarAnalisis'])->name('eventos.analisis');
     Route::patch('/eventos/{evento}/cerrar', [EventoController::class, 'cerrarAnalisis'])->name('eventos.cerrar');
     Route::patch('/eventos/{evento}/cancelar', [EventoController::class, 'cancelarEvento'])->name('eventos.cancelar');
     Route::patch('/eventos/{evento}/tipo', [EventoController::class, 'cambiarTipo'])->name('eventos.tipo');
     Route::post('/eventos/{evento}/evidencia', [EventoController::class, 'subirEvidencia'])->name('eventos.evidencia');
+    Route::patch('/eventos/{evento}/reabrir', [EventoController::class, 'reabrir'])->name('eventos.reabrir');
 
     // Jefe
     Route::get('/mis-eventos', [EventoController::class, 'misEventos'])->name('eventos.mis');
-    Route::post('/eventos/{evento}/evidencia', [EventoController::class, 'subirEvidencia'])->name('eventos.evidencia');
 });
 
 // ── Rutas de planes de mejora ──

@@ -308,4 +308,30 @@ class EventoController extends Controller
         return redirect()->back()
             ->with('success', 'Evidencia subida correctamente.');
     }
+    public function cancelados()
+    {
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
+            ->where('estado', 'cancelado')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return Inertia::render('Eventos/Cancelados', [
+            'eventos' => $eventos,
+        ]);
+    }
+
+    public function reabrir(EventoAdverso $evento)
+    {
+        $evento->update(['estado' => 'en_proceso']);
+
+        Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Reapertura de Evento',
+            'observacion' => 'Se reabrió el evento N° ' . $evento->id_eventoAdverso . ' el ' . now()->format('Y-m-d') . ' a las ' . now()->format('H:i'),
+        ]);
+
+        return redirect()->route('eventos.cancelados')
+            ->with('success', 'Evento reabierto correctamente.');
+    }
 }
