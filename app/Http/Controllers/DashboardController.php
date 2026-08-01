@@ -22,11 +22,12 @@ class DashboardController extends Controller
         $totalEventos = EventoAdverso::count();
 
         // ── Eventos del mes actual vs mes anterior ──
-        $mesActual   = EventoAdverso::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+        $ahora       = now();
+        $mesActual   = EventoAdverso::whereMonth('created_at', $ahora->month)
+            ->whereYear('created_at', $ahora->year)
             ->count();
-        $mesAnterior = EventoAdverso::whereMonth('created_at', now()->subMonth()->month)
-            ->whereYear('created_at', now()->subMonth()->year)
+        $mesAnterior = EventoAdverso::whereMonth('created_at', $ahora->copy()->subMonth()->month)
+            ->whereYear('created_at', $ahora->copy()->subMonth()->year)
             ->count();
 
         // ── Eventos por categoría ──
@@ -77,6 +78,34 @@ class DashboardController extends Controller
             ->where('estado', 'en_proceso')
             ->count();
 
+        // ── Eventos por clasificación y mes ──
+        $porClasificacionMes = EventoAdverso::select(
+            'clasificacion',
+            DB::raw('MONTH(created_at) as mes'),
+            DB::raw('YEAR(created_at) as anio'),
+            DB::raw('count(*) as total')
+        )
+            ->whereYear('created_at', now()->year)
+            ->whereNotNull('clasificacion')
+            ->groupBy('clasificacion', 'anio', 'mes')
+            ->orderBy('mes')
+            ->get();
+
+        // Transformar para recharts
+        $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        $clasificaciones = $porClasificacionMes->pluck('clasificacion')->unique()->values();
+
+        $datosClasificacion = collect(range(1, 12))->map(function ($mes) use ($porClasificacionMes, $meses, $clasificaciones) {
+            $fila = ['mes' => $meses[$mes - 1]];
+            foreach ($clasificaciones as $cls) {
+                $fila[$cls] = $porClasificacionMes
+                    ->where('mes', $mes)
+                    ->where('clasificacion', $cls)
+                    ->first()?->total ?? 0;
+            }
+            return $fila;
+        })->filter(fn($f) => collect($f)->except('mes')->sum() > 0)->values();
+
         return Inertia::render('Dashboard', [
             'estadisticas' => [
                 'totalEventos'     => $totalEventos,
@@ -88,6 +117,8 @@ class DashboardController extends Controller
                 'porMes'           => $porMes,
                 'planesPorEstado'  => $planesPorEstado,
                 'planesVencidos'   => $planesVencidos,
+                'porClasificacionMes' => $datosClasificacion,
+                'clasificaciones'     => $clasificaciones,
             ],
         ]);
     }

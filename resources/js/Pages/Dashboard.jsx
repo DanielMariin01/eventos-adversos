@@ -28,6 +28,7 @@ const LABEL_ESTADO = {
     cerrado: 'Cerrado',
 };
 
+
 function TarjetaIndicador({ titulo, valor, icono: Icono, color, subtitulo }) {
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-center gap-4">
@@ -70,6 +71,8 @@ export default function Dashboard({ estadisticas }) {
         porMes,
         planesPorEstado,
         planesVencidos,
+        porClasificacionMes,
+        clasificaciones,
     } = estadisticas;
 
     const tendencia = mesActual - mesAnterior;
@@ -203,6 +206,37 @@ export default function Dashboard({ estadisticas }) {
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
+
+                    {/* ── Clasificación de eventos ── */}
+                    {porClasificacionMes?.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Clasificación de Eventos {new Date().getFullYear()}
+                            </h3>
+                            <p className="text-xs text-gray-400 mb-4">
+                                INC: Incidente · COMP: Complicación · EAP: Evento adverso Prevenible · EANP: Evento adverso No Prevenible
+                            </p>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={porClasificacionMes}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                    <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip content={<TooltipPersonalizado />} />
+                                    <Legend />
+                                    {clasificaciones.map((cls, index) => (
+                                        <Bar
+                                            key={cls}
+                                            dataKey={cls}
+                                            name={cls}
+                                            fill={COLORES[index % COLORES.length]}
+                                            radius={[4, 4, 0, 0]}
+                                            label={{ position: 'top', fontSize: 10 }}
+                                        />
+                                    ))}
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
 
                     {/* Eventos por categoría */}
                     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
