@@ -70,6 +70,7 @@ Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
     Route::post('/mejoras/{evento}', [PlanMejoraController::class, 'store'])->name('mejoras.store');
     Route::get('/mejoras/{evento}/revisiones', [PlanMejoraController::class, 'revisiones'])->name('mejoras.revisiones');
     Route::post('/mejoras/{plan}/update', [PlanMejoraController::class, 'update'])->name('mejoras.update');
+    Route::patch('/mejoras/{evento}/cerrar', [PlanMejoraController::class, 'cerrarCaso'])->name('mejoras.cerrar');
 });
 
 // ── Rutas de áreas (solo administrador) ──

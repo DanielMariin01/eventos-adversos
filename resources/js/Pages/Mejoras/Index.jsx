@@ -3,18 +3,19 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter } from 'lucide-react';
+import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter, CheckCircle } from 'lucide-react';
 import ModalCrearMejora from '@/Components/Mejoras/ModalCrearMejora';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
 import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
-import { HiOutlineEye, HiOutlineClipboardList, HiOutlinePencil, HiOutlineDocumentText } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineClipboardList, HiOutlinePencil, HiOutlineDocumentText, HiOutlineCheckCircle } from 'react-icons/hi';
 
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
     en_mejora: 'bg-teal-500 text-white',
     radicado: 'bg-purple-500 text-white',
     procesado: 'bg-green-500 text-white',
+    cerrado: 'bg-gray-700 text-white',
 };
 
 const LABEL_ESTADO = {
@@ -22,6 +23,7 @@ const LABEL_ESTADO = {
     en_mejora: 'En Mejora',
     radicado: 'Radicado',
     procesado: 'Procesado',
+    cerrado: 'Cerrado',
 };
 
 export default function Index({ eventos, jefes }) {
@@ -134,9 +136,20 @@ export default function Index({ eventos, jefes }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCrear(true); }}
                             title="Crear/Editar mejora"
-                            className="w-8 h-8 bg-teal-700 rounded-b-full hover:bg-teal-800 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 bg-teal-700  hover:bg-teal-800 text-white flex items-center justify-center transition"
                         >
                             <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEventoSeleccionado(fila);
+                                setTimeout(() => cerrarCaso(), 0);
+                            }}
+                            title="Cerrar caso"
+                            className="w-8 h-8 rounded-b-full bg-gray-700 hover:bg-gray-800 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineCheckCircle className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -178,6 +191,34 @@ export default function Index({ eventos, jefes }) {
                 e.paciente?.nombres?.toLowerCase().includes(busquedaPaciente.toLowerCase()) ||
                 e.paciente?.cedula?.includes(busquedaPaciente))
         ),
+    };
+    const cerrarCaso = () => {
+        if (!eventoSeleccionado) return alertSeleccionar();
+        if (eventoSeleccionado.estado !== 'radicado') {
+            return Swal.fire({ icon: 'info', title: 'No permitido', text: 'Solo se pueden cerrar eventos con estado Radicado.' });
+        }
+        Swal.fire({
+            title: '¿Cerrar caso?',
+            text: 'El evento pasará a estado Cerrado.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#14b8a6',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, cerrar',
+            cancelButtonText: 'Cancelar',
+        }).then(result => {
+            if (result.isConfirmed) {
+                setCargando(true);
+                router.patch(route('mejoras.cerrar', eventoSeleccionado.id_eventoAdverso), {}, {
+                    onSuccess: () => {
+                        setCargando(false);
+                        setEventoSeleccionado(null);
+                        Swal.fire({ icon: 'success', title: 'Caso cerrado correctamente.' });
+                    },
+                    onFinish: () => setCargando(false),
+                });
+            }
+        });
     };
 
     return (
@@ -244,6 +285,14 @@ export default function Index({ eventos, jefes }) {
                         <Eye className="w-5 h-5" />
                         Ver revisiones
                     </button>
+                    <button
+                        onClick={cerrarCaso}
+                        disabled={!eventoSeleccionado}
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gray-700 rounded-lg hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <CheckCircle className="w-4 h-4" />
+                        Cerrar caso
+                    </button>
                 </div>
 
                 {/* ── Buscadores ── */}
@@ -270,6 +319,7 @@ export default function Index({ eventos, jefes }) {
                             <option value="analizado">Analizado</option>
                             <option value="en_mejora">En Mejora</option>
                             <option value="radicado">Radicado</option>
+                            <option value="cerrado">Cerrado</option>
                         </select>
                         <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
                             <Filter className="w-4 h-4 text-white" />

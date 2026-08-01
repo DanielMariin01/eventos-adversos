@@ -26,7 +26,7 @@ class PlanMejoraController extends Controller
             'archivos',
             'revisiones.usuario',
         ])
-            ->whereIn('estado', ['en_mejora', 'radicado'])
+            ->whereIn('estado', ['en_mejora', 'radicado', 'cerrado'])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
         $jefes = User::role('jefe')->get(['id', 'name']);
@@ -135,5 +135,29 @@ class PlanMejoraController extends Controller
 
         return redirect()->route('mejoras.index')
             ->with('success', 'Plan de mejora actualizado correctamente.');
+    }
+
+    public function cerrarCaso(EventoAdverso $evento)
+    {
+        if ($evento->estado !== 'radicado') {
+            return redirect()->back()
+                ->with('error', 'Solo se pueden cerrar eventos con estado Radicado.');
+        }
+
+        $evento->update([
+            'estado'       => 'cerrado',
+            'fecha_cierre' => now(),
+        ]);
+
+        // Registrar revisión
+        \App\Models\Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Cierre de Caso',
+            'observacion' => 'Se cerró el caso del evento N° ' . $evento->id_eventoAdverso . ' el ' . now()->format('Y-m-d') . ' a las ' . now()->format('H:i'),
+        ]);
+
+        return redirect()->route('mejoras.index')
+            ->with('success', 'Caso cerrado correctamente.');
     }
 }
