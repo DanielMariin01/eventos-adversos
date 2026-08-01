@@ -8,6 +8,7 @@ import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
 import { HiOutlineStop } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlineClipboardList } from 'react-icons/hi';
 
 const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
@@ -144,11 +145,55 @@ export default function Index({ eventos, categorias }) {
             label: 'Reportante',
             key: 'reportante',
             render: (fila) => (
-                <div className="text-xs space-y-0.5">
-                    <p><span className="font-semibold">Doc:</span> {fila.reportante?.cedula ?? '—'}</p>
-                    <p><span className="font-semibold">Nombre:</span> {fila.reportante?.nombres} {fila.reportante?.apellidos}</p>
-                    <p><span className="font-semibold">Cargo:</span> {fila.reportante?.cargo ?? '—'}</p>
-                    <p><span className="font-semibold">Empresa:</span> {fila.reportante?.empresa ?? '—'}</p>
+                <div className="flex gap-3 items-start">
+
+
+                    {/* Datos del reportante */}
+                    <div className="text-xs space-y-0.5">
+                        <p><span className="font-semibold">Doc:</span> {fila.reportante?.cedula ?? '—'}</p>
+                        <p><span className="font-semibold">Nombre:</span> {fila.reportante?.nombres} {fila.reportante?.apellidos}</p>
+                        <p><span className="font-semibold">Cargo:</span> {fila.reportante?.cargo ?? '—'}</p>
+                        <p><span className="font-semibold">Empresa:</span> {fila.reportante?.empresa ?? '—'}</p>
+                    </div>
+                    {/* Iconos apilados */}
+                    <div className="flex flex-col">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
+                            title="Análisis"
+                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineSearch className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalTipo(true); }}
+                            title="Cambiar tipo"
+                            className="w-8 h-8 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEventoSeleccionado(fila);
+                                setTimeout(() => cerrarAnalisis(), 0);
+                            }}
+                            title="Cerrar análisis"
+                            className="w-8 h-8 bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition"
+                        >
+                            <Lock className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEventoSeleccionado(fila);
+                                setTimeout(() => cancelarEvento(), 0);
+                            }}
+                            title="Cancelar evento"
+                            className="w-8 h-8 rounded-b-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition"
+                        >
+                            <XCircle className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             ),
         },
@@ -191,7 +236,6 @@ export default function Index({ eventos, categorias }) {
 
 
 
-
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Gestión de Eventos Adversos</h2>}>
             <Head title="Eventos Adversos" />
@@ -221,7 +265,7 @@ export default function Index({ eventos, categorias }) {
                     <button
                         onClick={abrirCambiarTipo}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Cambiar tipo de evento
@@ -333,7 +377,7 @@ export default function Index({ eventos, categorias }) {
                                     </button>
                                     <button
                                         onClick={detener}
-                                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-red-500 rounded-full hover:bg-red-600 transition"
+                                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-zinc-500 rounded-full hover:bg-zinc-600 transition"
                                     >
                                         <HiOutlineStop className="w-4 h-4" /> Detener
                                     </button>
