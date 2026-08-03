@@ -31,7 +31,7 @@ const LABEL_ESTADO = {
 
 function TarjetaIndicador({ titulo, valor, icono: Icono, color, subtitulo }) {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-center gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-5 flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
                 <Icono className="w-6 h-6 text-white" />
             </div>
