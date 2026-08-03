@@ -158,6 +158,18 @@ class EventoController extends Controller
     // ── Guardar análisis (calidad) ──
     public function guardarAnalisis(Request $request, EventoAdverso $evento)
     {
+
+        $clasificacionesCierre = [
+            'Evento adverso no prevenible',
+            'Complicación',
+            'Atención segura',
+        ];
+
+        $nuevoEstado = in_array($request->clasificacion, $clasificacionesCierre)
+            ? 'cerrado'
+            : 'analizado';
+
+
         $request->validate([
             'barreras_vulneradas'    => 'nullable|array',
             'barreras_descripcion'   => 'nullable|string',
@@ -183,11 +195,11 @@ class EventoController extends Controller
             'clasificacion'          => $request->clasificacion,
             'relacionado_con'        => $request->relacionado_con,
             'categorizacion'         => $request->categorizacion,
-            'estado'                 => 'analizado',
+            'estado'                 => $nuevoEstado,
             'fk_usuario_calidad'     => Auth::id(),
             'fecha_analisis'         => now(),
+            'fecha_cierre'           => $nuevoEstado === 'cerrado' ? now() : null,
         ]);
-
         // Guardar archivos
         if ($request->hasFile('archivos')) {
             foreach ($request->file('archivos') as $file) {
@@ -203,8 +215,19 @@ class EventoController extends Controller
             }
         }
 
+        // Registrar revisión si el evento se cerró automáticamente
+        if ($nuevoEstado === 'cerrado') {
+            Revision::create([
+                'fk_evento'   => $evento->id_eventoAdverso,
+                'fk_usuario'  => Auth::id(),
+                'tipo'        => 'Cierre Automático',
+                'observacion' => 'El evento N° ' . $evento->id_eventoAdverso . ' fue cerrado automáticamente por clasificación: ' . $request->clasificacion,
+            ]);
+        }
+
         return redirect()->route('eventos.index')
             ->with('success', 'Análisis guardado correctamente.');
+
     }
 
     // ── Cerrar análisis ──
