@@ -164,29 +164,67 @@ class PlanMejoraController extends Controller
 
     public function exportar()
     {
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente', 'planMejora.jefe'])
+        $eventos = EventoAdverso::with([
+            'categoria',
+            'area',
+            'reportante',
+            'paciente',
+            'planMejora.jefe',
+            'usuarioCalidad',
+        ])
             ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado', 'procesado'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $datos = $eventos->map(fn($e) => [
-            'N° Evento'          => $e->id_eventoAdverso,
-            'Fecha Evento'       => $e->fecha_evento?->format('Y-m-d'),
-            'Fecha Creación'     => $e->created_at?->format('Y-m-d H:i'),
-            'Categoría'          => $e->categoria?->nombre,
-            'Área'               => $e->area?->nombre,
-            'Estado Evento'      => $e->estado,
-            'Doc Reportante'     => $e->reportante?->cedula,
-            'Nombres Reportante' => $e->reportante?->nombres . ' ' . $e->reportante?->apellidos,
-            'Cargo Reportante'   => $e->reportante?->cargo,
-            'Empresa Reportante' => $e->reportante?->empresa,
-            'Doc Paciente'       => $e->paciente?->cedula,
-            'Nombres Paciente'   => $e->paciente?->nombres . ' ' . $e->paciente?->apellidos,
-            'Edad Paciente'      => $e->paciente?->edad . ' ' . $e->paciente?->edad_unidad,
-            'Entidad Paciente'   => $e->paciente?->entidad,
-            'Jefe Responsable'   => $e->planMejora?->jefe?->name,
-            'Fecha Ejecución'    => $e->planMejora?->fecha_ejecucion,
-            'Estado Plan'        => $e->planMejora?->estado,
+            // Datos generales
+            'N° Evento'              => $e->id_eventoAdverso,
+            'Fecha Evento'           => $e->fecha_evento?->format('Y-m-d'),
+            'Fecha Creación'         => $e->created_at?->format('Y-m-d H:i'),
+            'Categoría'              => $e->categoria?->nombre,
+            'Área'                   => $e->area?->nombre,
+            'Estado Evento'          => $e->estado,
+
+            // Reportante
+            'Doc Reportante'         => $e->reportante?->cedula,
+            'Nombres Reportante'     => $e->reportante?->nombres . ' ' . $e->reportante?->apellidos,
+            'Cargo Reportante'       => $e->reportante?->cargo,
+            'Empresa Reportante'     => $e->reportante?->empresa,
+
+            // Paciente
+            'Doc Paciente'           => $e->paciente?->cedula,
+            'Nombres Paciente'       => $e->paciente?->nombres . ' ' . $e->paciente?->apellidos,
+            'Edad Paciente'          => $e->paciente?->edad . ' ' . $e->paciente?->edad_unidad,
+            'Entidad Paciente'       => $e->paciente?->entidad,
+
+            // Descripción del evento
+            'Descripción Evento'     => $e->descripcion,
+
+            // Análisis
+            'Barreras Vulneradas'    => is_array($e->barreras_vulneradas)
+                ? implode(', ', $e->barreras_vulneradas)
+                : $e->barreras_vulneradas,
+            'Descripción Barreras'   => $e->barreras_descripcion,
+            'Acciones Inseguras'     => is_array($e->acciones_inseguras)
+                ? implode(', ', $e->acciones_inseguras)
+                : $e->acciones_inseguras,
+            'Descripción Acciones'   => $e->acciones_descripcion,
+            'Factores Contributivos' => is_array($e->factores_contributivos)
+                ? implode(', ', array_keys($e->factores_contributivos))
+                : $e->factores_contributivos,
+            'Descripción Análisis'   => $e->descripcion_analisis,
+            'Clasificación'          => $e->clasificacion,
+            'Relacionado Con'        => $e->relacionado_con,
+            'Categorización'         => $e->categorizacion,
+            'Analizado Por'          => $e->usuarioCalidad?->name,
+            'Fecha Análisis'         => $e->fecha_analisis?->format('Y-m-d H:i'),
+
+            // Plan de mejora
+            'Jefe Responsable'       => $e->planMejora?->jefe?->name,
+            'Descripción Plan'       => strip_tags($e->planMejora?->descripcion ?? ''),
+            'Fecha Ejecución'        => $e->planMejora?->fecha_ejecucion?->format('Y-m-d'),
+            'Estado Plan'            => $e->planMejora?->estado,
+            'Fecha Cierre'           => $e->fecha_cierre?->format('Y-m-d H:i'),
         ]);
 
         return response()->json($datos);
