@@ -9,6 +9,8 @@ import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
 import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
 import { HiOutlineEye, HiOutlineClipboardList, HiOutlinePencil, HiOutlineDocumentText, HiOutlineCheckCircle } from 'react-icons/hi';
+import * as XLSX from 'xlsx';
+import { FaFileExcel } from 'react-icons/fa';
 
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
@@ -221,6 +223,16 @@ export default function Index({ eventos, jefes }) {
         });
     };
 
+    const exportarExcel = async () => {
+        const response = await fetch(route('mejoras.exportar'));
+        const datos = await response.json();
+
+        const ws = XLSX.utils.json_to_sheet(datos);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Planes de Mejora');
+        XLSX.writeFile(wb, 'Planes_Mejora.xlsx');
+    };
+
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Planes de Mejora</h2>}>
             <Head title="Planes de Mejora" />
@@ -249,49 +261,58 @@ export default function Index({ eventos, jefes }) {
             <div className="max-w-7xl mx-auto py-8 px-6">
 
                 {/* ── Acciones ── */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-row mb-4">
                     <button
                         onClick={abrirCrearMejora}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-teal-500 rounded-md hover:bg-teal-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Crear/Editar mejora"
+                        className="w-9 h-9 rounded-l-xs bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <PlusCircle className="w-5 h-5" />
-                        Crear/Editar mejora
+                        <PlusCircle className="w-4 h-4" />
                     </button>
 
                     <button
                         onClick={abrirVerAnalisis}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-purple-500 rounded-lg hover:bg-purple-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Ver análisis"
+                        className="w-9 h-9 bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <ClipboardList className="w-5 h-5" />
-                        Ver análisis
+                        <ClipboardList className="w-4 h-4" />
                     </button>
 
                     <button
                         onClick={abrirVerPlan}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Ver plan de mejora"
+                        className="w-9 h-9 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <FileText className="w-5 h-5" />
-                        Ver plan de mejora
+                        <FileText className="w-4 h-4" />
                     </button>
 
                     <button
                         onClick={abrirRevisiones}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-lime-500 rounded-lg hover:bg-lime-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Ver revisiones"
+                        className="w-9 h-9 bg-lime-500 hover:bg-lime-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <Eye className="w-5 h-5" />
-                        Ver revisiones
+                        <Eye className="w-4 h-4" />
                     </button>
+
                     <button
                         onClick={cerrarCaso}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gray-700 rounded-lg hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Cerrar caso"
+                        className="w-9 h-9 bg-gray-700 hover:bg-gray-800 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <CheckCircle className="w-4 h-4" />
-                        Cerrar caso
+                    </button>
+
+                    <button
+                        onClick={exportarExcel}
+                        title="Exportar Excel"
+                        className="w-9 h-9 rounded-r-xs bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition"
+                    >
+                        <FaFileExcel className="w-4 h-4" />
                     </button>
                 </div>
 

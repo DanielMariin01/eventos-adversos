@@ -380,4 +380,33 @@ class EventoController extends Controller
         return redirect()->route('eventos.cancelados')
             ->with('success', 'Evento reabierto correctamente.');
     }
+
+
+    public function exportar()
+    {
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
+            ->whereIn('estado', ['en_proceso'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $datos = $eventos->map(fn($e) => [
+            'N° Evento'          => $e->id_eventoAdverso,
+            'Fecha Evento'       => $e->fecha_evento?->format('Y-m-d'),
+            'Fecha Creación'     => $e->created_at?->format('Y-m-d H:i'),
+            'Categoría'          => $e->categoria?->nombre,
+            'Área'               => $e->area?->nombre,
+            'Estado'             => $e->estado,
+            'Doc Reportante'     => $e->reportante?->cedula,
+            'Nombres Reportante' => $e->reportante?->nombres . ' ' . $e->reportante?->apellidos,
+            'Cargo Reportante'   => $e->reportante?->cargo,
+            'Empresa Reportante' => $e->reportante?->empresa,
+            'Doc Paciente'       => $e->paciente?->cedula,
+            'Nombres Paciente'   => $e->paciente?->nombres . ' ' . $e->paciente?->apellidos,
+            'Edad Paciente'      => $e->paciente?->edad . ' ' . $e->paciente?->edad_unidad,
+            'Entidad Paciente'   => $e->paciente?->entidad,
+            'Descripción'        => $e->descripcion,
+        ]);
+
+        return response()->json($datos);
+    }
 }

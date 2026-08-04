@@ -160,4 +160,35 @@ class PlanMejoraController extends Controller
         return redirect()->route('mejoras.index')
             ->with('success', 'Caso cerrado correctamente.');
     }
+
+
+    public function exportar()
+    {
+        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente', 'planMejora.jefe'])
+            ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado', 'procesado'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $datos = $eventos->map(fn($e) => [
+            'N° Evento'          => $e->id_eventoAdverso,
+            'Fecha Evento'       => $e->fecha_evento?->format('Y-m-d'),
+            'Fecha Creación'     => $e->created_at?->format('Y-m-d H:i'),
+            'Categoría'          => $e->categoria?->nombre,
+            'Área'               => $e->area?->nombre,
+            'Estado Evento'      => $e->estado,
+            'Doc Reportante'     => $e->reportante?->cedula,
+            'Nombres Reportante' => $e->reportante?->nombres . ' ' . $e->reportante?->apellidos,
+            'Cargo Reportante'   => $e->reportante?->cargo,
+            'Empresa Reportante' => $e->reportante?->empresa,
+            'Doc Paciente'       => $e->paciente?->cedula,
+            'Nombres Paciente'   => $e->paciente?->nombres . ' ' . $e->paciente?->apellidos,
+            'Edad Paciente'      => $e->paciente?->edad . ' ' . $e->paciente?->edad_unidad,
+            'Entidad Paciente'   => $e->paciente?->entidad,
+            'Jefe Responsable'   => $e->planMejora?->jefe?->name,
+            'Fecha Ejecución'    => $e->planMejora?->fecha_ejecucion,
+            'Estado Plan'        => $e->planMejora?->estado,
+        ]);
+
+        return response()->json($datos);
+    }
 }

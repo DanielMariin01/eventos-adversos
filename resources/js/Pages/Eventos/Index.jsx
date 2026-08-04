@@ -3,13 +3,15 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter } from 'lucide-react';
+import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter, FileSpreadsheet } from 'lucide-react';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
 import { HiOutlineStop } from 'react-icons/hi';
 import { HiOutlineSearch, HiOutlineEye } from 'react-icons/hi';
 import ModalCancelarEvento from '@/Components/Eventos/ModalCancelarEvento';
+import * as XLSX from 'xlsx';
+import { FaFileExcel } from 'react-icons/fa';
 
 const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
@@ -194,7 +196,15 @@ export default function Index({ eventos, categorias, jefes }) {
         ),
     };
 
+    const exportarExcel = async () => {
+        const response = await fetch(route('eventos.exportar'));
+        const datos = await response.json();
 
+        const ws = XLSX.utils.json_to_sheet(datos);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Eventos');
+        XLSX.writeFile(wb, 'Eventos_Adversos.xlsx');
+    };
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Gestión de Eventos Adversos</h2>}>
@@ -203,44 +213,51 @@ export default function Index({ eventos, categorias, jefes }) {
             <div className="max-w-7xl mx-auto py-8 px-6">
 
                 {/* ── Barra de acciones ── */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-row mb-4">
                     <button
                         onClick={abrirAnalisis}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title=" Añadir Análisis de evento"
+                        className="w-9 h-9 rounded-l-xs bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <ClipboardList className="w-4 h-4" />
-                        Análisis de evento
                     </button>
 
                     <button
                         onClick={cerrarAnalisis}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Cerrar análisis"
+                        className="w-9 h-9 bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <Lock className="w-4 h-4" />
-                        Cerrar análisis
                     </button>
 
                     <button
                         onClick={abrirCambiarTipo}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Cambiar tipo de evento"
+                        className="w-9 h-9 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <RefreshCw className="w-4 h-4" />
-                        Cambiar tipo de evento
                     </button>
 
                     <button
                         onClick={() => cancelarEvento(eventoSeleccionado)}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Cancelar evento"
+                        className="w-9 h-9 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <XCircle className="w-4 h-4" />
-                        Cancelar evento
+                    </button>
+
+                    <button
+                        onClick={exportarExcel}
+                        title="Exportar a Excel"
+                        className="w-9 h-9 rounded-r-xs bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition"
+                    >
+                        <FaFileExcel className="w-4 h-4" />
                     </button>
                 </div>
-
                 {/* ── Buscador ── */}
                 <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
@@ -370,52 +387,60 @@ export default function Index({ eventos, categorias, jefes }) {
             </div>
 
             {/* ── Modal Análisis ── */}
-            {modalAnalisis && (
-                <ModalAnalisis
-                    evento={eventoSeleccionado}
-                    jefes={jefes}
-                    onClose={() => setModalAnalisis(false)}
-                />
-            )}
+            {
+                modalAnalisis && (
+                    <ModalAnalisis
+                        evento={eventoSeleccionado}
+                        jefes={jefes}
+                        onClose={() => setModalAnalisis(false)}
+                    />
+                )
+            }
 
             {/* ── Modal Cambiar Tipo ── */}
-            {modalTipo && (
-                <ModalCambiarTipo
-                    evento={eventoSeleccionado}
-                    categorias={categorias}
-                    onClose={() => setModalTipo(false)}
-                />
-            )}
+            {
+                modalTipo && (
+                    <ModalCambiarTipo
+                        evento={eventoSeleccionado}
+                        categorias={categorias}
+                        onClose={() => setModalTipo(false)}
+                    />
+                )
+            }
 
-            {modalCancelar && (
-                <ModalCancelarEvento
-                    evento={eventoSeleccionado}
-                    jefes={jefes}
-                    onClose={() => setModalCancelar(false)}
-                />
-            )}
+            {
+                modalCancelar && (
+                    <ModalCancelarEvento
+                        evento={eventoSeleccionado}
+                        jefes={jefes}
+                        onClose={() => setModalCancelar(false)}
+                    />
+                )
+            }
             {/* Loading overlay */}
-            {cargando && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/85">
-                    <div className="relative w-[150px] h-[73px]">
-                        <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
-                            <polyline
-                                points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
-                                strokeMiterlimit="10"
-                                strokeWidth="3"
-                                stroke="#009B9E"
-                                fill="none"
-                            />
-                        </svg>
-                        <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_2.5s_linear_infinite]"
-                            style={{ left: 0, right: 'auto' }} />
-                        <div className="absolute top-0 h-full bg-slate-100 animate-[heartRateOut_2.5s_linear_infinite]"
-                            style={{ width: '120%', left: '-120%' }} />
+            {
+                cargando && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100/85">
+                        <div className="relative w-[150px] h-[73px]">
+                            <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
+                                <polyline
+                                    points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
+                                    strokeMiterlimit="10"
+                                    strokeWidth="3"
+                                    stroke="#009B9E"
+                                    fill="none"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_2.5s_linear_infinite]"
+                                style={{ left: 0, right: 'auto' }} />
+                            <div className="absolute top-0 h-full bg-slate-100 animate-[heartRateOut_2.5s_linear_infinite]"
+                                style={{ width: '120%', left: '-120%' }} />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
 
-        </AuthenticatedLayout>
+        </AuthenticatedLayout >
     );
 }

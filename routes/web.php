@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     // Rutas específicas primero
     Route::get('/eventos/crear', [EventoController::class, 'create'])->name('eventos.create');
     Route::get('/eventos/cancelados', [EventoController::class, 'cancelados'])->name('eventos.cancelados');
+    Route::get('/eventos/exportar', [EventoController::class, 'exportar'])->name('eventos.exportar');
     Route::post('/eventos/area', [EventoController::class, 'seleccionarArea'])->name('eventos.area');
     Route::get('/eventos/reportante/{cedula}', [EventoController::class, 'buscarReportante'])->name('eventos.reportante');
     Route::get('/eventos/paciente/{cedula}', [EventoController::class, 'buscarPaciente'])->name('eventos.paciente');
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/eventos/{evento}/evidencia', [EventoController::class, 'subirEvidencia'])->name('eventos.evidencia');
     Route::patch('/eventos/{evento}/reabrir', [EventoController::class, 'reabrir'])->name('eventos.reabrir');
 
+
     // Jefe
     Route::get('/mis-eventos', [EventoController::class, 'misEventos'])->name('eventos.mis');
 });
@@ -67,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
 // ── Rutas de planes de mejora ──
 Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
     Route::get('/mejoras', [PlanMejoraController::class, 'index'])->name('mejoras.index');
+    Route::get('/mejoras/exportar', [PlanMejoraController::class, 'exportar'])->name('mejoras.exportar');
     Route::post('/mejoras/{evento}', [PlanMejoraController::class, 'store'])->name('mejoras.store');
     Route::get('/mejoras/{evento}/revisiones', [PlanMejoraController::class, 'revisiones'])->name('mejoras.revisiones');
     Route::post('/mejoras/{plan}/update', [PlanMejoraController::class, 'update'])->name('mejoras.update');
