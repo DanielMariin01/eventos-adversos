@@ -288,6 +288,7 @@ class EventoController extends Controller
     }
 
     // ── Eventos del jefe ──
+    // ── Eventos del jefe ──
     public function misEventos()
     {
         $user = Auth::user();
@@ -300,7 +301,6 @@ class EventoController extends Controller
             'planMejora.jefe',
             'archivos',
             'revisiones.usuario',
-            'usuarioCalidad', // quien canceló
         ])
             ->whereIn('estado', ['en_mejora', 'radicado', 'cerrado', 'cancelado'])
             ->where(function ($q) use ($user) {
@@ -310,8 +310,41 @@ class EventoController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        // Eventos próximos a vencer (plan con fecha ejecución en los próximos 7 días)
+        $proximosVencer = EventoAdverso::with(['area', 'planMejora'])
+            ->where('estado', 'en_mejora')
+            ->where(function ($q) use ($user) {
+                $q->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
+                    ->orWhere('fk_jefe', $user->id);
+            })
+            ->whereHas(
+                'planMejora',
+                fn($q) => $q
+                    ->where('fecha_ejecucion', '<=', now()->addDays(7))
+                    ->where('fecha_ejecucion', '>=', now())
+                    ->where('estado', 'en_proceso')
+            )
+            ->get();
+
+        // Eventos vencidos
+        $vencidos = EventoAdverso::with(['area', 'planMejora'])
+            ->where('estado', 'en_mejora')
+            ->where(function ($q) use ($user) {
+                $q->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
+                    ->orWhere('fk_jefe', $user->id);
+            })
+            ->whereHas(
+                'planMejora',
+                fn($q) => $q
+                    ->where('fecha_ejecucion', '<', now())
+                    ->where('estado', 'en_proceso')
+            )
+            ->get();
+
         return Inertia::render('Eventos/MisEventos', [
-            'eventos' => $eventos,
+            'eventos'        => $eventos,
+            'proximosVencer' => $proximosVencer,
+            'vencidos'       => $vencidos,
         ]);
     }
     // ── Subir evidencia jefe ──

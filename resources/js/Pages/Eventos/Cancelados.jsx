@@ -123,7 +123,7 @@ export default function Cancelados({ eventos }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCancelacion(true); }}
                             title="Ver cancelación"
-                            className="w-8 h-8 rounded-b-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-b-full bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineEye className="w-4 h-4" />
                         </button>

@@ -3,8 +3,8 @@ import { Head, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, Upload, ClipboardList, FileText, Eye, Filter } from 'lucide-react';
-import { HiOutlineEye, HiOutlineClipboardList, HiOutlineUpload, HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
+import { Search, Upload, ClipboardList, FileText, Eye, Filter, AlertTriangle, Clock } from 'lucide-react';
+import { HiOutlineEye, HiOutlineClipboardList, HiOutlineUpload, HiOutlineSpeakerphone, HiOutlineStop, HiOutlineBell } from 'react-icons/hi';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
 import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
@@ -32,7 +32,7 @@ const LABEL_ESTADO = {
     cerrado: 'Cerrado',
 };
 
-export default function MisEventos({ eventos }) {
+export default function MisEventos({ eventos, proximosVencer, vencidos }) {
 
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [busquedaEvento, setBusquedaEvento] = useState('');
@@ -263,7 +263,34 @@ export default function MisEventos({ eventos }) {
                         Ver revisiones
                     </button>
                 </div>
+                {/* ── Alertas ── */}
+                {proximosVencer.length > 0 && (
+                    <div className="flex items-center bg-blue-500 text-white text-sm font-bold px-4 py-3 rounded-lg mb-4" role="alert">
+                        <HiOutlineBell className="w-6 h-6 mr-2 flex-shrink-0" />
+                        <p>
+                            Por favor revisa los siguientes eventos: {' '}
+                            {proximosVencer.map((e, i) => (
+                                <span key={e.id_eventoAdverso} className="underline">
+                                  Evento #{e.id_eventoAdverso}{i < proximosVencer.length - 1 ? ', ' : '.'}
+                                </span>
+                            ))}
+                        </p>
+                    </div>
+                )}
 
+                {vencidos.length > 0 && (
+                    <div className="flex items-center bg-blue-500 text-white text-sm font-bold px-4 py-3 rounded-lg mb-4" role="alert">
+                        <HiOutlineBell className="w-5 h-5 mr-2 flex-shrink-0" />
+                        <p>
+                            ¡Urgente! Por favor sube la evidencia de los siguientes eventos: {' '}
+                            {vencidos.map((e, i) => (
+                                <span key={e.id_eventoAdverso} className="underline">
+                                    Evento # {e.id_eventoAdverso}{i < vencidos.length - 1 ? ', ' : '.'}
+                                </span>
+                            ))}
+                        </p>
+                    </div>
+                )}
                 {/* ── Buscadores ── */}
                 <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
