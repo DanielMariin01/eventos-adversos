@@ -124,17 +124,20 @@ export default function MisEventos({ eventos }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalPlan(true); }}
                             title="Ver plan de mejora"
-                            className="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition"
+                            className={`w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition ${fila.estado === 'cerrado' || fila.estado === 'cancelado' ? 'rounded-b-full' : ''
+                                }`}
                         >
                             <HiOutlineClipboardList className="w-4 h-4" />
                         </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
-                            title="Subir evidencia"
-                            className="w-8 h-8 rounded-b-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
-                        >
-                            <HiOutlineUpload className="w-4 h-4" />
-                        </button>
+                        {fila.estado !== 'cerrado' && fila.estado !== 'cancelado' && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
+                                title="Subir evidencia"
+                                className="w-8 h-8 rounded-b-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                            >
+                                <HiOutlineUpload className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
 
                     {/* Datos del reportante */}
@@ -209,7 +212,7 @@ export default function MisEventos({ eventos }) {
                 <div className="flex flex-wrap gap-2 mb-4">
                     <button
                         onClick={abrirSubirEvidencia}
-                        disabled={!eventoSeleccionado}
+                        disabled={!eventoSeleccionado || eventoSeleccionado?.estado === 'cerrado' || eventoSeleccionado?.estado === 'cancelado'}
                         className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <Upload className="w-4 h-4" />
