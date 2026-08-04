@@ -356,7 +356,14 @@ class EventoController extends Controller
     }
     public function cancelados()
     {
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
+        $eventos = EventoAdverso::with([
+            'categoria',
+            'area',
+            'reportante',
+            'paciente',
+            'revisiones.usuario',
+            'usuarioCalidad',
+        ])
             ->where('estado', 'cancelado')
             ->orderBy('created_at', 'desc')
             ->paginate(10);

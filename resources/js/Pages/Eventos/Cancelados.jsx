@@ -4,10 +4,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
 import { Search, RefreshCw } from 'lucide-react';
-import { HiOutlineRefresh, HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
+import { HiOutlineRefresh, HiOutlineSpeakerphone, HiOutlineStop, HiOutlineEye } from 'react-icons/hi';
+import ModalVerCancelacion from '@/Components/Eventos/ModalVerCancelacion';
 
 const BADGE_ESTADO = {
-    cancelado: 'bg-red-500 text-white',
+    cancelado: 'bg-red-900 text-white',
 };
 
 const LABEL_ESTADO = {
@@ -21,6 +22,7 @@ export default function Cancelados({ eventos }) {
     const [busquedaReportante, setBusquedaReportante] = useState('');
     const [busquedaPaciente, setBusquedaPaciente] = useState('');
     const [cargando, setCargando] = useState(false);
+    const [modalCancelacion, setModalCancelacion] = useState(false);
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -105,7 +107,7 @@ export default function Cancelados({ eventos }) {
             key: 'paciente',
             render: (fila) => (
                 <div className="flex gap-3 items-start">
-                    {/* Icono reabrir */}
+                    {/* Iconos apilados */}
                     <div className="flex flex-col">
                         <button
                             onClick={(e) => {
@@ -114,9 +116,16 @@ export default function Cancelados({ eventos }) {
                                 setTimeout(() => reabrirEvento(), 0);
                             }}
                             title="Reabrir evento"
-                            className="w-8 h-8 rounded-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineRefresh className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCancelacion(true); }}
+                            title="Ver cancelación"
+                            className="w-8 h-8 rounded-b-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlineEye className="w-4 h-4" />
                         </button>
                     </div>
 
@@ -237,10 +246,10 @@ export default function Cancelados({ eventos }) {
                                     <span className="text-sm text-gray-700">{fila.descripcion}</span>
                                 </div>
                                 <div className="flex gap-2 flex-shrink-0">
-                                    <button onClick={leer} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-teal-500 rounded-full hover:bg-teal-600 transition">
+                                    <button onClick={leer} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-sky-400 rounded-full hover:bg-sky-500 transition">
                                         <HiOutlineSpeakerphone className="w-4 h-4" /> Leer
                                     </button>
-                                    <button onClick={detener} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-red-500 rounded-full hover:bg-red-600 transition">
+                                    <button onClick={detener} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-zinc-500 rounded-full hover:bg-zinc-600 transition">
                                         <HiOutlineStop className="w-4 h-4" /> Detener
                                     </button>
                                 </div>
@@ -253,6 +262,12 @@ export default function Cancelados({ eventos }) {
                     <p className="mt-2 text-xs text-teal-600">
                         ✓ Evento #{eventoSeleccionado.id_eventoAdverso} seleccionado
                     </p>
+                )}
+                {modalCancelacion && eventoSeleccionado && (
+                    <ModalVerCancelacion
+                        evento={eventoSeleccionado}
+                        onClose={() => setModalCancelacion(false)}
+                    />
                 )}
             </div>
 
