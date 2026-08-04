@@ -122,7 +122,7 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
                             <button
                                 onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCancelacion(true); }}
                                 title="Ver cancelación"
-                                className="w-8 h-8 rounded-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                                className="w-8 h-8 rounded-full bg-cyan-500 hover:bg-cyan-600 text-white flex items-center justify-center transition"
                             >
                                 <HiOutlineEye className="w-4 h-4" />
                             </button>
@@ -132,7 +132,7 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
                                     title="Ver análisis"
-                                    className="w-8 h-8 rounded-t-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                                    className="w-8 h-8 rounded-t-full bg-cyan-500 hover:bg-cyan-600 text-white flex items-center justify-center transition"
                                 >
                                     <HiOutlineEye className="w-4 h-4" />
                                 </button>
@@ -239,7 +239,7 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
                     <button
                         onClick={abrirVerAnalisis}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-purple-500 rounded-lg hover:bg-purple-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-cyan-500 rounded-lg hover:bg-cyan-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <ClipboardList className="w-4 h-4" />
                         Ver análisis
