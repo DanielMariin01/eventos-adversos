@@ -132,6 +132,7 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
+        $jefes = \App\Models\User::role('jefe')->get(['id', 'name']);
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereNotIn('estado', ['en_mejora', 'radicado', 'cancelado', 'cerrado'])
             ->orderBy('created_at', 'desc')
@@ -142,6 +143,7 @@ class EventoController extends Controller
         return Inertia::render('Eventos/Index', [
             'eventos'    => $eventos,
             'categorias' => $categorias,
+            'jefes'      => $jefes,
         ]);
     }
 
@@ -182,6 +184,7 @@ class EventoController extends Controller
             'relacionado_con'        => 'nullable|string|max:255',
             'categorizacion'         => 'nullable|string|max:100',
             'archivos.*'             => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'fk_jefe' => 'nullable|exists:users,id',
         ]);
 
         $evento->update([
@@ -196,7 +199,8 @@ class EventoController extends Controller
             'relacionado_con'        => $request->relacionado_con,
             'categorizacion'         => $request->categorizacion,
             'estado'                 => $nuevoEstado,
-            'fk_usuario_calidad'     => Auth::id(),
+            'fk_usuario_calidad' => Auth::id(),
+            'fk_jefe' => $request->fk_jefe,
             'fecha_analisis'         => now(),
             'fecha_cierre'           => $nuevoEstado === 'cerrado' ? now() : null,
         ]);
@@ -227,7 +231,6 @@ class EventoController extends Controller
 
         return redirect()->route('eventos.index')
             ->with('success', 'Análisis guardado correctamente.');
-
     }
 
     // ── Cerrar análisis ──
@@ -283,7 +286,7 @@ class EventoController extends Controller
             'revisiones.usuario',
         ])
             ->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
-            ->whereIn('estado', ['en_mejora', 'radicado'])
+            ->whereIn('estado', ['en_mejora', 'radicado','cerrado','cancelado'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

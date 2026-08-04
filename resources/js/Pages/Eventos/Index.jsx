@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, ClipboardList, XCircle, RefreshCw, Lock,Filter } from 'lucide-react';
+import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter } from 'lucide-react';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
@@ -27,7 +27,7 @@ const LABEL_ESTADO = {
 };
 
 
-export default function Index({ eventos, categorias }) {
+export default function Index({ eventos, categorias, jefes }) {
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [busqueda, setBusqueda] = useState('');
     const [modalAnalisis, setModalAnalisis] = useState(false);
@@ -310,7 +310,7 @@ export default function Index({ eventos, categorias }) {
                             <option value="">Todos los estados</option>
                             <option value="en_proceso">En Proceso</option>
                             <option value="procesado">Procesado</option>
-                     
+
                         </select>
                         <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
                             <Filter className="w-4 h-4 text-white" />
@@ -393,6 +393,7 @@ export default function Index({ eventos, categorias }) {
             {modalAnalisis && (
                 <ModalAnalisis
                     evento={eventoSeleccionado}
+                    jefes={jefes}
                     onClose={() => setModalAnalisis(false)}
                 />
             )}

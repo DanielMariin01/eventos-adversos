@@ -15,6 +15,7 @@ class EventoAdverso extends Model
         'fk_area',
         'fk_reportante',
         'fk_paciente',
+        'fk_jefe',
 
         // Evento
         'fecha_evento',
@@ -83,5 +84,10 @@ class EventoAdverso extends Model
     public function revisiones()
     {
         return $this->hasMany(Revision::class, 'fk_evento', 'id_eventoAdverso');
+    }
+    // Agrega la relación:
+    public function jefe()
+    {
+        return $this->belongsTo(User::class, 'fk_jefe');
     }
 }

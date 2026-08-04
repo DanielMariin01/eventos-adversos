@@ -59,7 +59,7 @@ function Campo({ label, error, children }) {
     );
 }
 
-export default function ModalAnalisis({ evento, onClose }) {
+export default function ModalAnalisis({ evento, jefes = [], onClose }) {
     const [pestana, setPestana] = useState('basicos');
 
     const { data, setData, post, processing, errors } = useForm({
@@ -73,6 +73,7 @@ export default function ModalAnalisis({ evento, onClose }) {
         relacionado_con: evento.relacionado_con ?? '',
         categorizacion: evento.categorizacion ?? '',
         archivos: [],
+        fk_jefe: '',
     });
 
     const toggleArray = (campo, valor) => {
@@ -435,7 +436,7 @@ export default function ModalAnalisis({ evento, onClose }) {
                     {pestana === 'clasificacion' && (
                         <div className="space-y-5">
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <Campo label="Clasificación" error={errors.clasificacion}>
                                     <select
                                         value={data.clasificacion}
@@ -473,6 +474,18 @@ export default function ModalAnalisis({ evento, onClose }) {
                                         <option value="">Seleccione la categorización...</option>
                                         {CATEGORIZACIONES.map(c => (
                                             <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </Campo>
+                                <Campo label="Responsable de Ejecución" error={errors.fk_jefe}>
+                                    <select
+                                        value={data.fk_jefe}
+                                        onChange={e => setData('fk_jefe', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                    >
+                                        <option value="">Seleccione el jefe...</option>
+                                        {jefes.map(jefe => (
+                                            <option key={jefe.id} value={jefe.id}>{jefe.name}</option>
                                         ))}
                                     </select>
                                 </Campo>
