@@ -300,6 +300,7 @@ class EventoController extends Controller
             'planMejora.jefe',
             'archivos',
             'revisiones.usuario',
+            'usuarioCalidad', // quien canceló
         ])
             ->whereIn('estado', ['en_mejora', 'radicado', 'cerrado', 'cancelado'])
             ->where(function ($q) use ($user) {

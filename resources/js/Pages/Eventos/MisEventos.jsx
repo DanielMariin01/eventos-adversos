@@ -9,6 +9,8 @@ import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
 import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
 import ModalSubirEvidencia from '@/Components/Eventos/ModalSubirEvidencia';
+import ModalVerCancelacion from '@/Components/Eventos/ModalVerCancelacion';
+
 
 const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
@@ -42,6 +44,7 @@ export default function MisEventos({ eventos }) {
     const [modalEvidencia, setModalEvidencia] = useState(false);
     const [cargando, setCargando] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState('');
+    const [modalCancelacion, setModalCancelacion] = useState(false);
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -114,29 +117,43 @@ export default function MisEventos({ eventos }) {
                 <div className="flex gap-3 items-start">
                     {/* Iconos apilados */}
                     <div className="flex flex-col">
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
-                            title="Ver análisis"
-                            className="w-8 h-8 rounded-t-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
-                        >
-                            <HiOutlineEye className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalPlan(true); }}
-                            title="Ver plan de mejora"
-                            className={`w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition ${fila.estado === 'cerrado' || fila.estado === 'cancelado' ? 'rounded-b-full' : ''
-                                }`}
-                        >
-                            <HiOutlineClipboardList className="w-4 h-4" />
-                        </button>
-                        {fila.estado !== 'cerrado' && fila.estado !== 'cancelado' && (
+                        {fila.estado === 'cancelado' ? (
+                            // Solo mostrar icono de cancelación
                             <button
-                                onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
-                                title="Subir evidencia"
-                                className="w-8 h-8 rounded-b-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                                onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCancelacion(true); }}
+                                title="Ver cancelación"
+                                className="w-8 h-8 rounded-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
                             >
-                                <HiOutlineUpload className="w-4 h-4" />
+                                <HiOutlineEye className="w-4 h-4" />
                             </button>
+                        ) : (
+                            // Mostrar iconos normales
+                            <>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
+                                    title="Ver análisis"
+                                    className="w-8 h-8 rounded-t-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center transition"
+                                >
+                                    <HiOutlineEye className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalPlan(true); }}
+                                    title="Ver plan de mejora"
+                                    className={`w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition ${fila.estado === 'cerrado' ? 'rounded-b-full' : ''
+                                        }`}
+                                >
+                                    <HiOutlineClipboardList className="w-4 h-4" />
+                                </button>
+                                {fila.estado !== 'cerrado' && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
+                                        title="Subir evidencia"
+                                        className="w-8 h-8 rounded-b-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                                    >
+                                        <HiOutlineUpload className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </>
                         )}
                     </div>
 
@@ -346,6 +363,12 @@ export default function MisEventos({ eventos }) {
                     evento={eventoSeleccionado}
                     onClose={() => setModalEvidencia(false)}
                     setCargando={setCargando}
+                />
+            )}
+            {modalCancelacion && (
+                <ModalVerCancelacion
+                    evento={eventoSeleccionado}
+                    onClose={() => setModalCancelacion(false)}
                 />
             )}
 

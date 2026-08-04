@@ -91,4 +91,8 @@ class EventoAdverso extends Model
     {
         return $this->belongsTo(User::class, 'fk_jefe');
     }
+    public function usuarioCalidad()
+    {
+        return $this->belongsTo(User::class, 'fk_usuario_calidad');
+    }
 }
