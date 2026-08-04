@@ -221,7 +221,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {etapa === 'area' && (
                     <div>
                         <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-bold text-teal-600 mb-2">¿Cuál es el área responsable del evento?</h2>
+                            <h2 className="text-2xl font-bold text-teal-600 mb-2">¿En cuál área ocurrió el evento?</h2>
                         </div>
 
                         {/* Buscador */}

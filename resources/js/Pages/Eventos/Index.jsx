@@ -9,6 +9,7 @@ import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
 import { HiOutlineStop } from 'react-icons/hi';
 import { HiOutlineSearch, HiOutlineEye } from 'react-icons/hi';
+import ModalCancelarEvento from '@/Components/Eventos/ModalCancelarEvento';
 
 const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
@@ -37,6 +38,7 @@ export default function Index({ eventos, categorias, jefes }) {
     const [busquedaPaciente, setBusquedaPaciente] = useState('');
     const [cargando, setCargando] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState('');
+    const [modalCancelar, setModalCancelar] = useState(false);
 
     // ── Acciones ──
     const abrirAnalisis = () => {
@@ -70,32 +72,10 @@ export default function Index({ eventos, categorias, jefes }) {
         });
     };
 
-    const cancelarEvento = () => {
-        if (!eventoSeleccionado) return alertSeleccionar();
-        Swal.fire({
-            title: '¿Cancelar evento?',
-            text: 'El evento pasará a estado Cancelado.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Sí, cancelar',
-            cancelButtonText: 'No',
-        }).then(result => {
-            if (result.isConfirmed) {
-                setCargando(true);
-                router.patch(route('eventos.cancelar', eventoSeleccionado.id_eventoAdverso), {}, {
-                    onSuccess: () => {
-                        setCargando(false);
-                        setEventoSeleccionado(null);
-                        Swal.fire({ icon: 'success', title: 'Evento cancelado correctamente.' });
-                    },
-                    onFinish: () => setCargando(false),
-                });
-            }
-        });
+    const cancelarEvento = (fila) => {
+        setEventoSeleccionado(fila);
+        setModalCancelar(true);
     };
-
     const abrirCambiarTipo = () => {
         if (!eventoSeleccionado) return alertSeleccionar();
         setModalTipo(true);
@@ -252,7 +232,7 @@ export default function Index({ eventos, categorias, jefes }) {
                     </button>
 
                     <button
-                        onClick={cancelarEvento}
+                        onClick={() => cancelarEvento(eventoSeleccionado)}
                         disabled={!eventoSeleccionado}
                         className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
@@ -404,6 +384,14 @@ export default function Index({ eventos, categorias, jefes }) {
                     evento={eventoSeleccionado}
                     categorias={categorias}
                     onClose={() => setModalTipo(false)}
+                />
+            )}
+
+            {modalCancelar && (
+                <ModalCancelarEvento
+                    evento={eventoSeleccionado}
+                    jefes={jefes}
+                    onClose={() => setModalCancelar(false)}
                 />
             )}
             {/* Loading overlay */}

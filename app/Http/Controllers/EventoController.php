@@ -246,9 +246,25 @@ class EventoController extends Controller
     }
 
     // ── Cancelar evento ──
-    public function cancelarEvento(EventoAdverso $evento)
+    public function cancelarEvento(Request $request, EventoAdverso $evento)
     {
-        $evento->update(['estado' => 'cancelado']);
+        $request->validate([
+            'observacion_cancelacion' => 'required|string',
+            'fk_jefe'                 => 'nullable|exists:users,id',
+        ]);
+
+        $evento->update([
+            'estado'                  => 'cancelado',
+            'observacion_cancelacion' => $request->observacion_cancelacion,
+            'fk_jefe'                 => $request->fk_jefe,
+        ]);
+
+        Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Cancelación de Evento',
+            'observacion' => 'El evento N° ' . $evento->id_eventoAdverso . ' fue cancelado. Motivo: ' . $request->observacion_cancelacion,
+        ]);
 
         return redirect()->route('eventos.index')
             ->with('success', 'Evento cancelado correctamente.');
@@ -285,8 +301,11 @@ class EventoController extends Controller
             'archivos',
             'revisiones.usuario',
         ])
-            ->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
-            ->whereIn('estado', ['en_mejora', 'radicado','cerrado','cancelado'])
+            ->whereIn('estado', ['en_mejora', 'radicado', 'cerrado', 'cancelado'])
+            ->where(function ($q) use ($user) {
+                $q->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
+                    ->orWhere('fk_jefe', $user->id);
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

@@ -35,6 +35,7 @@ class EventoAdverso extends Model
         'fecha_analisis',
         'fecha_cierre',
         'observacion_tipo',
+        'observacion_cancelacion',
     ];
 
     protected $casts = [

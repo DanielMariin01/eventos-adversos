@@ -17,6 +17,7 @@ const BADGE_ESTADO = {
     cancelado: 'bg-red-500 text-white',
     en_mejora: 'bg-teal-500 text-white',
     radicado: 'bg-purple-500 text-white',
+    cerrado: 'bg-gray-700 text-white',
 };
 
 const LABEL_ESTADO = {
@@ -26,6 +27,7 @@ const LABEL_ESTADO = {
     cancelado: 'Cancelado',
     en_mejora: 'En Mejora',
     radicado: 'Radicado',
+    cerrado: 'Cerrado',
 };
 
 export default function MisEventos({ eventos }) {
@@ -265,6 +267,8 @@ export default function MisEventos({ eventos }) {
                             <option value="">Todos los estados</option>
                             <option value="en_mejora">En Mejora</option>
                             <option value="radicado">Radicado</option>
+                            <option value="cerrado">Cerrado</option>
+                            <option value="cancelado">Cancelado</option>
                         </select>
                         <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
                             <Filter className="w-4 h-4 text-white" />
