@@ -69,7 +69,7 @@ export default function ModalCancelarEvento({ evento, jefes = [], onClose }) {
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
 
                 {/* Header */}
-                <div className="bg-red-500 px-6 py-4 flex items-center justify-between rounded-t-xl">
+                <div className="bg-red-900 px-6 py-4 flex items-center justify-between rounded-t-xl">
                     <h2 className="text-white font-bold text-lg">
                         Cancelar Evento N°: {evento.id_eventoAdverso}
                     </h2>

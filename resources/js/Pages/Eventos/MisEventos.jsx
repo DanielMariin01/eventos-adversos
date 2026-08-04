@@ -16,7 +16,7 @@ const BADGE_ESTADO = {
     en_proceso: 'bg-yellow-500 text-white',
     analizado: 'bg-blue-500 text-white',
     procesado: 'bg-green-500 text-white',
-    cancelado: 'bg-red-500 text-white',
+    cancelado: 'bg-red-900 text-white',
     en_mejora: 'bg-teal-500 text-white',
     radicado: 'bg-purple-500 text-white',
     cerrado: 'bg-gray-700 text-white',
@@ -332,7 +332,7 @@ export default function MisEventos({ eventos }) {
                                     <button onClick={leer} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition">
                                         <HiOutlineSpeakerphone className="w-4 h-4" /> Leer
                                     </button>
-                                    <button onClick={detener} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition">
+                                    <button onClick={detener} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-zinc-500 rounded-lg hover:bg-zinc-600 transition">
                                         <HiOutlineStop className="w-4 h-4" /> Detener
                                     </button>
                                 </div>

@@ -26,9 +26,9 @@ class PlanMejoraController extends Controller
             'archivos',
             'revisiones.usuario',
         ])
-            ->whereIn('estado', ['en_mejora', 'radicado', 'cerrado', 'analizado'])
+            ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado', 'procesado'])
             ->orderBy('created_at', 'desc')
-            ->paginate(5);
+            ->paginate(10);
         $jefes = User::role('jefe')->get(['id', 'name']);
 
         return Inertia::render('Mejoras/Index', [

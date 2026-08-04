@@ -39,7 +39,7 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
         _method: 'POST',
         descripcion: plan?.descripcion ?? '',
         fecha_ejecucion: plan?.fecha_ejecucion?.split('T')[0] ?? '',
-        fk_jefe: plan?.fk_jefe ?? evento.area?.jefe?.id ?? '',
+        fk_jefe: plan?.fk_jefe ?? evento.fk_jefe ?? evento.area?.jefe?.id ?? '',
         archivo: null,
     });
 

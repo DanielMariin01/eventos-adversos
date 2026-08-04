@@ -134,7 +134,7 @@ class EventoController extends Controller
     {
         $jefes = \App\Models\User::role('jefe')->get(['id', 'name']);
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
-            ->whereNotIn('estado', ['en_mejora', 'radicado', 'cancelado', 'cerrado'])
+            ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
