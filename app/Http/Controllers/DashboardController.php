@@ -46,12 +46,13 @@ class DashboardController extends Controller
         // ── Eventos por área y mes ──
         $porAreaMes = EventoAdverso::select(
             'fk_area',
+            'fk_categoria',
             DB::raw('MONTH(created_at) as mes'),
             DB::raw('YEAR(created_at) as anio'),
             DB::raw('count(*) as total')
         )
             ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('fk_area', 'anio', 'mes')
+            ->groupBy('fk_area', 'fk_categoria', 'anio', 'mes')
             ->orderBy('anio')
             ->orderBy('mes')
             ->get();

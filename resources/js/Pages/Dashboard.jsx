@@ -106,6 +106,7 @@ export default function Dashboard({ estadisticas }) {
 
     const [mesCategoriaSeleccionado, setMesCategoriaSeleccionado] = useState('');
     const [mesAreaSeleccionado, setMesAreaSeleccionado] = useState('');
+    const [categoriaAreaSeleccionada, setCategoriaAreaSeleccionada] = useState('');
 
 
     // Datos por categoría y mes
@@ -130,7 +131,6 @@ export default function Dashboard({ estadisticas }) {
         });
         return Object.values(porMesAgrupado);
     };
-
     const datosAreasMes = () => {
         let filtrado = estadisticas.porAreaMes ?? [];
 
@@ -140,13 +140,17 @@ export default function Dashboard({ estadisticas }) {
         if (mesAreaSeleccionado) {
             filtrado = filtrado.filter(e => e.mes == mesAreaSeleccionado);
         }
+        if (categoriaAreaSeleccionada) {
+            filtrado = filtrado.filter(e => e.fk_categoria == categoriaAreaSeleccionada);
+        }
 
         const porMesAgrupado = {};
         filtrado.forEach(e => {
             const key = `${meses[e.mes - 1]} ${e.anio}`;
             if (!porMesAgrupado[key]) porMesAgrupado[key] = { mes: key };
             const area = estadisticas.areas.find(a => a.id_area === e.fk_area);
-            porMesAgrupado[key][area?.nombre ?? e.fk_area] = e.total;
+            const nombreArea = area?.nombre ?? `Área ${e.fk_area}`;
+            porMesAgrupado[key][nombreArea] = (porMesAgrupado[key][nombreArea] ?? 0) + e.total;
         });
         return Object.values(porMesAgrupado);
     };
@@ -266,7 +270,7 @@ export default function Dashboard({ estadisticas }) {
                     {/* Eventos por área y mes */}
                     <GraficaCard titulo="Eventos por área y mes" datos={datosAreasMes()}>
                         {/* Filtros área */}
-                        <div className="mb-3 grid grid-cols-2 gap-2">
+                        <div className="mb-3 grid grid-cols-3 gap-2">
                             <select
                                 value={areaSeleccionada}
                                 onChange={e => setAreaSeleccionada(e.target.value)}
@@ -285,6 +289,16 @@ export default function Dashboard({ estadisticas }) {
                                 <option value="">Todos los meses</option>
                                 {meses.map((m, i) => (
                                     <option key={i + 1} value={i + 1}>{m}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={categoriaAreaSeleccionada}
+                                onChange={e => setCategoriaAreaSeleccionada(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las categorías</option>
+                                {estadisticas.categorias?.map(c => (
+                                    <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
                                 ))}
                             </select>
                         </div>
