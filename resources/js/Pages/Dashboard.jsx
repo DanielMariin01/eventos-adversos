@@ -101,12 +101,15 @@ export default function Dashboard({ estadisticas }) {
     const [trimestre, setTrimestre] = useState(trimestreSeleccionado);
     const [semestre, setSemestre] = useState(semestreSeleccionado);
 
-    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre) => {
+
+
+    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre, nuevaCategoriaEstado) => {
         router.get(route('dashboard'), {
             anio: nuevoAnio ?? anio,
             periodo: nuevoPeriodo ?? periodo,
             trimestre: nuevoTrimestre ?? trimestre,
             semestre: nuevoSemestre ?? semestre,
+            categoria_estado: nuevaCategoriaEstado ?? categoriaEstado,
         }, { preserveState: true });
     };
 
@@ -129,6 +132,7 @@ export default function Dashboard({ estadisticas }) {
     const [areaMesSeleccionada, setAreaMesSeleccionada] = useState('');
     const [categoriaMesSeleccionada, setCategoriaMesSeleccionada] = useState('');
     const [mesSeleccionado, setMesSeleccionado] = useState('');
+    const [categoriaEstado, setCategoriaEstado] = useState(estadisticas.categoriaEstadoSeleccionada ?? '');
 
 
     // Datos por categoría y mes
@@ -201,6 +205,7 @@ export default function Dashboard({ estadisticas }) {
         });
         return Object.values(porMesAgrupado);
     };
+
 
 
     return (
@@ -345,6 +350,18 @@ export default function Dashboard({ estadisticas }) {
                     </GraficaCard>
 
                     <GraficaCard titulo="Distribución por estado" datos={datosEstados}>
+                        <div className="mb-3">
+                            <select
+                                value={categoriaEstado}
+                                onChange={e => { setCategoriaEstado(e.target.value); aplicarFiltros(null, null, null, null, e.target.value); }}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las categorías</option>
+                                {estadisticas.categorias?.map(c => (
+                                    <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                                ))}
+                            </select>
+                        </div>
                         <ResponsiveContainer width="100%" height={250}>
                             <PieChart>
                                 <Pie

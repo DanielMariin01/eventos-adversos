@@ -37,8 +37,10 @@ class DashboardController extends Controller
         }
 
         // ── Totales por estado (filtrado) ──
+        // ── Totales por estado (filtrado) ──
         $totalesPorEstado = (clone $query)
             ->select('estado', DB::raw('count(*) as total'))
+            ->when($request->get('categoria_estado'), fn($q, $cat) => $q->where('fk_categoria', $cat))
             ->groupBy('estado')
             ->pluck('total', 'estado');
 
@@ -183,6 +185,7 @@ class DashboardController extends Controller
                 'periodoSeleccionado'   => $periodo,
                 'trimestreSeleccionado' => (int) $request->get('trimestre', ceil(now()->month / 3)),
                 'semestreSeleccionado'  => (int) $request->get('semestre', now()->month <= 6 ? 1 : 2),
+                'categoriaEstadoSeleccionada' => $request->get('categoria_estado', ''),
             ],
         ]);
     }
