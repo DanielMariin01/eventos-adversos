@@ -137,6 +137,7 @@ export default function Dashboard({ estadisticas }) {
     const [categoriaMesSeleccionada, setCategoriaMesSeleccionada] = useState('');
     const [mesSeleccionado, setMesSeleccionado] = useState('');
     const [categoriaEstado, setCategoriaEstado] = useState(estadisticas.categoriaEstadoSeleccionada ?? '');
+    const [categoriaEventoClasificacion, setCategoriaEventoClasificacion] = useState('');
 
 
     // Datos por categoría y mes
@@ -222,6 +223,9 @@ export default function Dashboard({ estadisticas }) {
         }
         if (mesClasificacion) {
             filtrado = filtrado.filter(e => e.mes == mesClasificacion);
+        }
+        if (categoriaEventoClasificacion) {
+            filtrado = filtrado.filter(e => e.fk_categoria == categoriaEventoClasificacion);
         }
 
         const clasificacionesUnicas = [...new Set(filtrado.map(e => e.clasificacion))];
@@ -540,7 +544,7 @@ export default function Dashboard({ estadisticas }) {
                             subtitulo="INC: Incidente · COMP: Complicación · EAP: Evento adverso Prevenible · EANP: Evento adverso No Prevenible"
                             datos={datos}
                         >
-                            <div className="mb-3 grid grid-cols-3 gap-2">
+                            <div className="mb-3 grid grid-cols-4 gap-2">
                                 <select
                                     value={areaClasificacion}
                                     onChange={e => setAreaClasificacion(e.target.value)}
@@ -569,6 +573,16 @@ export default function Dashboard({ estadisticas }) {
                                     <option value="">Todos los meses</option>
                                     {meses.map((m, i) => (
                                         <option key={i + 1} value={i + 1}>{m}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={categoriaEventoClasificacion}
+                                    onChange={e => setCategoriaEventoClasificacion(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todas las categorías</option>
+                                    {estadisticas.categorias?.map(c => (
+                                        <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
                                     ))}
                                 </select>
                             </div>
