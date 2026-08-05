@@ -7,6 +7,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
+
 import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, TrendingDown, FileText } from 'lucide-react';
 
 const COLORES = [
@@ -100,6 +101,9 @@ export default function Dashboard({ estadisticas }) {
     const [anio, setAnio] = useState(anioSeleccionado);
     const [trimestre, setTrimestre] = useState(trimestreSeleccionado);
     const [semestre, setSemestre] = useState(semestreSeleccionado);
+    const [areaClasificacion, setAreaClasificacion] = useState('');
+    const [categoriaClasificacion, setCategoriaClasificacion] = useState('');
+    const [mesClasificacion, setMesClasificacion] = useState('');
 
 
 
@@ -206,6 +210,35 @@ export default function Dashboard({ estadisticas }) {
         return Object.values(porMesAgrupado);
     };
 
+
+    const datosClasificacionFiltrados = () => {
+        let filtrado = estadisticas.porClasificacionRaw ?? [];
+
+        if (areaClasificacion) {
+            filtrado = filtrado.filter(e => e.fk_area == areaClasificacion);
+        }
+        if (categoriaClasificacion) {
+            filtrado = filtrado.filter(e => e.clasificacion === categoriaClasificacion);
+        }
+        if (mesClasificacion) {
+            filtrado = filtrado.filter(e => e.mes == mesClasificacion);
+        }
+
+        const clasificacionesUnicas = [...new Set(filtrado.map(e => e.clasificacion))];
+        const mesesUnicos = [...new Set(filtrado.map(e => e.mes))].sort((a, b) => a - b);
+
+        const resultado = mesesUnicos.map(mes => {
+            const fila = { mes: meses[mes - 1] };
+            clasificacionesUnicas.forEach(cls => {
+                fila[cls] = filtrado
+                    .filter(e => e.mes === mes && e.clasificacion === cls)
+                    .reduce((sum, e) => sum + e.total, 0);
+            });
+            return fila;
+        });
+
+        return { datos: resultado, clasificaciones: clasificacionesUnicas };
+    };
 
 
     return (
@@ -499,27 +532,68 @@ export default function Dashboard({ estadisticas }) {
                 )}
 
                 {/* ── Clasificación de eventos ── */}
-                {porClasificacionMes?.length > 0 && (
-                    <GraficaCard
-                        titulo={`Clasificación de Eventos ${new Date().getFullYear()}`}
-                        subtitulo="INC: Incidente · COMP: Complicación · EAP: Evento adverso Prevenible · EANP: Evento adverso No Prevenible"
-                        datos={porClasificacionMes}
-                    >
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={porClasificacionMes}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
-                                <YAxis tick={{ fontSize: 12 }} />
-                                <Tooltip content={<TooltipPersonalizado />} />
-                                <Legend />
-                                {clasificaciones.map((cls, index) => (
-                                    <Bar key={cls} dataKey={cls} name={cls} fill={COLORES[index % COLORES.length]} radius={[4, 4, 0, 0]} label={{ position: 'top', fontSize: 10 }} />
-                                ))}
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </GraficaCard>
-                )}
+                {(() => {
+                    const { datos, clasificaciones: clsUnicas } = datosClasificacionFiltrados();
+                    return (
+                        <GraficaCard
+                            titulo={`Clasificación de Eventos ${new Date().getFullYear()}`}
+                            subtitulo="INC: Incidente · COMP: Complicación · EAP: Evento adverso Prevenible · EANP: Evento adverso No Prevenible"
+                            datos={datos}
+                        >
+                            <div className="mb-3 grid grid-cols-3 gap-2">
+                                <select
+                                    value={areaClasificacion}
+                                    onChange={e => setAreaClasificacion(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todas las áreas</option>
+                                    {estadisticas.areas?.map(a => (
+                                        <option key={a.id_area} value={a.id_area}>{a.nombre}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={categoriaClasificacion}
+                                    onChange={e => setCategoriaClasificacion(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todas las clasificaciones</option>
+                                    {estadisticas.clasificaciones?.map(c => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={mesClasificacion}
+                                    onChange={e => setMesClasificacion(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todos los meses</option>
+                                    {meses.map((m, i) => (
+                                        <option key={i + 1} value={i + 1}>{m}</option>
+                                    ))}
+                                </select>
+                            </div>
 
+                            {datos.length === 0 ? (
+                                <div className="flex items-center justify-center h-[300px] text-gray-400 text-sm">
+                                    No hay datos para el filtro seleccionado
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={datos}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                        <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
+                                        <YAxis tick={{ fontSize: 12 }} />
+                                        <Tooltip content={<TooltipPersonalizado />} />
+                                        <Legend />
+                                        {clsUnicas.map((cls, index) => (
+                                            <Bar key={cls} dataKey={cls} name={cls} fill={COLORES[index % COLORES.length]} radius={[4, 4, 0, 0]} label={{ position: 'top', fontSize: 10 }} />
+                                        ))}
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            )}
+                        </GraficaCard>
+                    );
+                })()}
             </div>
         </AuthenticatedLayout>
     );

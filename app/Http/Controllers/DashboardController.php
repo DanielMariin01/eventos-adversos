@@ -130,21 +130,27 @@ class DashboardController extends Controller
         $porClasificacionMes = (clone $query)
             ->select(
                 'clasificacion',
+                'fk_area',
                 DB::raw('MONTH(created_at) as mes'),
                 DB::raw('YEAR(created_at) as anio'),
                 DB::raw('count(*) as total')
             )
             ->whereNotNull('clasificacion')
-            ->groupBy('clasificacion', 'anio', 'mes')
+            ->groupBy('clasificacion', 'fk_area', 'anio', 'mes')
             ->orderBy('mes')
             ->get();
-
-
-
         $mesesNombres   = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         $clasificaciones = $porClasificacionMes->pluck('clasificacion')->unique()->values();
 
         $mesesConDatos = $porClasificacionMes->pluck('mes')->unique()->sort()->values();
+        $todasClasificaciones = [
+            'Atención segura',
+            'Complicación',
+            'Evento adverso no prevenible',
+            'Evento adverso prevenible',
+            'Evento centinela',
+            'Incidente',
+        ];
 
         $datosClasificacion = $mesesConDatos->map(function ($mes) use ($porClasificacionMes, $mesesNombres, $clasificaciones) {
             $fila = ['mes' => $mesesNombres[$mes - 1]];
@@ -152,7 +158,7 @@ class DashboardController extends Controller
                 $fila[$cls] = $porClasificacionMes
                     ->where('mes', $mes)
                     ->where('clasificacion', $cls)
-                    ->first()?->total ?? 0;
+                    ->sum('total');
             }
             return $fila;
         })->filter(fn($f) => collect($f)->except('mes')->sum() > 0)->values();
@@ -165,27 +171,28 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'estadisticas' => [
-                'totalEventos'          => $totalEventos,
-                'mesActual'             => $mesActual,
-                'mesAnterior'           => $mesAnterior,
-                'totalesPorEstado'      => $totalesPorEstado,
-                'porCategoria'          => $porCategoria,
-                'porArea'               => $porArea,
-                'porMes'                => $porMes,
-                'porCategoriaMes'       => $porCategoriaMes,
-                'porAreaMes'            => $porAreaMes,
-                'planesPorEstado'       => $planesPorEstado,
-                'planesVencidos'        => $planesVencidos,
-                'porClasificacionMes'   => $datosClasificacion,
-                'clasificaciones'       => $clasificaciones,
-                'categorias'            => Categoria::where('activo', 1)->get(['id_categoria', 'nombre']),
-                'areas'                 => Area::where('activo', 1)->get(['id_area', 'nombre']),
-                'aniosDisponibles'      => $aniosDisponibles,
-                'anioSeleccionado'      => (int) $anio,
-                'periodoSeleccionado'   => $periodo,
-                'trimestreSeleccionado' => (int) $request->get('trimestre', ceil(now()->month / 3)),
-                'semestreSeleccionado'  => (int) $request->get('semestre', now()->month <= 6 ? 1 : 2),
+                'totalEventos'               => $totalEventos,
+                'mesActual'                  => $mesActual,
+                'mesAnterior'                => $mesAnterior,
+                'totalesPorEstado'           => $totalesPorEstado,
+                'porCategoria'               => $porCategoria,
+                'porArea'                    => $porArea,
+                'porMes'                     => $porMes,
+                'porCategoriaMes'            => $porCategoriaMes,
+                'porAreaMes'                 => $porAreaMes,
+                'planesPorEstado'            => $planesPorEstado,
+                'planesVencidos'             => $planesVencidos,
+                'porClasificacionMes'        => $datosClasificacion,
+                'clasificaciones'            => $todasClasificaciones,
+                'categorias'                 => Categoria::where('activo', 1)->get(['id_categoria', 'nombre']),
+                'areas'                      => Area::where('activo', 1)->get(['id_area', 'nombre']),
+                'aniosDisponibles'           => $aniosDisponibles,
+                'anioSeleccionado'           => (int) $anio,
+                'periodoSeleccionado'        => $periodo,
+                'trimestreSeleccionado'      => (int) $request->get('trimestre', ceil(now()->month / 3)),
+                'semestreSeleccionado'       => (int) $request->get('semestre', now()->month <= 6 ? 1 : 2),
                 'categoriaEstadoSeleccionada' => $request->get('categoria_estado', ''),
+                'porClasificacionRaw'        => $porClasificacionMes,
             ],
         ]);
     }
