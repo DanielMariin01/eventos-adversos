@@ -107,6 +107,9 @@ export default function Dashboard({ estadisticas }) {
     const [mesCategoriaSeleccionado, setMesCategoriaSeleccionado] = useState('');
     const [mesAreaSeleccionado, setMesAreaSeleccionado] = useState('');
     const [categoriaAreaSeleccionada, setCategoriaAreaSeleccionada] = useState('');
+    const [areaMesSeleccionada, setAreaMesSeleccionada] = useState('');
+    const [categoriaMesSeleccionada, setCategoriaMesSeleccionada] = useState('');
+    const [mesSeleccionado, setMesSeleccionado] = useState('');
 
 
     // Datos por categoría y mes
@@ -158,7 +161,27 @@ export default function Dashboard({ estadisticas }) {
     const categoriasUnicas = [...new Set(estadisticas.porCategoriaMes?.map(e => e.fk_categoria) ?? [])];
     const areasUnicas = [...new Set(estadisticas.porAreaMes?.map(e => e.fk_area) ?? [])];
 
+    const datosPorMes = () => {
+        let filtrado = estadisticas.porMes ?? [];
 
+        if (areaMesSeleccionada) {
+            filtrado = filtrado.filter(e => e.fk_area == areaMesSeleccionada);
+        }
+        if (categoriaMesSeleccionada) {
+            filtrado = filtrado.filter(e => e.fk_categoria == categoriaMesSeleccionada);
+        }
+        if (mesSeleccionado) {
+            filtrado = filtrado.filter(e => e.mes == mesSeleccionado);
+        }
+
+        const porMesAgrupado = {};
+        filtrado.forEach(e => {
+            const key = `${meses[e.mes - 1]} ${e.anio}`;
+            if (!porMesAgrupado[key]) porMesAgrupado[key] = { mes: key, total: 0 };
+            porMesAgrupado[key].total += e.total;
+        });
+        return Object.values(porMesAgrupado);
+    };
 
 
     return (
@@ -190,15 +213,55 @@ export default function Dashboard({ estadisticas }) {
 
                 {/* ── Gráficas ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                    <GraficaCard titulo="Eventos por mes (últimos 6 meses)" datos={porMes}>
+                    {/* ── Gráfica Eventos Por Mes── */}
+                    <GraficaCard titulo="Eventos por mes" datos={datosPorMes()}>
+                        <div className="mb-3 grid grid-cols-3 gap-2">
+                            <select
+                                value={areaMesSeleccionada}
+                                onChange={e => setAreaMesSeleccionada(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las áreas</option>
+                                {estadisticas.areas?.map(a => (
+                                    <option key={a.id_area} value={a.id_area}>{a.nombre}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={categoriaMesSeleccionada}
+                                onChange={e => setCategoriaMesSeleccionada(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las categorías</option>
+                                {estadisticas.categorias?.map(c => (
+                                    <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={mesSeleccionado}
+                                onChange={e => setMesSeleccionado(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todos los meses</option>
+                                {meses.map((m, i) => (
+                                    <option key={i + 1} value={i + 1}>{m}</option>
+                                ))}
+                            </select>
+                        </div>
                         <ResponsiveContainer width="100%" height={250}>
-                            <LineChart data={porMes}>
+                            <LineChart data={datosPorMes()}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                                 <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
                                 <YAxis tick={{ fontSize: 12 }} />
                                 <Tooltip content={<TooltipPersonalizado />} />
-                                <Line type="monotone" dataKey="total" name="Eventos" stroke="#14b8a6" strokeWidth={3} dot={{ fill: '#14b8a6', r: 5 }} activeDot={{ r: 7 }} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="total"
+                                    name="Eventos"
+                                    stroke="#14b8a6"
+                                    strokeWidth={3}
+                                    dot={{ fill: '#14b8a6', r: 5 }}
+                                    activeDot={{ r: 7 }}
+                                />
                             </LineChart>
                         </ResponsiveContainer>
                     </GraficaCard>

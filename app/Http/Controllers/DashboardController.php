@@ -59,19 +59,17 @@ class DashboardController extends Controller
 
         // ── Eventos por mes (últimos 6 meses) ──
         $porMes = EventoAdverso::select(
+            'fk_area',
+            'fk_categoria',
             DB::raw('MONTH(created_at) as mes'),
             DB::raw('YEAR(created_at) as anio'),
             DB::raw('count(*) as total')
         )
             ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('anio', 'mes')
+            ->groupBy('fk_area', 'fk_categoria', 'anio', 'mes')
             ->orderBy('anio')
             ->orderBy('mes')
-            ->get()
-            ->map(fn($e) => [
-                'mes'   => \Carbon\Carbon::createFromDate($e->anio, $e->mes, 1)->locale('es')->isoFormat('MMM YY'),
-                'total' => $e->total,
-            ]);
+            ->get();
 
         // ── Planes de mejora por estado ──
         $planesPorEstado = PlanMejora::select('estado', DB::raw('count(*) as total'))
