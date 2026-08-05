@@ -1,13 +1,27 @@
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GraficaCard from '@/Components/GraficaCard';
+import { useState } from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
 import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, TrendingDown, FileText } from 'lucide-react';
 
-const COLORES = ['#14b8a6', '#0d9488', '#99f6e4', '#5eead4', '#ccfbf1', '#0f766e', '#115e59', '#134e4a'];
+const COLORES = [
+    '#14b8a6', // teal
+    '#3b82f6', // blue
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#8b5cf6', // violet
+    '#10b981', // emerald
+    '#f97316', // orange
+    '#06b6d4', // cyan
+    '#ec4899', // pink
+    '#84cc16', // lime
+    '#6366f1', // indigo
+    '#14b8a6', // teal repeat
+];
 
 const COLORES_ESTADO = {
     en_proceso: '#f59e0b',
@@ -87,6 +101,45 @@ export default function Dashboard({ estadisticas }) {
         name: estado === 'en_proceso' ? 'En Proceso' : estado === 'ejecutado' ? 'Ejecutado' : 'Radicado',
         total: total,
     }));
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
+    const [areaSeleccionada, setAreaSeleccionada] = useState('');
+
+
+    // Datos por categoría y mes
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    const datosCategoriasMes = () => {
+        const filtrado = categoriaSeleccionada
+            ? estadisticas.porCategoriaMes.filter(e => e.fk_categoria == categoriaSeleccionada)
+            : estadisticas.porCategoriaMes;
+
+        const porMesAgrupado = {};
+        filtrado.forEach(e => {
+            const key = `${meses[e.mes - 1]} ${e.anio}`;
+            if (!porMesAgrupado[key]) porMesAgrupado[key] = { mes: key };
+            const cat = estadisticas.categorias.find(c => c.id_categoria === e.fk_categoria);
+            porMesAgrupado[key][cat?.nombre ?? e.fk_categoria] = e.total;
+        });
+        return Object.values(porMesAgrupado);
+    };
+
+    const datosAreasMes = () => {
+        const filtrado = areaSeleccionada
+            ? estadisticas.porAreaMes.filter(e => e.fk_area == areaSeleccionada)
+            : estadisticas.porAreaMes;
+
+        const porMesAgrupado = {};
+        filtrado.forEach(e => {
+            const key = `${meses[e.mes - 1]} ${e.anio}`;
+            if (!porMesAgrupado[key]) porMesAgrupado[key] = { mes: key };
+            const area = estadisticas.areas.find(a => a.id_area === e.fk_area);
+            porMesAgrupado[key][area?.nombre ?? e.fk_area] = e.total;
+        });
+        return Object.values(porMesAgrupado);
+    };
+
+    const categoriasUnicas = [...new Set(estadisticas.porCategoriaMes?.map(e => e.fk_categoria) ?? [])];
+    const areasUnicas = [...new Set(estadisticas.porAreaMes?.map(e => e.fk_area) ?? [])];
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Dashboard</h2>}>
@@ -152,34 +205,64 @@ export default function Dashboard({ estadisticas }) {
                         </ResponsiveContainer>
                     </GraficaCard>
 
-                    <GraficaCard titulo="Eventos por categoría" datos={porCategoria}>
+                    {/* Eventos por categoría y mes */}
+                    <GraficaCard titulo="Eventos por categoría y mes" datos={datosCategoriasMes()}>
+                        <div className="mb-3">
+                            <select
+                                value={categoriaSeleccionada}
+                                onChange={e => setCategoriaSeleccionada(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las categorías</option>
+                                {estadisticas.categorias?.map(c => (
+                                    <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                                ))}
+                            </select>
+                        </div>
                         <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={porCategoria} layout="vertical">
+                            <BarChart data={datosCategoriasMes()}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                <XAxis type="number" tick={{ fontSize: 12 }} />
-                                <YAxis dataKey="nombre" type="category" tick={{ fontSize: 11 }} width={130} />
+                                <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+                                <YAxis tick={{ fontSize: 12 }} />
                                 <Tooltip content={<TooltipPersonalizado />} />
-                                <Bar dataKey="total" name="Eventos" radius={[0, 6, 6, 0]}>
-                                    {porCategoria.map((_, index) => (
-                                        <Cell key={index} fill={COLORES[index % COLORES.length]} />
-                                    ))}
-                                </Bar>
+                                <Legend />
+                                {categoriasUnicas.map((id, index) => {
+                                    const cat = estadisticas.categorias?.find(c => c.id_categoria === id);
+                                    return (
+                                        <Bar key={id} dataKey={cat?.nombre ?? id} fill={COLORES[index % COLORES.length]} radius={[4, 4, 0, 0]} />
+                                    );
+                                })}
                             </BarChart>
                         </ResponsiveContainer>
                     </GraficaCard>
 
-                    <GraficaCard titulo="Top áreas con más eventos" datos={porArea}>
+                    {/* Eventos por área y mes */}
+                    <GraficaCard titulo="Eventos por área y mes" datos={datosAreasMes()}>
+                        <div className="mb-3">
+                            <select
+                                value={areaSeleccionada}
+                                onChange={e => setAreaSeleccionada(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las áreas</option>
+                                {estadisticas.areas?.map(a => (
+                                    <option key={a.id_area} value={a.id_area}>{a.nombre}</option>
+                                ))}
+                            </select>
+                        </div>
                         <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={porArea} layout="vertical">
+                            <BarChart data={datosAreasMes()}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                <XAxis type="number" tick={{ fontSize: 12 }} />
-                                <YAxis dataKey="nombre" type="category" tick={{ fontSize: 11 }} width={130} />
+                                <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+                                <YAxis tick={{ fontSize: 12 }} />
                                 <Tooltip content={<TooltipPersonalizado />} />
-                                <Bar dataKey="total" name="Eventos" radius={[0, 6, 6, 0]}>
-                                    {porArea.map((_, index) => (
-                                        <Cell key={index} fill={COLORES[index % COLORES.length]} />
-                                    ))}
-                                </Bar>
+                                <Legend />
+                                {areasUnicas.map((id, index) => {
+                                    const area = estadisticas.areas?.find(a => a.id_area === id);
+                                    return (
+                                        <Bar key={id} dataKey={area?.nombre ?? id} fill={COLORES[index % COLORES.length]} radius={[4, 4, 0, 0]} />
+                                    );
+                                })}
                             </BarChart>
                         </ResponsiveContainer>
                     </GraficaCard>

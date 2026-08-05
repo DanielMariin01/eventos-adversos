@@ -30,27 +30,31 @@ class DashboardController extends Controller
             ->whereYear('created_at', $ahora->copy()->subMonth()->year)
             ->count();
 
-        // ── Eventos por categoría ──
-        $porCategoria = EventoAdverso::select('fk_categoria', DB::raw('count(*) as total'))
-            ->with('categoria')
-            ->groupBy('fk_categoria')
-            ->get()
-            ->map(fn($e) => [
-                'nombre' => $e->categoria->nombre ?? 'Sin categoría',
-                'total'  => $e->total,
-            ]);
+        // ── Eventos por categoría y mes ──
+        $porCategoriaMes = EventoAdverso::select(
+            'fk_categoria',
+            DB::raw('MONTH(created_at) as mes'),
+            DB::raw('YEAR(created_at) as anio'),
+            DB::raw('count(*) as total')
+        )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('fk_categoria', 'anio', 'mes')
+            ->orderBy('anio')
+            ->orderBy('mes')
+            ->get();
 
-        // ── Eventos por área ──
-        $porArea = EventoAdverso::select('fk_area', DB::raw('count(*) as total'))
-            ->with('area')
-            ->groupBy('fk_area')
-            ->orderByDesc('total')
-            ->limit(8)
-            ->get()
-            ->map(fn($e) => [
-                'nombre' => $e->area->nombre ?? 'Sin área',
-                'total'  => $e->total,
-            ]);
+        // ── Eventos por área y mes ──
+        $porAreaMes = EventoAdverso::select(
+            'fk_area',
+            DB::raw('MONTH(created_at) as mes'),
+            DB::raw('YEAR(created_at) as anio'),
+            DB::raw('count(*) as total')
+        )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('fk_area', 'anio', 'mes')
+            ->orderBy('anio')
+            ->orderBy('mes')
+            ->get();
 
         // ── Eventos por mes (últimos 6 meses) ──
         $porMes = EventoAdverso::select(
@@ -112,13 +116,15 @@ class DashboardController extends Controller
                 'mesActual'        => $mesActual,
                 'mesAnterior'      => $mesAnterior,
                 'totalesPorEstado' => $totalesPorEstado,
-                'porCategoria'     => $porCategoria,
-                'porArea'          => $porArea,
                 'porMes'           => $porMes,
                 'planesPorEstado'  => $planesPorEstado,
                 'planesVencidos'   => $planesVencidos,
                 'porClasificacionMes' => $datosClasificacion,
                 'clasificaciones'     => $clasificaciones,
+                'porCategoriaMes' => $porCategoriaMes,
+                'porAreaMes'      => $porAreaMes,
+                'categorias'      => Categoria::where('activo', 1)->get(['id_categoria', 'nombre']),
+                'areas'           => Area::where('activo', 1)->get(['id_area', 'nombre']),
             ],
         ]);
     }
