@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GraficaCard from '@/Components/GraficaCard';
 import { useState } from 'react';
+import { router } from '@inertiajs/react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, LineChart, Line, Legend
@@ -87,9 +88,27 @@ export default function Dashboard({ estadisticas }) {
         planesVencidos,
         porClasificacionMes,
         clasificaciones,
+        aniosDisponibles,
+        anioSeleccionado,
+        periodoSeleccionado,
+        trimestreSeleccionado,
+        semestreSeleccionado,
     } = estadisticas;
 
     const tendencia = mesActual - mesAnterior;
+    const [periodo, setPeriodo] = useState(periodoSeleccionado);
+    const [anio, setAnio] = useState(anioSeleccionado);
+    const [trimestre, setTrimestre] = useState(trimestreSeleccionado);
+    const [semestre, setSemestre] = useState(semestreSeleccionado);
+
+    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre) => {
+        router.get(route('dashboard'), {
+            anio: nuevoAnio ?? anio,
+            periodo: nuevoPeriodo ?? periodo,
+            trimestre: nuevoTrimestre ?? trimestre,
+            semestre: nuevoSemestre ?? semestre,
+        }, { preserveState: true });
+    };
 
     const datosEstados = Object.entries(totalesPorEstado ?? {}).map(([estado, total]) => ({
         name: LABEL_ESTADO[estado] ?? estado,
@@ -188,6 +207,7 @@ export default function Dashboard({ estadisticas }) {
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Dashboard</h2>}>
             <Head title="Dashboard" />
 
+
             <div className="max-w-7xl mx-auto py-8 px-6 space-y-6">
 
                 {/* ── Tarjetas de indicadores ── */}
@@ -209,6 +229,64 @@ export default function Dashboard({ estadisticas }) {
                     <TarjetaIndicador titulo="En Mejora" valor={totalesPorEstado?.en_mejora ?? 0} icono={CheckCircle} color="bg-teal-600" />
                     <TarjetaIndicador titulo="Radicado" valor={totalesPorEstado?.radicado ?? 0} icono={CheckCircle} color="bg-purple-500" />
                     <TarjetaIndicador titulo="Cancelados" valor={totalesPorEstado?.cancelado ?? 0} icono={XCircle} color="bg-red-400" />
+                </div>
+                {/* ── Filtros globales ── */}
+                <div className="flex flex-wrap gap-3 mb-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-semibold text-gray-600">Año:</label>
+                        <select
+                            value={anio}
+                            onChange={e => { setAnio(e.target.value); aplicarFiltros(e.target.value, null, null, null); }}
+                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                        >
+                            {aniosDisponibles?.map(a => (
+                                <option key={a} value={a}>{a}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-semibold text-gray-600">Período:</label>
+                        <select
+                            value={periodo}
+                            onChange={e => { setPeriodo(e.target.value); aplicarFiltros(null, e.target.value, null, null); }}
+                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                        >
+                            <option value="anual">Anual</option>
+                            <option value="semestral">Semestral</option>
+                            <option value="trimestral">Trimestral</option>
+                        </select>
+                    </div>
+
+                    {periodo === 'trimestral' && (
+                        <div className="flex items-center gap-2">
+                            <label className="text-sm font-semibold text-gray-600">Trimestre:</label>
+                            <select
+                                value={trimestre}
+                                onChange={e => { setTrimestre(e.target.value); aplicarFiltros(null, null, e.target.value, null); }}
+                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value={1}>T1 (Ene - Mar)</option>
+                                <option value={2}>T2 (Abr - Jun)</option>
+                                <option value={3}>T3 (Jul - Sep)</option>
+                                <option value={4}>T4 (Oct - Dic)</option>
+                            </select>
+                        </div>
+                    )}
+
+                    {periodo === 'semestral' && (
+                        <div className="flex items-center gap-2">
+                            <label className="text-sm font-semibold text-gray-600">Semestre:</label>
+                            <select
+                                value={semestre}
+                                onChange={e => { setSemestre(e.target.value); aplicarFiltros(null, null, null, e.target.value); }}
+                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value={1}>S1 (Ene - Jun)</option>
+                                <option value={2}>S2 (Jul - Dic)</option>
+                            </select>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── Gráficas ── */}
