@@ -104,14 +104,22 @@ export default function Dashboard({ estadisticas }) {
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
     const [areaSeleccionada, setAreaSeleccionada] = useState('');
 
+    const [mesCategoriaSeleccionado, setMesCategoriaSeleccionado] = useState('');
+    const [mesAreaSeleccionado, setMesAreaSeleccionado] = useState('');
+
 
     // Datos por categoría y mes
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
     const datosCategoriasMes = () => {
-        const filtrado = categoriaSeleccionada
-            ? estadisticas.porCategoriaMes.filter(e => e.fk_categoria == categoriaSeleccionada)
-            : estadisticas.porCategoriaMes;
+        let filtrado = estadisticas.porCategoriaMes ?? [];
+
+        if (categoriaSeleccionada) {
+            filtrado = filtrado.filter(e => e.fk_categoria == categoriaSeleccionada);
+        }
+        if (mesCategoriaSeleccionado) {
+            filtrado = filtrado.filter(e => e.mes == mesCategoriaSeleccionado);
+        }
 
         const porMesAgrupado = {};
         filtrado.forEach(e => {
@@ -124,9 +132,14 @@ export default function Dashboard({ estadisticas }) {
     };
 
     const datosAreasMes = () => {
-        const filtrado = areaSeleccionada
-            ? estadisticas.porAreaMes.filter(e => e.fk_area == areaSeleccionada)
-            : estadisticas.porAreaMes;
+        let filtrado = estadisticas.porAreaMes ?? [];
+
+        if (areaSeleccionada) {
+            filtrado = filtrado.filter(e => e.fk_area == areaSeleccionada);
+        }
+        if (mesAreaSeleccionado) {
+            filtrado = filtrado.filter(e => e.mes == mesAreaSeleccionado);
+        }
 
         const porMesAgrupado = {};
         filtrado.forEach(e => {
@@ -140,6 +153,9 @@ export default function Dashboard({ estadisticas }) {
 
     const categoriasUnicas = [...new Set(estadisticas.porCategoriaMes?.map(e => e.fk_categoria) ?? [])];
     const areasUnicas = [...new Set(estadisticas.porAreaMes?.map(e => e.fk_area) ?? [])];
+
+
+
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Dashboard</h2>}>
@@ -207,7 +223,8 @@ export default function Dashboard({ estadisticas }) {
 
                     {/* Eventos por categoría y mes */}
                     <GraficaCard titulo="Eventos por categoría y mes" datos={datosCategoriasMes()}>
-                        <div className="mb-3">
+                        {/* Filtros categoría */}
+                        <div className="mb-3 grid grid-cols-2 gap-2">
                             <select
                                 value={categoriaSeleccionada}
                                 onChange={e => setCategoriaSeleccionada(e.target.value)}
@@ -216,6 +233,16 @@ export default function Dashboard({ estadisticas }) {
                                 <option value="">Todas las categorías</option>
                                 {estadisticas.categorias?.map(c => (
                                     <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={mesCategoriaSeleccionado}
+                                onChange={e => setMesCategoriaSeleccionado(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todos los meses</option>
+                                {meses.map((m, i) => (
+                                    <option key={i + 1} value={i + 1}>{m}</option>
                                 ))}
                             </select>
                         </div>
@@ -238,7 +265,8 @@ export default function Dashboard({ estadisticas }) {
 
                     {/* Eventos por área y mes */}
                     <GraficaCard titulo="Eventos por área y mes" datos={datosAreasMes()}>
-                        <div className="mb-3">
+                        {/* Filtros área */}
+                        <div className="mb-3 grid grid-cols-2 gap-2">
                             <select
                                 value={areaSeleccionada}
                                 onChange={e => setAreaSeleccionada(e.target.value)}
@@ -247,6 +275,16 @@ export default function Dashboard({ estadisticas }) {
                                 <option value="">Todas las áreas</option>
                                 {estadisticas.areas?.map(a => (
                                     <option key={a.id_area} value={a.id_area}>{a.nombre}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={mesAreaSeleccionado}
+                                onChange={e => setMesAreaSeleccionado(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todos los meses</option>
+                                {meses.map((m, i) => (
+                                    <option key={i + 1} value={i + 1}>{m}</option>
                                 ))}
                             </select>
                         </div>

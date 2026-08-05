@@ -40,7 +40,7 @@ export default function GraficaCard({ titulo, subtitulo, datos = [], children })
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-base p-6">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div>
