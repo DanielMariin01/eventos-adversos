@@ -172,6 +172,20 @@ class DashboardController extends Controller
             ->orderByDesc('anio')
             ->pluck('anio');
 
+        // ── Eventos por relación ──
+        $porRelacion = (clone $query)->select(
+            'relacionado_con',
+            'fk_area',
+            'fk_categoria',
+            DB::raw('MONTH(created_at) as mes'),
+            DB::raw('YEAR(created_at) as anio'),
+            DB::raw('count(*) as total')
+        )
+            ->whereNotNull('relacionado_con')
+            ->groupBy('relacionado_con', 'fk_area', 'fk_categoria', 'anio', 'mes')
+            ->orderBy('mes')
+            ->get();
+
         // ── Eventos por relación específica (Caídas y Úlceras) ──
         $relacionesEspecificas = ['Caídas intrainstitucionales', 'Ulceras por presión'];
 
@@ -215,6 +229,30 @@ class DashboardController extends Controller
                 'porClasificacionRaw'        => $porClasificacionMes,
                 'porRelacionMes' => $porRelacionMes,
                 'relacionesEspecificas' => $relacionesEspecificas,
+                'porRelacion' => $porRelacion,
+                'todasRelaciones' => [
+                    'Alergias',
+                    'Asalto sexual en la institución',
+                    'Administración equivocada de medicamentos',
+                    'Caídas intrainstitucionales',
+                    'Complicación quirúrgica',
+                    'Deficiencia en la comunicación',
+                    'Demoras en la atención',
+                    'Dispositivos y equipos biomédicos',
+                    'Egreso inseguro',
+                    'Fallas en agendamiento de citas',
+                    'Fallas en manejo medico',
+                    'Flebitis mecánica',
+                    'Fuga de pacientes',
+                    'Infecciones de sitio quirúrgico',
+                    'Infecciones asociadas a la atención en salud (IAAS)',
+                    'Identificación errónea del paciente',
+                    'Lesiones de piel',
+                    'Reacción adversa a medicamentos',
+                    'Reingreso a urgencias',
+                    'Traslado inseguro',
+                    'Ulceras por presión',
+                ],
             ],
         ]);
     }

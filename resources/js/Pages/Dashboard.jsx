@@ -138,7 +138,10 @@ export default function Dashboard({ estadisticas }) {
     const [mesSeleccionado, setMesSeleccionado] = useState('');
     const [categoriaEstado, setCategoriaEstado] = useState(estadisticas.categoriaEstadoSeleccionada ?? '');
     const [categoriaEventoClasificacion, setCategoriaEventoClasificacion] = useState('');
-
+    const [areaRelacionGrafica, setAreaRelacionGrafica] = useState('');
+    const [mesRelacionGrafica, setMesRelacionGrafica] = useState('');
+    const [categoriaRelacionGrafica, setCategoriaRelacionGrafica] = useState('');
+    const [relacionGrafica, setRelacionGrafica] = useState('');
 
     // Datos por categoría y mes
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -271,6 +274,35 @@ export default function Dashboard({ estadisticas }) {
         });
     };
 
+
+    const datosTablaRelacion = () => {
+        let filtrado = estadisticas.porRelacion ?? [];
+
+        if (areaRelacionGrafica) filtrado = filtrado.filter(e => e.fk_area == areaRelacionGrafica);
+        if (mesRelacionGrafica) filtrado = filtrado.filter(e => e.mes == mesRelacionGrafica);
+        if (categoriaRelacionGrafica) filtrado = filtrado.filter(e => e.fk_categoria == categoriaRelacionGrafica);
+        if (relacionGrafica) filtrado = filtrado.filter(e => e.relacionado_con === relacionGrafica);
+
+        const mesesUnicos = [...new Set(filtrado.map(e => e.mes))].sort((a, b) => a - b);
+
+        // Agrupar por relación + área sin duplicados
+        const claves = [...new Set(filtrado.map(e => `${e.relacionado_con}||${e.fk_area}`))].sort();
+
+        const tabla = claves.map(clave => {
+            const [relacion, fkArea] = clave.split('||');
+            const area = estadisticas.areas?.find(a => String(a.id_area) === String(fkArea));
+            const fila = { nombre: relacion, area: area?.nombre ?? '—' };
+            mesesUnicos.forEach(mes => {
+                fila[meses[mes - 1]] = filtrado
+                    .filter(e => e.relacionado_con === relacion && String(e.fk_area) === String(fkArea) && e.mes === mes)
+                    .reduce((sum, e) => sum + e.total, 0) || '';
+            });
+            return fila;
+        });
+
+
+        return { tabla, mesesUnicos };
+    };
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Dashboard</h2>}>
@@ -688,7 +720,92 @@ export default function Dashboard({ estadisticas }) {
                             </ResponsiveContainer>
                         )}
                     </GraficaCard>
+
                 </div>
+                {(() => {
+                    const { tabla, mesesUnicos } = datosTablaRelacion();
+                    return (
+                        <GraficaCard titulo="Eventos por Relación" datos={tabla}>
+                            <div className="mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <select
+                                    value={relacionGrafica}
+                                    onChange={e => setRelacionGrafica(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todas las relaciones</option>
+                                    {estadisticas.todasRelaciones?.map(r => (
+                                        <option key={r} value={r}>{r}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={areaRelacionGrafica}
+                                    onChange={e => setAreaRelacionGrafica(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todas las áreas</option>
+                                    {estadisticas.areas?.map(a => (
+                                        <option key={a.id_area} value={a.id_area}>{a.nombre}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={mesRelacionGrafica}
+                                    onChange={e => setMesRelacionGrafica(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todos los meses</option>
+                                    {meses.map((m, i) => (
+                                        <option key={i + 1} value={i + 1}>{m}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={categoriaRelacionGrafica}
+                                    onChange={e => setCategoriaRelacionGrafica(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="">Todas las categorías</option>
+                                    {estadisticas.categorias?.map(c => (
+                                        <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {tabla.length === 0 ? (
+                                <div className="flex items-center justify-center h-[200px] text-gray-400 text-sm">
+                                    No hay datos para el filtro seleccionado
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto scroll-teal">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-teal-600 text-white">
+                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Evento</th>
+                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Área</th>
+                                                {mesesUnicos.map(mes => (
+                                                    <th key={mes} className="px-4 py-3 text-center text-xs font-semibold uppercase">
+                                                        {meses[mes - 1]}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {tabla.map((fila, index) => (
+                                                <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                    <td className="px-4 py-3 font-medium text-gray-800">{fila.nombre}</td>
+                                                    <td className="px-4 py-3 text-gray-600">{fila.area}</td>
+                                                    {mesesUnicos.map(mes => (
+                                                        <td key={mes} className="px-4 py-3 text-center text-gray-600">
+                                                            {fila[meses[mes - 1]] || ''}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </GraficaCard>
+                    );
+                })()}
             </div>
         </AuthenticatedLayout>
     );
