@@ -172,6 +172,23 @@ class DashboardController extends Controller
             ->orderByDesc('anio')
             ->pluck('anio');
 
+        // ── Eventos por relación específica (Caídas y Úlceras) ──
+        $relacionesEspecificas = ['Caídas intrainstitucionales', 'Ulceras por presión'];
+
+        $porRelacionMes = (clone $query)
+            ->select(
+                'relacionado_con',
+                'fk_area',
+                'fk_categoria',
+                DB::raw('MONTH(created_at) as mes'),
+                DB::raw('YEAR(created_at) as anio'),
+                DB::raw('count(*) as total')
+            )
+            ->whereIn('relacionado_con', $relacionesEspecificas)
+            ->groupBy('relacionado_con', 'fk_area', 'fk_categoria', 'anio', 'mes')
+            ->orderBy('mes')
+            ->get();
+
         return Inertia::render('Dashboard', [
             'estadisticas' => [
                 'totalEventos'               => $totalEventos,
@@ -196,6 +213,8 @@ class DashboardController extends Controller
                 'semestreSeleccionado'       => (int) $request->get('semestre', now()->month <= 6 ? 1 : 2),
                 'categoriaEstadoSeleccionada' => $request->get('categoria_estado', ''),
                 'porClasificacionRaw'        => $porClasificacionMes,
+                'porRelacionMes' => $porRelacionMes,
+                'relacionesEspecificas' => $relacionesEspecificas,
             ],
         ]);
     }

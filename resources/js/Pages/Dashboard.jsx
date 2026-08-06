@@ -244,6 +244,33 @@ export default function Dashboard({ estadisticas }) {
         return { datos: resultado, clasificaciones: clasificacionesUnicas };
     };
 
+    const [egresos, setEgresos] = useState('');
+    const [areaRelacion, setAreaRelacion] = useState('');
+    const [mesRelacion, setMesRelacion] = useState('');
+    const [categoriaRelacion, setCategoriaRelacion] = useState('');
+    const [relacionSeleccionada, setRelacionSeleccionada] = useState('');
+
+    const datosTasaIncidencia = () => {
+        let filtrado = estadisticas.porRelacionMes ?? [];
+
+        if (areaRelacion) filtrado = filtrado.filter(e => e.fk_area == areaRelacion);
+        if (mesRelacion) filtrado = filtrado.filter(e => e.mes == mesRelacion);
+        if (categoriaRelacion) filtrado = filtrado.filter(e => e.fk_categoria == categoriaRelacion);
+        if (relacionSeleccionada) filtrado = filtrado.filter(e => e.relacionado_con === relacionSeleccionada);
+
+        const mesesUnicos = [...new Set(filtrado.map(e => e.mes))].sort((a, b) => a - b);
+
+        return mesesUnicos.map(mes => {
+            const total = filtrado
+                .filter(e => e.mes === mes)
+                .reduce((sum, e) => sum + e.total, 0);
+            const tasa = egresos && Number(egresos) > 0
+                ? parseFloat((total / Number(egresos)).toFixed(2))
+                : total;
+            return { mes: meses[mes - 1], total, tasa };
+        });
+    };
+
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Dashboard</h2>}>
@@ -587,6 +614,80 @@ export default function Dashboard({ estadisticas }) {
                             </GraficaCard>
                         );
                     })()}
+                    <GraficaCard titulo="Tasa de Incidencia" subtitulo="Caídas intrainstitucionales y Úlceras por presión" datos={datosTasaIncidencia()}>
+                        <div className="mb-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <select
+                                value={relacionSeleccionada}
+                                onChange={e => setRelacionSeleccionada(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las relaciones</option>
+                                {estadisticas.relacionesEspecificas?.map(r => (
+                                    <option key={r} value={r}>{r}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={areaRelacion}
+                                onChange={e => setAreaRelacion(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las áreas</option>
+                                {estadisticas.areas?.map(a => (
+                                    <option key={a.id_area} value={a.id_area}>{a.nombre}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={mesRelacion}
+                                onChange={e => setMesRelacion(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todos los meses</option>
+                                {meses.map((m, i) => (
+                                    <option key={i + 1} value={i + 1}>{m}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={categoriaRelacion}
+                                onChange={e => setCategoriaRelacion(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            >
+                                <option value="">Todas las categorías</option>
+                                {estadisticas.categorias?.map(c => (
+                                    <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                                ))}
+                            </select>
+                            <div className="flex items-center gap-2 border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 col-span-2 md:col-span-2">
+                                <input
+                                    type="number"
+                                    value={egresos}
+                                    onChange={e => setEgresos(e.target.value)}
+                                    placeholder="N° de egresos..."
+                                    className="flex-1 px-3 py-2 text-sm focus:outline-none"
+                                    min="1"
+                                />
+                                <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0 text-white text-xs font-semibold">
+                                    Egresos
+                                </div>
+                            </div>
+                        </div>
+
+                        {datosTasaIncidencia().length === 0 ? (
+                            <div className="flex items-center justify-center h-[250px] text-gray-400 text-sm">
+                                No hay datos para el filtro seleccionado
+                            </div>
+                        ) : (
+                            <ResponsiveContainer width="100%" height={250}>
+                                <BarChart data={datosTasaIncidencia()}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                    <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip content={<TooltipPersonalizado />} />
+                                    <Legend />
+                                    <Bar dataKey="tasa" name={egresos ? "Tasa (eventos/egresos)" : "Total eventos"} fill="#14b8a6" radius={[4, 4, 0, 0]} label={{ position: 'top', fontSize: 10 }} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        )}
+                    </GraficaCard>
                 </div>
             </div>
         </AuthenticatedLayout>
