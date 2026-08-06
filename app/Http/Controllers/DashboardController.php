@@ -44,8 +44,8 @@ class DashboardController extends Controller
             ->groupBy('estado')
             ->pluck('total', 'estado');
 
-        // ── Total general ──
-        $totalEventos = EventoAdverso::count();
+        // ── Total general (filtrado) ──
+        $totalEventos = (clone $query)->count();
 
         // ── Eventos del mes actual vs mes anterior ──
         $ahora       = now();
