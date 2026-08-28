@@ -102,6 +102,8 @@ export default function Dashboard({ estadisticas }) {
         detalleCancelados,
     } = estadisticas;
 
+    console.log('estadisticas completas:', estadisticas);
+
     const tendencia = mesActual - mesAnterior;
     const [periodo, setPeriodo] = useState(periodoSeleccionado);
     const [anio, setAnio] = useState(anioSeleccionado);
