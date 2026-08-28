@@ -36,6 +36,123 @@ class DashboardController extends Controller
                 ->whereMonth('created_at', '<=', $mesFin);
         }
 
+        // ── Datos detallados por estado ──
+        $detalleRevisados = [
+            'analizado'  => EventoAdverso::where('estado', 'analizado')->count(),
+            'en_mejora'  => EventoAdverso::where('estado', 'en_mejora')->count(),
+            'radicado'   => EventoAdverso::where('estado', 'radicado')->count(),
+            'cerrado'    => EventoAdverso::where('estado', 'cerrado')->count(),
+            'porCategoria' => EventoAdverso::select('fk_categoria', DB::raw('count(*) as total'))
+                ->with('categoria')
+                ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])
+                ->groupBy('fk_categoria')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->categoria?->nombre, 'total' => $e->total]),
+            'porArea' => EventoAdverso::select('fk_area', DB::raw('count(*) as total'))
+                ->with('area')
+                ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])
+                ->groupBy('fk_area')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->area?->nombre, 'total' => $e->total]),
+        ];
+
+        $detalleTramitados = [
+            'radicado'  => EventoAdverso::where('estado', 'radicado')->count(),
+            'cerrado'   => EventoAdverso::where('estado', 'cerrado')->count(),
+            'tiempoPromedio' => round(EventoAdverso::whereIn('estado', ['radicado', 'cerrado'])
+                ->whereNotNull('fecha_cierre')
+                ->get()
+                ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_cierre)), 1),
+            'porJefe' => EventoAdverso::select('fk_jefe', DB::raw('count(*) as total'))
+                ->with('jefe')
+                ->whereIn('estado', ['radicado', 'cerrado'])
+                ->whereNotNull('fk_jefe')
+                ->groupBy('fk_jefe')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->jefe?->name, 'total' => $e->total]),
+        ];
+
+        $detalleCancelados = [
+            'total'       => EventoAdverso::where('estado', 'cancelado')->count(),
+            'porArea'     => EventoAdverso::select('fk_area', DB::raw('count(*) as total'))
+                ->with('area')
+                ->where('estado', 'cancelado')
+                ->groupBy('fk_area')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->area?->nombre, 'total' => $e->total]),
+            'porCategoria' => EventoAdverso::select('fk_categoria', DB::raw('count(*) as total'))
+                ->with('categoria')
+                ->where('estado', 'cancelado')
+                ->groupBy('fk_categoria')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->categoria?->nombre, 'total' => $e->total]),
+        ];
+
+        $detalleRevisados = [
+            'analizado'       => (clone $query)->where('estado', 'analizado')->count(),
+            'en_mejora'       => (clone $query)->where('estado', 'en_mejora')->count(),
+            'radicado'        => (clone $query)->where('estado', 'radicado')->count(),
+            'cerrado'         => (clone $query)->where('estado', 'cerrado')->count(),
+            'jefes_en_mejora' => (clone $query)->select('fk_jefe', DB::raw('count(*) as total'))
+                ->with('jefe')
+                ->where('estado', 'en_mejora')
+                ->whereNotNull('fk_jefe')
+                ->groupBy('fk_jefe')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->jefe?->name, 'total' => $e->total]),
+            'jefes_radicado'  => (clone $query)->select('fk_jefe', DB::raw('count(*) as total'))
+                ->with('jefe')
+                ->where('estado', 'radicado')
+                ->whereNotNull('fk_jefe')
+                ->groupBy('fk_jefe')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->jefe?->name, 'total' => $e->total]),
+            'porCategoria'    => (clone $query)->select('fk_categoria', DB::raw('count(*) as total'))
+                ->with('categoria')
+                ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])
+                ->groupBy('fk_categoria')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->categoria?->nombre, 'total' => $e->total]),
+            'porArea'         => (clone $query)->select('fk_area', DB::raw('count(*) as total'))
+                ->with('area')
+                ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])
+                ->groupBy('fk_area')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->area?->nombre, 'total' => $e->total]),
+        ];
+
+        $detalleTramitados = [
+            'radicado'       => (clone $query)->where('estado', 'radicado')->count(),
+            'cerrado'        => (clone $query)->where('estado', 'cerrado')->count(),
+            'tiempoPromedio' => round((clone $query)->whereIn('estado', ['radicado', 'cerrado'])
+                ->whereNotNull('fecha_cierre')
+                ->get()
+                ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_cierre)), 1),
+            'porJefe'        => (clone $query)->select('fk_jefe', DB::raw('count(*) as total'))
+                ->with('jefe')
+                ->whereIn('estado', ['radicado', 'cerrado'])
+                ->whereNotNull('fk_jefe')
+                ->groupBy('fk_jefe')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->jefe?->name, 'total' => $e->total]),
+        ];
+
+        $detalleCancelados = [
+            'total'        => (clone $query)->where('estado', 'cancelado')->count(),
+            'porArea'      => (clone $query)->select('fk_area', DB::raw('count(*) as total'))
+                ->with('area')
+                ->where('estado', 'cancelado')
+                ->groupBy('fk_area')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->area?->nombre, 'total' => $e->total]),
+            'porCategoria' => (clone $query)->select('fk_categoria', DB::raw('count(*) as total'))
+                ->with('categoria')
+                ->where('estado', 'cancelado')
+                ->groupBy('fk_categoria')
+                ->get()
+                ->map(fn($e) => ['nombre' => $e->categoria?->nombre, 'total' => $e->total]),
+        ];
+
         // ── Totales por estado (filtrado) ──
         // ── Totales por estado (filtrado) ──
         $totalesPorEstado = (clone $query)
@@ -47,6 +164,16 @@ class DashboardController extends Controller
         // ── Total general (filtrado) ──
         $totalEventos = (clone $query)->count();
 
+
+        // ── Porcentajes de avance ──
+        $totalGeneral     = (clone $query)->count();
+        $revisados        = (clone $query)->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])->count();
+        $tramitados       = (clone $query)->whereIn('estado', ['radicado', 'cerrado'])->count();
+        $cancelados       = (clone $query)->where('estado', 'cancelado')->count();
+
+        $porcentajeRevisados  = $totalGeneral > 0 ? round(($revisados / $totalGeneral) * 100, 1) : 0;
+        $porcentajeTramitados = $totalGeneral > 0 ? round(($tramitados / $totalGeneral) * 100, 1) : 0;
+        $porcentajeCancelados = $totalGeneral > 0 ? round(($cancelados / $totalGeneral) * 100, 1) : 0;
         // ── Eventos del mes actual vs mes anterior ──
         $ahora       = now();
         $mesActual   = EventoAdverso::whereMonth('created_at', $ahora->month)
@@ -203,6 +330,17 @@ class DashboardController extends Controller
             ->orderBy('mes')
             ->get();
 
+
+        $totalGeneral = EventoAdverso::count();
+
+        $revisados = EventoAdverso::whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])->count();
+        $tramitados = EventoAdverso::whereIn('estado', ['radicado', 'cerrado'])->count();
+        $cancelados = EventoAdverso::where('estado', 'cancelado')->count();
+
+        $porcentajeRevisados = $totalGeneral > 0 ? round(($revisados / $totalGeneral) * 100, 1) : 0;
+        $porcentajeTramitados = $totalGeneral > 0 ? round(($tramitados / $totalGeneral) * 100, 1) : 0;
+        $porcentajeCancelados = $totalGeneral > 0 ? round(($cancelados / $totalGeneral) * 100, 1) : 0;
+
         return Inertia::render('Dashboard', [
             'estadisticas' => [
                 'totalEventos'               => $totalEventos,
@@ -252,7 +390,14 @@ class DashboardController extends Controller
                     'Reingreso a urgencias',
                     'Traslado inseguro',
                     'Ulceras por presión',
+
                 ],
+                'porcentajeRevisados'  => $porcentajeRevisados,
+                'porcentajeTramitados' => $porcentajeTramitados,
+                'porcentajeCancelados' => $porcentajeCancelados,
+                'detalleRevisados'  => $detalleRevisados,
+                'detalleTramitados' => $detalleTramitados,
+                'detalleCancelados' => $detalleCancelados,
             ],
         ]);
     }

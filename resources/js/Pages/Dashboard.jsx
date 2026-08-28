@@ -94,6 +94,12 @@ export default function Dashboard({ estadisticas }) {
         periodoSeleccionado,
         trimestreSeleccionado,
         semestreSeleccionado,
+        porcentajeRevisados,
+        porcentajeTramitados,
+        porcentajeCancelados,
+        detalleRevisados,
+        detalleTramitados,
+        detalleCancelados,
     } = estadisticas;
 
     const tendencia = mesActual - mesAnterior;
@@ -104,6 +110,8 @@ export default function Dashboard({ estadisticas }) {
     const [areaClasificacion, setAreaClasificacion] = useState('');
     const [categoriaClasificacion, setCategoriaClasificacion] = useState('');
     const [mesClasificacion, setMesClasificacion] = useState('');
+    const [expandido, setExpandido] = useState(null);
+    const [expandidoEstado, setExpandidoEstado] = useState(null);
 
 
 
@@ -389,9 +397,229 @@ export default function Dashboard({ estadisticas }) {
                         </div>
                     )}
                 </div>
+                {/* ── Árbol de jerarquía ── */}
+                <div className="space-y-3">
 
+                    {/* Tarjeta Revisados */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <button
+                            onClick={() => setExpandido(expandido === 'revisados' ? null : 'revisados')}
+                            className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center">
+                                    <FileText className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-2xl font-bold text-gray-900">{porcentajeRevisados}%</p>
+                                    <p className="text-sm text-gray-600">Eventos Revisados</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                                    <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${porcentajeRevisados}%` }}></div>
+                                </div>
+                                <span className="text-gray-400 text-lg">{expandido === 'revisados' ? '▲' : '▼'}</span>
+                            </div>
+                        </button>
+
+                        {expandido === 'revisados' && (
+                            <div className="border-t border-gray-100 p-5 bg-blue-50 space-y-4">
+                                {/* Estados */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {[
+                                        { label: 'Analizado', valor: detalleRevisados?.analizado, color: 'bg-blue-500', key: 'analizado' },
+                                        { label: 'En Mejora', valor: detalleRevisados?.en_mejora, color: 'bg-teal-500', key: 'en_mejora' },
+                                        { label: 'Radicado', valor: detalleRevisados?.radicado, color: 'bg-purple-500', key: 'radicado' },
+                                        { label: 'Cerrado', valor: detalleRevisados?.cerrado, color: 'bg-gray-600', key: 'cerrado' },
+                                    ].map(item => (
+                                        <div key={item.label}>
+                                            <button
+                                                onClick={() => setExpandidoEstado(expandidoEstado === item.key ? null : item.key)}
+                                                className="w-full bg-white rounded-lg p-3 text-center border border-gray-200 hover:border-teal-400 transition"
+                                            >
+                                                <p className="text-2xl font-bold text-gray-900">{item.valor ?? 0}</p>
+                                                <div className={`w-full h-1.5 rounded-full ${item.color} mt-1 mb-1`}></div>
+                                                <p className="text-xs text-gray-500">{item.label}</p>
+                                            </button>
+
+                                            {/* Jefes en mejora */}
+                                            {expandidoEstado === 'en_mejora' && item.key === 'en_mejora' && (
+                                                <div className="mt-2 bg-white border border-teal-200 rounded-lg p-3">
+                                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Coordinadores responsables</p>
+                                                    {detalleRevisados?.jefes_en_mejora?.length === 0 ? (
+                                                        <p className="text-xs text-gray-400">Sin jefes asignados</p>
+                                                    ) : (
+                                                        detalleRevisados?.jefes_en_mejora?.map((j, i) => (
+                                                            <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
+                                                                <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                                <span className="text-xs font-bold text-teal-600">{j.total} evento(s)</span>
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Jefes radicado */}
+                                            {expandidoEstado === 'radicado' && item.key === 'radicado' && (
+                                                <div className="mt-2 bg-white border border-purple-200 rounded-lg p-3">
+                                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Responsables que subieron evidencia</p>
+                                                    {detalleRevisados?.jefes_radicado?.length === 0 ? (
+                                                        <p className="text-xs text-gray-400">Sin jefes asignados</p>
+                                                    ) : (
+                                                        detalleRevisados?.jefes_radicado?.map((j, i) => (
+                                                            <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
+                                                                <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                                <span className="text-xs font-bold text-purple-600">{j.total} evento(s)</span>
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Por categoría */}
+                                <div>
+                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Por Categoría</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        {detalleRevisados?.porCategoria?.map((c, i) => (
+                                            <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                                                <p className="text-lg font-bold text-blue-600">{c.total}</p>
+                                                <p className="text-xs text-gray-500">{c.nombre}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Por área */}
+                                <div>
+                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Por Área</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        {detalleRevisados?.porArea?.map((a, i) => (
+                                            <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                                                <p className="text-lg font-bold text-blue-600">{a.total}</p>
+                                                <p className="text-xs text-gray-500">{a.nombre}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Tarjeta Tramitados */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <button
+                            onClick={() => setExpandido(expandido === 'tramitados' ? null : 'tramitados')}
+                            className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center">
+                                    <CheckCircle className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-2xl font-bold text-gray-900">{porcentajeTramitados}%</p>
+                                    <p className="text-sm text-gray-600">Eventos Tramitados</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                                    <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${porcentajeTramitados}%` }}></div>
+                                </div>
+                                <span className="text-gray-400 text-lg">{expandido === 'tramitados' ? '▲' : '▼'}</span>
+                            </div>
+                        </button>
+
+                        {expandido === 'tramitados' && (
+                            <div className="border-t border-gray-100 p-5 bg-green-50 space-y-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {[
+                                        { label: 'Radicado', valor: detalleTramitados?.radicado, color: 'bg-purple-500' },
+                                        { label: 'Cerrado', valor: detalleTramitados?.cerrado, color: 'bg-gray-600' },
+                                        { label: 'Días promedio resolución', valor: detalleTramitados?.tiempoPromedio, color: 'bg-green-500' },
+                                    ].map(item => (
+                                        <div key={item.label} className="bg-white rounded-lg p-3 text-center border border-gray-200">
+                                            <p className={`text-xl font-bold text-white ${item.color} rounded-lg py-1 mb-1`}>{item.valor}</p>
+                                            <p className="text-xs text-gray-500">{item.label}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div>
+                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Por Responsable</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        {detalleTramitados?.porJefe?.map((j, i) => (
+                                            <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                                                <p className="text-lg font-bold text-green-600">{j.total}</p>
+                                                <p className="text-xs text-gray-500">{j.nombre}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Tarjeta Cancelados */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <button
+                            onClick={() => setExpandido(expandido === 'cancelados' ? null : 'cancelados')}
+                            className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center">
+                                    <XCircle className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-2xl font-bold text-gray-900">{porcentajeCancelados}%</p>
+                                    <p className="text-sm text-gray-600">Eventos Cancelados</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                                    <div className="bg-red-500 h-2.5 rounded-full" style={{ width: `${porcentajeCancelados}%` }}></div>
+                                </div>
+                                <span className="text-gray-400 text-lg">{expandido === 'cancelados' ? '▲' : '▼'}</span>
+                            </div>
+                        </button>
+
+                        {expandido === 'cancelados' && (
+                            <div className="border-t border-gray-100 p-5 bg-red-50 space-y-4">
+                                <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase mb-2">Por Área</p>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {detalleCancelados?.porArea?.map((a, i) => (
+                                                <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                                                    <p className="text-lg font-bold text-red-600">{a.total}</p>
+                                                    <p className="text-xs text-gray-500">{a.nombre}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase mb-2">Por Categoría</p>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {detalleCancelados?.porCategoria?.map((c, i) => (
+                                                <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                                                    <p className="text-lg font-bold text-red-600">{c.total}</p>
+                                                    <p className="text-xs text-gray-500">{c.nombre}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                </div>
                 {/* ── Gráficas ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
                     {/* ── Gráfica Eventos Por Mes── */}
                     <GraficaCard titulo="Eventos por mes" datos={datosPorMes()}>
                         <div className="mb-3 grid grid-cols-3 gap-2">
