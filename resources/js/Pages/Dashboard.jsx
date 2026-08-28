@@ -449,16 +449,15 @@ export default function Dashboard({ estadisticas }) {
                                             {expandidoEstado === 'en_mejora' && item.key === 'en_mejora' && (
                                                 <div className="mt-2 bg-white border border-teal-200 rounded-lg p-3">
                                                     <p className="text-xs font-bold text-gray-500 uppercase mb-2">Coordinadores responsables</p>
-                                                    {detalleRevisados?.jefes_en_mejora?.length === 0 ? (
-                                                        <p className="text-xs text-gray-400">Sin jefes asignados</p>
-                                                    ) : (
-                                                        detalleRevisados?.jefes_en_mejora?.map((j, i) => (
-                                                            <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
-                                                                <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                    {detalleRevisados?.jefes_en_mejora?.map((j, i) => (
+                                                        <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
+                                                            <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                            <div className="text-right">
                                                                 <span className="text-xs font-bold text-teal-600">{j.total} evento(s)</span>
+                                                                <p className="text-xs text-gray-400">#{j.eventos}</p>
                                                             </div>
-                                                        ))
-                                                    )}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             )}
 
@@ -466,16 +465,15 @@ export default function Dashboard({ estadisticas }) {
                                             {expandidoEstado === 'radicado' && item.key === 'radicado' && (
                                                 <div className="mt-2 bg-white border border-purple-200 rounded-lg p-3">
                                                     <p className="text-xs font-bold text-gray-500 uppercase mb-2">Responsables que subieron evidencia</p>
-                                                    {detalleRevisados?.jefes_radicado?.length === 0 ? (
-                                                        <p className="text-xs text-gray-400">Sin jefes asignados</p>
-                                                    ) : (
-                                                        detalleRevisados?.jefes_radicado?.map((j, i) => (
-                                                            <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
-                                                                <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                    {detalleRevisados?.jefes_radicado?.map((j, i) => (
+                                                        <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
+                                                            <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                            <div className="text-right">
                                                                 <span className="text-xs font-bold text-purple-600">{j.total} evento(s)</span>
+                                                                <p className="text-xs text-gray-400">#{j.eventos}</p>
                                                             </div>
-                                                        ))
-                                                    )}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             )}
                                         </div>

@@ -169,14 +169,30 @@ class DashboardController extends Controller
             'en_mejora'       => (clone $query)->where('estado', 'en_mejora')->count(),
             'radicado'        => (clone $query)->where('estado', 'radicado')->count(),
             'cerrado'         => (clone $query)->where('estado', 'cerrado')->count(),
-            'jefes_en_mejora' => (clone $query)->select('fk_jefe', DB::raw('count(*) as total'))
+            'jefes_en_mejora' => (clone $query)->select(
+                'fk_jefe',
+                DB::raw('count(*) as total'),
+                DB::raw('GROUP_CONCAT(id_eventoAdverso) as eventos')
+            )
                 ->with('jefe')->where('estado', 'en_mejora')->whereNotNull('fk_jefe')
                 ->groupBy('fk_jefe')->get()
-                ->map(fn($e) => ['nombre' => $e->jefe?->name, 'total' => $e->total]),
-            'jefes_radicado'  => (clone $query)->select('fk_jefe', DB::raw('count(*) as total'))
+                ->map(fn($e) => [
+                    'nombre'  => $e->jefe?->name,
+                    'total'   => $e->total,
+                    'eventos' => $e->eventos,
+                ]),
+            'jefes_radicado' => (clone $query)->select(
+                'fk_jefe',
+                DB::raw('count(*) as total'),
+                DB::raw('GROUP_CONCAT(id_eventoAdverso) as eventos')
+            )
                 ->with('jefe')->where('estado', 'radicado')->whereNotNull('fk_jefe')
                 ->groupBy('fk_jefe')->get()
-                ->map(fn($e) => ['nombre' => $e->jefe?->name, 'total' => $e->total]),
+                ->map(fn($e) => [
+                    'nombre'  => $e->jefe?->name,
+                    'total'   => $e->total,
+                    'eventos' => $e->eventos,
+                ]),
             'porCategoria'    => (clone $query)->select('fk_categoria', DB::raw('count(*) as total'))
                 ->with('categoria')->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado'])
                 ->groupBy('fk_categoria')->get()
