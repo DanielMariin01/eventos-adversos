@@ -106,7 +106,7 @@ export default function ModalVerPlan({ evento, onClose }) {
                     {/* Evidencia del jefe */}
                     {archivosJefe.length > 0
                         ? <ListaArchivos archivos={archivosJefe} titulo="Evidencia del Jefe" />
-                        : <p><span className="font-bold">Evidencia del Jefe: </span>Sin evidencia.</p>
+                        : <p><span className="font-bold">Evidencia del responsable: </span>Sin evidencia.</p>
                     }
 
                 </div>
