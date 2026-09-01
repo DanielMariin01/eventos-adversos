@@ -385,6 +385,11 @@ export default function Dashboard({ estadisticas }) {
                     <TarjetaIndicador titulo="Radicado" valor={totalesPorEstado?.radicado ?? 0} icono={CheckCircle} color="bg-purple-500" />
                     <TarjetaIndicador titulo="Cancelados" valor={totalesPorEstado?.cancelado ?? 0} icono={XCircle} color="bg-red-400" />
                 </div>
+                {/* ── Título filtros ── */}
+                <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-bold text-gray-700 uppercase tracking-wider">Filtros</h2>
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                </div>
                 {/* ── Filtros globales ── */}
                 <div className="flex flex-wrap gap-3 mb-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                     <div className="flex items-center gap-2">
@@ -442,6 +447,11 @@ export default function Dashboard({ estadisticas }) {
                             </select>
                         </div>
                     )}
+                </div>
+                {/* ── Título tiempos promedio ── */}
+                <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-bold text-gray-700 uppercase tracking-wider">Tiempos de Análisis</h2>
+                    <div className="flex-1 h-px bg-gray-200"></div>
                 </div>
 
                 {/* ── Tiempos promedio ── */}
@@ -546,6 +556,11 @@ export default function Dashboard({ estadisticas }) {
                         <p className="text-3xl font-bold text-gray-900">{tiempos?.total ?? 0} <span className="text-sm font-normal text-gray-400">días</span></p>
                         <p className="text-xs text-gray-400 mt-1">Días promedio desde que se reporta el evento hasta que se cierra completamente</p>
                     </div>
+                </div>
+                {/* ── Título porcentaje de avance ── */}
+                <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-bold text-gray-700 uppercase tracking-wider">Porcentaje de Avance</h2>
+                    <div className="flex-1 h-px bg-gray-200"></div>
                 </div>
                 {/* ── Árbol de jerarquía ── */}
                 <div className="space-y-3">
@@ -763,6 +778,12 @@ export default function Dashboard({ estadisticas }) {
                         )}
                     </div>
 
+                </div>
+
+                {/* ── Título gráficas ── */}
+                <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-bold text-gray-700 uppercase tracking-wider">Indicadores Gráficos</h2>
+                    <div className="flex-1 h-px bg-gray-200"></div>
                 </div>
                 {/* ── Gráficas ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
