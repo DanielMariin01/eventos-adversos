@@ -100,6 +100,7 @@ export default function Dashboard({ estadisticas }) {
         detalleRevisados,
         detalleTramitados,
         detalleCancelados,
+        detallePlanesVencidos,
     } = estadisticas;
 
     console.log('estadisticas completas:', estadisticas);
@@ -114,6 +115,7 @@ export default function Dashboard({ estadisticas }) {
     const [mesClasificacion, setMesClasificacion] = useState('');
     const [expandido, setExpandido] = useState(null);
     const [expandidoEstado, setExpandidoEstado] = useState(null);
+    const [verPlanesVencidos, setVerPlanesVencidos] = useState(false);
 
 
 
@@ -332,7 +334,46 @@ export default function Dashboard({ estadisticas }) {
                         subtitulo={`${tendencia >= 0 ? '+' : ''}${tendencia} vs mes anterior`}
                     />
                     <TarjetaIndicador titulo="En Proceso" valor={totalesPorEstado?.en_proceso ?? 0} icono={Clock} color="bg-yellow-500" />
-                    <TarjetaIndicador titulo="Planes Vencidos" valor={planesVencidos} icono={AlertTriangle} color="bg-red-500" subtitulo="Sin evidencia subida" />
+                    {/* ── Tarjetas de indicadores plan vencido── */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <button
+                            onClick={() => setVerPlanesVencidos(!verPlanesVencidos)}
+                            className="w-full p-5 flex items-center gap-4 hover:bg-gray-50 transition"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="text-left flex-1">
+                                <p className="text-2xl font-bold text-gray-900">{planesVencidos}</p>
+                                <p className="text-sm font-medium text-gray-600">Planes Vencidos</p>
+                                <p className="text-xs text-gray-400">Sin evidencia subida</p>
+                            </div>
+                            <span className="text-gray-400 text-lg">{verPlanesVencidos ? '▲' : '▼'}</span>
+                        </button>
+
+                        {verPlanesVencidos && (
+                            <div className="border-t border-gray-100 p-4 bg-red-50">
+                                {detallePlanesVencidos?.length === 0 ? (
+                                    <p className="text-xs text-gray-400 text-center">No hay planes vencidos</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {detallePlanesVencidos?.map((p, i) => (
+                                            <div key={i} className="bg-white rounded-lg p-3 border border-red-200 flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-xs font-bold text-gray-800">Evento #{p.id_evento}</p>
+                                                    <p className="text-xs text-gray-500">{p.jefe}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-xs text-red-600 font-bold">{p.dias_vencido} días vencido</p>
+                                                    <p className="text-xs text-gray-400">Límite: {p.fecha_ejecucion}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -111,8 +111,23 @@ class DashboardController extends Controller
             ->groupBy('estado')->pluck('total', 'estado');
 
         // ── Planes vencidos ──
+        // ── Planes vencidos (filtrado) ──
         $planesVencidos = PlanMejora::where('fecha_ejecucion', '<', now())
-            ->where('estado', 'en_proceso')->count();
+            ->where('estado', 'en_proceso')
+            ->whereHas('evento', fn($q) => $q->whereIn('id_eventoAdverso', (clone $query)->select('id_eventoAdverso')))
+            ->count();
+
+        $detallePlanesVencidos = PlanMejora::with(['evento', 'jefe'])
+            ->where('fecha_ejecucion', '<', now())
+            ->where('estado', 'en_proceso')
+            ->whereHas('evento', fn($q) => $q->whereIn('id_eventoAdverso', (clone $query)->select('id_eventoAdverso')))
+            ->get()
+            ->map(fn($p) => [
+                'id_evento'       => $p->fk_evento,
+                'jefe'            => $p->jefe?->name ?? 'Sin asignar',
+                'fecha_ejecucion' => $p->fecha_ejecucion?->format('Y-m-d'),
+                'dias_vencido' => (int) abs(now()->diffInDays($p->fecha_ejecucion)),
+            ]);
 
         // ── Clasificación por mes ──
         $porClasificacionMes = (clone $query)->select(
@@ -296,6 +311,7 @@ class DashboardController extends Controller
                 'detalleRevisados'           => $detalleRevisados,
                 'detalleTramitados'          => $detalleTramitados,
                 'detalleCancelados'          => $detalleCancelados,
+                'detallePlanesVencidos' => $detallePlanesVencidos,
             ],
         ]);
     }
