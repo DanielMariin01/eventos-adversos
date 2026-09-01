@@ -101,6 +101,7 @@ export default function Dashboard({ estadisticas }) {
         detalleTramitados,
         detalleCancelados,
         detallePlanesVencidos,
+        tiempos
     } = estadisticas;
 
     console.log('estadisticas completas:', estadisticas);
@@ -439,6 +440,42 @@ export default function Dashboard({ estadisticas }) {
                             </select>
                         </div>
                     )}
+                </div>
+
+                {/* ── Tiempos promedio ── */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
+                                <Clock className="w-5 h-5 text-white" />
+                            </div>
+                            <p className="text-sm font-semibold text-gray-600">Tiempo de Análisis</p>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">{tiempos?.analisis ?? 0} <span className="text-sm font-normal text-gray-400">días</span></p>
+                        <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el equipo de calidad en revisar y clasificar un evento adverso desde que fue reportado</p>
+                    </div>
+
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center">
+                                <Clock className="w-5 h-5 text-white" />
+                            </div>
+                            <p className="text-sm font-semibold text-gray-600">Tiempo Plan de Mejora</p>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">{tiempos?.plan ?? 0} <span className="text-sm font-normal text-gray-400">días</span></p>
+                        <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el equipo de calidad en crear el plan de mejora después de haber clasificado el evento</p>
+                    </div>
+
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center">
+                                <Clock className="w-5 h-5 text-white" />
+                            </div>
+                            <p className="text-sm font-semibold text-gray-600">Tiempo de Evidencia</p>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">{tiempos?.evidencia ?? 0} <span className="text-sm font-normal text-gray-400">días</span></p>
+                        <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el responsable del área en subir la evidencia de ejecución del plan de mejora</p>
+                    </div>
                 </div>
                 {/* ── Árbol de jerarquía ── */}
                 <div className="space-y-3">

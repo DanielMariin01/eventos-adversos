@@ -255,6 +255,28 @@ class DashboardController extends Controller
             'Incidente',
         ];
 
+        // ── Tiempos promedio ──
+        $tiempoAnalisis = EventoAdverso::whereNotNull('fecha_analisis')
+            ->whereYear('created_at', $anio)
+            ->get()
+            ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_analisis));
+
+        $tiempoPlanMejora = PlanMejora::with('evento')
+            ->whereHas('evento', fn($q) => $q->whereNotNull('fecha_analisis')->whereYear('created_at', $anio))
+            ->get()
+            ->avg(fn($p) => $p->evento?->fecha_analisis?->diffInDays($p->created_at));
+
+        $tiempoEvidencia = PlanMejora::with('evento')
+            ->whereHas('evento', fn($q) => $q->where('estado', 'radicado')->whereYear('created_at', $anio))
+            ->get()
+            ->avg(fn($p) => $p->created_at->diffInDays($p->updated_at));
+
+        $tiempos = [
+            'analisis'    => round($tiempoAnalisis ?? 0, 1),
+            'plan'        => round($tiempoPlanMejora ?? 0, 1),
+            'evidencia'   => round($tiempoEvidencia ?? 0, 1),
+        ];
+
         return Inertia::render('Dashboard', [
             'estadisticas' => [
                 'totalEventos'               => $totalEventos,
@@ -312,6 +334,7 @@ class DashboardController extends Controller
                 'detalleTramitados'          => $detalleTramitados,
                 'detalleCancelados'          => $detalleCancelados,
                 'detallePlanesVencidos' => $detallePlanesVencidos,
+                'tiempos' => $tiempos,
             ],
         ]);
     }
