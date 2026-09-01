@@ -42,6 +42,9 @@ class DashboardController extends Controller
         if ($request->get('mes_global')) {
             $query->whereMonth('created_at', $request->get('mes_global'));
         }
+        if ($request->get('entidad_global')) {
+            $query->whereHas('paciente', fn($q) => $q->where('entidad', $request->get('entidad_global')));
+        }
 
         // ── Total general (filtrado) ──
         $totalEventos = (clone $query)->count();
@@ -388,6 +391,12 @@ class DashboardController extends Controller
                 'detalleCancelados'          => $detalleCancelados,
                 'detallePlanesVencidos' => $detallePlanesVencidos,
                 'tiempos' => $tiempos,
+                'entidadesDisponibles'    => \App\Models\Paciente::select('entidad')
+                    ->whereNotNull('entidad')
+                    ->distinct()
+                    ->orderBy('entidad')
+                    ->pluck('entidad'),
+                'entidadGlobalSeleccionada' => $request->get('entidad_global', ''),
             ],
         ]);
     }

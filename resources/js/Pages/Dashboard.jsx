@@ -118,9 +118,11 @@ export default function Dashboard({ estadisticas }) {
     const [verPlanesVencidos, setVerPlanesVencidos] = useState(false);
     const [categoriaGlobal, setCategoriaGlobal] = useState('');
     const [mesGlobal, setMesGlobal] = useState('');
+    const [entidadGlobal, setEntidadGlobal] = useState(estadisticas.entidadGlobalSeleccionada ?? '');
 
 
-    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre, nuevaCategoriaEstado, nuevaCategoriaGlobal, nuevoMesGlobal) => {
+
+    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre, nuevaCategoriaEstado, nuevaCategoriaGlobal, nuevoMesGlobal, nuevoEntidadGlobal) => {
         router.get(route('dashboard'), {
             anio: nuevoAnio ?? anio,
             periodo: nuevoPeriodo ?? periodo,
@@ -129,6 +131,7 @@ export default function Dashboard({ estadisticas }) {
             categoria_estado: nuevaCategoriaEstado ?? categoriaEstado,
             categoria_global: nuevaCategoriaGlobal ?? categoriaGlobal,
             mes_global: nuevoMesGlobal ?? mesGlobal,
+            entidad_global: nuevoEntidadGlobal ?? entidadGlobal,
         }, { preserveState: false });
     };
 
@@ -474,6 +477,19 @@ export default function Dashboard({ estadisticas }) {
                             <option value="">Todos</option>
                             {meses.map((m, i) => (
                                 <option key={i + 1} value={i + 1}>{m}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-semibold text-gray-600">EPS:</label>
+                        <select
+                            value={entidadGlobal}
+                            onChange={e => { setEntidadGlobal(e.target.value); aplicarFiltros(null, null, null, null, null, null, null, e.target.value); }}
+                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                        >
+                            <option value="">Todas</option>
+                            {estadisticas.entidadesDisponibles?.map(e => (
+                                <option key={e} value={e}>{e}</option>
                             ))}
                         </select>
                     </div>
