@@ -36,6 +36,12 @@ class DashboardController extends Controller
             $fechaFin    = \Carbon\Carbon::create($anio, $mesFin, 1)->endOfMonth();
             $query->whereBetween('created_at', [$fechaInicio, $fechaFin]);
         }
+        if ($request->get('categoria_global')) {
+            $query->where('fk_categoria', $request->get('categoria_global'));
+        }
+        if ($request->get('mes_global')) {
+            $query->whereMonth('created_at', $request->get('mes_global'));
+        }
 
         // ── Total general (filtrado) ──
         $totalEventos = (clone $query)->count();

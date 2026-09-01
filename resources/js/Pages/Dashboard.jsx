@@ -104,7 +104,6 @@ export default function Dashboard({ estadisticas }) {
         tiempos
     } = estadisticas;
 
-    console.log('estadisticas completas:', estadisticas);
 
     const tendencia = mesActual - mesAnterior;
     const [periodo, setPeriodo] = useState(periodoSeleccionado);
@@ -117,17 +116,20 @@ export default function Dashboard({ estadisticas }) {
     const [expandido, setExpandido] = useState(null);
     const [expandidoEstado, setExpandidoEstado] = useState(null);
     const [verPlanesVencidos, setVerPlanesVencidos] = useState(false);
+    const [categoriaGlobal, setCategoriaGlobal] = useState('');
+    const [mesGlobal, setMesGlobal] = useState('');
 
 
-
-    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre, nuevaCategoriaEstado) => {
+    const aplicarFiltros = (nuevoAnio, nuevoPeriodo, nuevoTrimestre, nuevoSemestre, nuevaCategoriaEstado, nuevaCategoriaGlobal, nuevoMesGlobal) => {
         router.get(route('dashboard'), {
             anio: nuevoAnio ?? anio,
             periodo: nuevoPeriodo ?? periodo,
             trimestre: nuevoTrimestre ?? trimestre,
             semestre: nuevoSemestre ?? semestre,
             categoria_estado: nuevaCategoriaEstado ?? categoriaEstado,
-        }, { preserveState: true });
+            categoria_global: nuevaCategoriaGlobal ?? categoriaGlobal,
+            mes_global: nuevoMesGlobal ?? mesGlobal,
+        }, { preserveState: false });
     };
 
     const datosEstados = Object.entries(totalesPorEstado ?? {}).map(([estado, total]) => ({
@@ -447,6 +449,34 @@ export default function Dashboard({ estadisticas }) {
                             </select>
                         </div>
                     )}
+
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-semibold text-gray-600">Categoría:</label>
+                        <select
+                            value={categoriaGlobal}
+                            onChange={e => { setCategoriaGlobal(e.target.value); aplicarFiltros(null, null, null, null, null, e.target.value, null); }}
+                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                        >
+                            <option value="">Todas</option>
+                            {estadisticas.categorias?.map(c => (
+                                <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-semibold text-gray-600">Mes:</label>
+                        <select
+                            value={mesGlobal}
+                            onChange={e => { setMesGlobal(e.target.value); aplicarFiltros(null, null, null, null, null, null, e.target.value); }}
+                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                        >
+                            <option value="">Todos</option>
+                            {meses.map((m, i) => (
+                                <option key={i + 1} value={i + 1}>{m}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 {/* ── Título tiempos promedio ── */}
                 <div className="flex items-center gap-3">
