@@ -275,12 +275,32 @@ class DashboardController extends Controller
             ->whereYear('created_at', $anio)
             ->get()
             ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_cierre));
+        $tiempoEvidenciaPorArea = PlanMejora::with(['evento.area', 'jefe'])
+            ->whereHas('evento', fn($q) => $q->where('estado', 'radicado')->whereYear('created_at', $anio))
+            ->get()
+            ->groupBy(fn($p) => $p->evento?->area?->nombre ?? 'Sin área')
+            ->map(fn($planes, $area) => [
+                'nombre'  => $area,
+                'promedio' => round($planes->avg(fn($p) => $p->created_at->diffInDays($p->updated_at)), 1),
+            ])->values();
+
+        $tiempoEvidenciaPorJefe = PlanMejora::with(['evento', 'jefe'])
+            ->whereHas('evento', fn($q) => $q->where('estado', 'radicado')->whereYear('created_at', $anio))
+            ->whereNotNull('fk_jefe')
+            ->get()
+            ->groupBy(fn($p) => $p->jefe?->name ?? 'Sin asignar')
+            ->map(fn($planes, $jefe) => [
+                'nombre'   => $jefe,
+                'promedio' => round($planes->avg(fn($p) => $p->created_at->diffInDays($p->updated_at)), 1),
+            ])->values();
 
         $tiempos = [
-            'analisis'  => round($tiempoAnalisis ?? 0, 1),
-            'plan'      => round($tiempoPlanMejora ?? 0, 1),
-            'evidencia' => round($tiempoEvidencia ?? 0, 1),
-            'total'     => round($tiempoTotal ?? 0, 1),
+            'analisis'              => round($tiempoAnalisis ?? 0, 1),
+            'plan'                  => round($tiempoPlanMejora ?? 0, 1),
+            'evidencia'             => round($tiempoEvidencia ?? 0, 1),
+            'total'                 => round($tiempoTotal ?? 0, 1),
+            'evidencia_por_area'    => $tiempoEvidenciaPorArea,
+            'evidencia_por_jefe'    => $tiempoEvidenciaPorJefe,
         ];
 
         return Inertia::render('Dashboard', [

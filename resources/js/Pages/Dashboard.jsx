@@ -155,6 +155,8 @@ export default function Dashboard({ estadisticas }) {
     const [mesRelacionGrafica, setMesRelacionGrafica] = useState('');
     const [categoriaRelacionGrafica, setCategoriaRelacionGrafica] = useState('');
     const [relacionGrafica, setRelacionGrafica] = useState('');
+    const [verDetalleEvidencia, setVerDetalleEvidencia] = useState(false);
+    const [vistaEvidencia, setVistaEvidencia] = useState('area'); // 'area' o 'jefe'
 
     // Datos por categoría y mes
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -466,15 +468,73 @@ export default function Dashboard({ estadisticas }) {
                         <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el equipo de calidad en crear el plan de mejora después de haber clasificado el evento</p>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center">
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <button
+                            onClick={() => setVerDetalleEvidencia(!verDetalleEvidencia)}
+                            className="w-full p-5 flex items-center gap-3 hover:bg-gray-50 transition"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center flex-shrink-0">
                                 <Clock className="w-5 h-5 text-white" />
                             </div>
-                            <p className="text-sm font-semibold text-gray-600">Tiempo de Evidencia</p>
-                        </div>
-                        <p className="text-3xl font-bold text-gray-900">{tiempos?.evidencia ?? 0} <span className="text-sm font-normal text-gray-400">días</span></p>
-                        <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el responsable del área en subir la evidencia de ejecución del plan de mejora</p>
+                            <div className="text-left flex-1">
+                                <p className="text-sm font-semibold text-gray-600">Tiempo de Evidencia</p>
+                                <p className="text-3xl font-bold text-gray-900">{tiempos?.evidencia ?? 0} <span className="text-sm font-normal text-gray-400">días</span></p>
+                                <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el responsable del área en subir la evidencia de ejecución del plan de mejora</p>
+                            </div>
+                            <span className="text-gray-400 text-lg">{verDetalleEvidencia ? '▲' : '▼'}</span>
+                        </button>
+
+                        {verDetalleEvidencia && (
+                            <div className="border-t border-gray-100 p-4 bg-purple-50">
+                                {/* Selector de vista */}
+                                <div className="flex gap-2 mb-3">
+                                    <button
+                                        onClick={() => setVistaEvidencia('area')}
+                                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition ${vistaEvidencia === 'area' ? 'bg-purple-500 text-white' : 'bg-white text-gray-600 border border-gray-300'}`}
+                                    >
+                                        Por Área
+                                    </button>
+                                    <button
+                                        onClick={() => setVistaEvidencia('jefe')}
+                                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition ${vistaEvidencia === 'jefe' ? 'bg-purple-500 text-white' : 'bg-white text-gray-600 border border-gray-300'}`}
+                                    >
+                                        Por Coordinador
+                                    </button>
+                                </div>
+
+                                {/* Por área */}
+                                {vistaEvidencia === 'area' && (
+                                    <div className="space-y-2">
+                                        {tiempos?.evidencia_por_area?.length === 0 ? (
+                                            <p className="text-xs text-gray-400 text-center">No hay datos</p>
+                                        ) : (
+                                            tiempos?.evidencia_por_area?.map((a, i) => (
+                                                <div key={i} className="bg-white rounded-lg p-3 border border-purple-200 flex items-center justify-between">
+                                                    <span className="text-xs text-gray-700">{a.nombre}</span>
+                                                    <span className="text-xs font-bold text-purple-600">{a.promedio} días</span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Por jefe */}
+                                {vistaEvidencia === 'jefe' && (
+                                    <div className="space-y-2">
+                                        {tiempos?.evidencia_por_jefe?.length === 0 ? (
+                                            <p className="text-xs text-gray-400 text-center">No hay datos</p>
+                                        ) : (
+                                            tiempos?.evidencia_por_jefe?.map((j, i) => (
+                                                <div key={i} className="bg-white rounded-lg p-3 border border-purple-200 flex items-center justify-between">
+                                                    <span className="text-xs text-gray-700">{j.nombre}</span>
+                                                    <span className="text-xs font-bold text-purple-600">{j.promedio} días</span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
                         <div className="flex items-center gap-3 mb-3">
