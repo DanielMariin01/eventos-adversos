@@ -271,10 +271,16 @@ class DashboardController extends Controller
             ->get()
             ->avg(fn($p) => $p->created_at->diffInDays($p->updated_at));
 
+        $tiempoTotal = EventoAdverso::whereNotNull('fecha_cierre')
+            ->whereYear('created_at', $anio)
+            ->get()
+            ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_cierre));
+
         $tiempos = [
-            'analisis'    => round($tiempoAnalisis ?? 0, 1),
-            'plan'        => round($tiempoPlanMejora ?? 0, 1),
-            'evidencia'   => round($tiempoEvidencia ?? 0, 1),
+            'analisis'  => round($tiempoAnalisis ?? 0, 1),
+            'plan'      => round($tiempoPlanMejora ?? 0, 1),
+            'evidencia' => round($tiempoEvidencia ?? 0, 1),
+            'total'     => round($tiempoTotal ?? 0, 1),
         ];
 
         return Inertia::render('Dashboard', [
