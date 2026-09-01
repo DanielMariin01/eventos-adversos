@@ -256,36 +256,57 @@ class DashboardController extends Controller
         ];
 
         // ── Tiempos promedio ──
-        $tiempoAnalisis = EventoAdverso::whereNotNull('fecha_analisis')
-            ->whereYear('created_at', $anio)
+        $tiempoAnalisis = (clone $query)
+            ->whereNotNull('fecha_analisis')
             ->get()
             ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_analisis));
 
         $tiempoPlanMejora = PlanMejora::with('evento')
-            ->whereHas('evento', fn($q) => $q->whereNotNull('fecha_analisis')->whereYear('created_at', $anio))
+            ->whereHas(
+                'evento',
+                fn($q) => $q
+                    ->whereNotNull('fecha_analisis')
+                    ->whereIn('id_eventoAdverso', (clone $query)->select('id_eventoAdverso'))
+            )
             ->get()
             ->avg(fn($p) => $p->evento?->fecha_analisis?->diffInDays($p->created_at));
 
         $tiempoEvidencia = PlanMejora::with('evento')
-            ->whereHas('evento', fn($q) => $q->where('estado', 'radicado')->whereYear('created_at', $anio))
+            ->whereHas(
+                'evento',
+                fn($q) => $q
+                    ->where('estado', 'radicado')
+                    ->whereIn('id_eventoAdverso', (clone $query)->select('id_eventoAdverso'))
+            )
             ->get()
             ->avg(fn($p) => $p->created_at->diffInDays($p->updated_at));
 
-        $tiempoTotal = EventoAdverso::whereNotNull('fecha_cierre')
-            ->whereYear('created_at', $anio)
+        $tiempoTotal = (clone $query)
+            ->whereNotNull('fecha_cierre')
             ->get()
             ->avg(fn($e) => $e->created_at->diffInDays($e->fecha_cierre));
+
         $tiempoEvidenciaPorArea = PlanMejora::with(['evento.area', 'jefe'])
-            ->whereHas('evento', fn($q) => $q->where('estado', 'radicado')->whereYear('created_at', $anio))
+            ->whereHas(
+                'evento',
+                fn($q) => $q
+                    ->where('estado', 'radicado')
+                    ->whereIn('id_eventoAdverso', (clone $query)->select('id_eventoAdverso'))
+            )
             ->get()
             ->groupBy(fn($p) => $p->evento?->area?->nombre ?? 'Sin área')
             ->map(fn($planes, $area) => [
-                'nombre'  => $area,
+                'nombre'   => $area,
                 'promedio' => round($planes->avg(fn($p) => $p->created_at->diffInDays($p->updated_at)), 1),
             ])->values();
 
         $tiempoEvidenciaPorJefe = PlanMejora::with(['evento', 'jefe'])
-            ->whereHas('evento', fn($q) => $q->where('estado', 'radicado')->whereYear('created_at', $anio))
+            ->whereHas(
+                'evento',
+                fn($q) => $q
+                    ->where('estado', 'radicado')
+                    ->whereIn('id_eventoAdverso', (clone $query)->select('id_eventoAdverso'))
+            )
             ->whereNotNull('fk_jefe')
             ->get()
             ->groupBy(fn($p) => $p->jefe?->name ?? 'Sin asignar')
@@ -295,12 +316,12 @@ class DashboardController extends Controller
             ])->values();
 
         $tiempos = [
-            'analisis'              => round($tiempoAnalisis ?? 0, 1),
-            'plan'                  => round($tiempoPlanMejora ?? 0, 1),
-            'evidencia'             => round($tiempoEvidencia ?? 0, 1),
-            'total'                 => round($tiempoTotal ?? 0, 1),
-            'evidencia_por_area'    => $tiempoEvidenciaPorArea,
-            'evidencia_por_jefe'    => $tiempoEvidenciaPorJefe,
+            'analisis'           => round($tiempoAnalisis ?? 0, 1),
+            'plan'               => round($tiempoPlanMejora ?? 0, 1),
+            'evidencia'          => round($tiempoEvidencia ?? 0, 1),
+            'total'              => round($tiempoTotal ?? 0, 1),
+            'evidencia_por_area' => $tiempoEvidenciaPorArea,
+            'evidencia_por_jefe' => $tiempoEvidenciaPorJefe,
         ];
 
         return Inertia::render('Dashboard', [
