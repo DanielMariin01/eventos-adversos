@@ -114,7 +114,7 @@ class EventoController extends Controller
             ]
         );
 
-        EventoAdverso::create([
+        $evento = EventoAdverso::create([
             'fk_categoria'  => $request->fk_categoria,
             'fk_area'       => $request->fk_area,
             'fk_reportante' => $reportante->id_reportante,
@@ -126,7 +126,7 @@ class EventoController extends Controller
         ]);
 
         return redirect()->route('eventos.create')
-            ->with('success', '¡Evento adverso reportado correctamente!');
+            ->with('success', '¡Evento N° ' . $evento->id_eventoAdverso . ' reportado correctamente!');
     }
 
     // ── Lista de eventos (calidad) ──

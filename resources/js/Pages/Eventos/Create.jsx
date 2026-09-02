@@ -1,4 +1,4 @@
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import TarjetaCategoria from '@/Components/Eventos/TarjetaCategoria';
@@ -19,6 +19,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     const [cargandoAreas, setCargandoAreas] = useState(false);
     const [erroresPaso, setErroresPaso] = useState({});
     const [busquedaArea, setBusquedaArea] = useState('');
+    const { props } = usePage();
 
     const { data, setData, post, processing, errors, reset } = useForm({
         fk_categoria: fkCategoriaProp ?? '',
@@ -145,14 +146,22 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         }
 
         post(route('eventos.store'), {
-            onSuccess: () => {
+            onSuccess: (page) => {
                 reset();
                 setEtapa('categoria');
                 setPaso(1);
                 Swal.fire({
                     icon: 'success',
                     title: '¡Evento registrado!',
-                    text: 'El evento adverso fue reportado correctamente.',
+                    html: `
+            <p class="text-gray-600 mb-2">El evento adverso fue reportado correctamente.</p>
+            <div class="inline-block bg-teal-50 border border-teal-200 rounded-lg px-6 py-3 mt-2">
+                <p class="text-xs text-teal-600 font-semibold uppercase tracking-wider mb-1">N° de Evento</p>
+                <p class="text-3xl font-bold text-teal-600">${page.props.flash?.success?.match(/\d+/)?.[0] ?? ''}</p>
+            </div>
+        `,
+                    confirmButtonColor: '#14b8a6',
+                    confirmButtonText: 'Aceptar',
                 });
             },
             onError: () => {
