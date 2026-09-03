@@ -11,6 +11,7 @@ import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
 import { HiOutlineEye, HiOutlineClipboardList, HiOutlinePencil, HiOutlineDocumentText, HiOutlineCheckCircle } from 'react-icons/hi';
 import * as XLSX from 'xlsx';
 import { FaFileExcel } from 'react-icons/fa';
+import { HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
 
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
@@ -357,6 +358,43 @@ export default function Index({ eventos, jefes }) {
                         eventoSeleccionado?.id_eventoAdverso === fila.id_eventoAdverso ? null : fila
                     )}
                     filaSeleccionada={eventoSeleccionado?.id_eventoAdverso}
+                    renderExpansion={(fila) => {
+                        const leer = () => {
+                            if ('speechSynthesis' in window) {
+                                window.speechSynthesis.cancel();
+                                const utterance = new SpeechSynthesisUtterance(fila.descripcion);
+                                utterance.lang = 'es-CO';
+                                utterance.rate = 0.95;
+                                utterance.pitch = 1;
+                                const voces = window.speechSynthesis.getVoices();
+                                const vozEspanol =
+                                    voces.find(v => v.lang === 'es-CO' && v.localService) ||
+                                    voces.find(v => v.lang.startsWith('es') && v.localService) ||
+                                    voces.find(v => v.lang.startsWith('es'));
+                                if (vozEspanol) utterance.voice = vozEspanol;
+                                window.speechSynthesis.speak(utterance);
+                            }
+                        };
+                        const detener = () => {
+                            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+                        };
+                        return (
+                            <div className="flex items-start gap-4">
+                                <div className="flex-1">
+                                    <span className="font-bold text-sm">Descripción: </span>
+                                    <span className="text-sm text-gray-700">{fila.descripcion}</span>
+                                </div>
+                                <div className="flex gap-2 flex-shrink-0">
+                                    <button onClick={leer} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-sky-400 rounded-full hover:bg-sky-600 transition">
+                                        <HiOutlineSpeakerphone className="w-4 h-4" /> Leer
+                                    </button>
+                                    <button onClick={detener} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-zinc-500 rounded-full hover:bg-zinc-600 transition">
+                                        <HiOutlineStop className="w-4 h-4" /> Detener
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    }}
                 />
 
                 {eventoSeleccionado && (
