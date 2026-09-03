@@ -44,7 +44,7 @@ const RELACIONADO_CON = [
 ];
 
 const CATEGORIZACIONES = [
-    'Daño permanente al paciente', 'Daño temporal al paciente',
+    'Daño permanente al paciente', 'Daño temporal al paciente','Sin Daño',
     'Evento cercano a la muerte', 'Muerte',
     'Requiere hospitalización', 'Requiere tratamiento e intervención medica',
 ];
