@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Revision;
+use App\Mail\EventoReportado;
+use Illuminate\Support\Facades\Mail;
 
 class EventoController extends Controller
 {
@@ -124,6 +126,11 @@ class EventoController extends Controller
             'estado'        => 'en_proceso',
             'fk_usuario'    => Auth::id(),
         ]);
+
+        // Enviar correo de notificación
+        $evento->load(['categoria', 'area', 'reportante', 'paciente']);
+        Mail::to('coordinacion.calidad@clinicacentraldeleje.com')
+            ->send(new EventoReportado($evento));
 
         return redirect()->route('eventos.create')
             ->with('success', '¡Evento N° ' . $evento->id_eventoAdverso . ' reportado correctamente!');

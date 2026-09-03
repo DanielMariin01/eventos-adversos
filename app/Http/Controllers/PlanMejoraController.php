@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Mail\PlanMejoraCreado;
+use Illuminate\Support\Facades\Mail;
 
 
 class PlanMejoraController extends Controller
@@ -81,6 +83,15 @@ class PlanMejoraController extends Controller
             'tipo'        => 'Plan de Mejora',
             'observacion' => 'Se creó el plan de mejora para el evento N° ' . $evento->id_eventoAdverso,
         ]);
+
+        // Enviar correo al jefe responsable
+        $evento->load(['categoria', 'area', 'jefe', 'planMejora']);
+        $jefe = \App\Models\User::find($request->fk_jefe);
+
+        if ($jefe?->email) {
+            Mail::to($jefe->email)
+                ->send(new PlanMejoraCreado($evento));
+        }
 
         return redirect()->route('mejoras.index')
             ->with('success', 'Plan de mejora creado correctamente.');
