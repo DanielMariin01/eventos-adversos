@@ -226,7 +226,19 @@ class EventoController extends Controller
             }
         }
 
-        // Registrar revisión si el evento se cerró automáticamente
+        // Registrar revisión de análisis (siempre)
+        Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Análisis de Evento',
+            'observacion' => 'Se realizó el análisis del evento N° ' . $evento->id_eventoAdverso .
+                '. Clasificación: ' . $request->clasificacion .
+                '. Categorización: ' . $request->categorizacion .
+                '. Relacionado con: ' . $request->relacionado_con .
+                '. Fecha: ' . now()->format('Y-m-d') . ' a las ' . now()->format('H:i'),
+        ]);
+
+        // Registrar revisión adicional si el evento se cerró automáticamente
         if ($nuevoEstado === 'cerrado') {
             Revision::create([
                 'fk_evento'   => $evento->id_eventoAdverso,
@@ -235,7 +247,6 @@ class EventoController extends Controller
                 'observacion' => 'El evento N° ' . $evento->id_eventoAdverso . ' fue cerrado automáticamente por clasificación: ' . $request->clasificacion,
             ]);
         }
-
         return redirect()->route('eventos.index')
             ->with('success', 'Análisis guardado correctamente.');
     }
