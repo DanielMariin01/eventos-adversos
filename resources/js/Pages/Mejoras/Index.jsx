@@ -11,7 +11,9 @@ import ModalRevisiones from '@/Components/Mejoras/ModalRevisiones';
 import { HiOutlineEye, HiOutlineClipboardList, HiOutlinePencil, HiOutlineDocumentText, HiOutlineCheckCircle } from 'react-icons/hi';
 import * as XLSX from 'xlsx';
 import { FaFileExcel } from 'react-icons/fa';
-import { HiOutlineSpeakerphone, HiOutlineStop } from 'react-icons/hi';
+import { HiOutlineSpeakerphone, HiOutlineStop, HiOutlinePencilAlt } from 'react-icons/hi';
+import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
+
 
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
@@ -41,6 +43,7 @@ export default function Index({ eventos, jefes }) {
     const [modalRevisiones, setModalRevisiones] = useState(false);
     const [cargando, setCargando] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState('');
+    const [modalEditarAnalisis, setModalEditarAnalisis] = useState(false);
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -142,6 +145,13 @@ export default function Index({ eventos, jefes }) {
                             className="w-8 h-8 bg-teal-700  hover:bg-teal-800 text-white flex items-center justify-center transition"
                         >
                             <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEditarAnalisis(true); }}
+                            title="Editar análisis"
+                            className="w-8 h-8 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition"
+                        >
+                            <HiOutlinePencilAlt className="w-4 h-4" />
                         </button>
                         <button
                             onClick={(e) => {
@@ -431,6 +441,13 @@ export default function Index({ eventos, jefes }) {
                 <ModalRevisiones
                     evento={eventoSeleccionado}
                     onClose={() => setModalRevisiones(false)}
+                />
+            )}
+            {modalEditarAnalisis && (
+                <ModalAnalisis
+                    evento={eventoSeleccionado}
+                    jefes={jefes}
+                    onClose={() => setModalEditarAnalisis(false)}
                 />
             )}
 
