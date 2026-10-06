@@ -139,18 +139,20 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
-        $jefes = \App\Models\User::role('jefe')->get(['id', 'name']);
+        $jefes  = \App\Models\User::role('jefe')->get(['id', 'name']);
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         $categorias = Categoria::where('activo', 1)->get();
+        $areas      = Area::where('activo', 1)->get(['id_area', 'nombre']);
 
         return Inertia::render('Eventos/Index', [
             'eventos'    => $eventos,
             'categorias' => $categorias,
             'jefes'      => $jefes,
+            'areas'      => $areas,   // ← esta línea es la clave
         ]);
     }
 
@@ -305,7 +307,34 @@ class EventoController extends Controller
             ->with('success', 'Tipo de evento actualizado correctamente.');
     }
 
-    // ── Eventos del jefe ──
+    // ── Cambiar area ──
+    public function cambiarArea(Request $request, EventoAdverso $evento)
+    {
+        $request->validate([
+            'fk_area'    => 'required|exists:areas,id_area',
+            'observacion' => 'nullable|string',
+        ]);
+
+        $areAnterior = $evento->area?->nombre;
+
+        $evento->update([
+            'fk_area' => $request->fk_area,
+        ]);
+
+        Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Cambio de Área',
+            'observacion' => 'Se cambió el área del evento N° ' . $evento->id_eventoAdverso .
+                ' de "' . $areAnterior . '" a "' . Area::find($request->fk_area)?->nombre . '"' .
+                ($request->observacion ? '. Motivo: ' . $request->observacion : ''),
+        ]);
+
+        return redirect()->route('eventos.index')
+            ->with('success', 'Área actualizada correctamente.');
+    }
+
+
     // ── Eventos del jefe ──
     public function misEventos()
     {

@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eventos/paciente/{cedula}', [EventoController::class, 'buscarPaciente'])->name('eventos.paciente');
     Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
 
+
     // Rutas genéricas después
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
@@ -58,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/eventos/{evento}/cerrar', [EventoController::class, 'cerrarAnalisis'])->name('eventos.cerrar');
     Route::patch('/eventos/{evento}/cancelar', [EventoController::class, 'cancelarEvento'])->name('eventos.cancelar');
     Route::patch('/eventos/{evento}/tipo', [EventoController::class, 'cambiarTipo'])->name('eventos.tipo');
+    Route::patch('/eventos/{evento}/area', [EventoController::class, 'cambiarArea'])->name('eventos.cambiarArea');
     Route::post('/eventos/{evento}/evidencia', [EventoController::class, 'subirEvidencia'])->name('eventos.evidencia');
     Route::patch('/eventos/{evento}/reabrir', [EventoController::class, 'reabrir'])->name('eventos.reabrir');
 

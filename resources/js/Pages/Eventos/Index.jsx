@@ -3,9 +3,10 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter, FileSpreadsheet } from 'lucide-react';
+import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter, MapPin } from 'lucide-react';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
+import ModalCambiarArea from '@/Components/Eventos/ModalCambiarArea';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
 import { HiOutlineStop } from 'react-icons/hi';
 import { HiOutlineSearch, HiOutlineEye } from 'react-icons/hi';
@@ -30,7 +31,7 @@ const LABEL_ESTADO = {
 };
 
 
-export default function Index({ eventos, categorias, jefes }) {
+export default function Index({ eventos, categorias, jefes, areas }) {
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [busqueda, setBusqueda] = useState('');
     const [modalAnalisis, setModalAnalisis] = useState(false);
@@ -39,6 +40,7 @@ export default function Index({ eventos, categorias, jefes }) {
     const [busquedaReportante, setBusquedaReportante] = useState('');
     const [busquedaPaciente, setBusquedaPaciente] = useState('');
     const [cargando, setCargando] = useState(false);
+    const [modalArea, setModalArea] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState('');
     const [modalCancelar, setModalCancelar] = useState(false);
 
@@ -81,6 +83,10 @@ export default function Index({ eventos, categorias, jefes }) {
     const abrirCambiarTipo = () => {
         if (!eventoSeleccionado) return alertSeleccionar();
         setModalTipo(true);
+    };
+    const abrirCambiarArea = () => {
+        if (!eventoSeleccionado) return alertSeleccionar();
+        setModalArea(true);
     };
 
     const alertSeleccionar = () => {
@@ -148,12 +154,20 @@ export default function Index({ eventos, categorias, jefes }) {
                             <HiOutlineEye className="w-5 h-5" />
                         </button>
                         <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalArea(true); }}
+                            title="Cambiar área"
+                            className="w-8 h-8 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition"
+                        >
+                            <MapPin className="w-4 h-4" />
+                        </button>
+                        <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalTipo(true); }}
                             title="Cambiar tipo"
                             className="w-8 h-8 rounded-b-full bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
                         >
                             <RefreshCw className="w-4 h-4" />
                         </button>
+
                     </div>
                 </div>
             ),
@@ -231,7 +245,14 @@ export default function Index({ eventos, categorias, jefes }) {
                     >
                         <Lock className="w-4 h-4" />
                     </button>
-
+                    <button
+                        onClick={abrirCambiarArea}
+                        disabled={!eventoSeleccionado}
+                        title="Cambiar área"
+                        className="w-9 h-9 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <MapPin className="w-4 h-4" />
+                    </button>
                     <button
                         onClick={abrirCambiarTipo}
                         disabled={!eventoSeleccionado}
@@ -417,6 +438,13 @@ export default function Index({ eventos, categorias, jefes }) {
                     />
                 )
             }
+            {modalArea && (
+                <ModalCambiarArea
+                    evento={eventoSeleccionado}
+                    areas={areas}
+                    onClose={() => setModalArea(false)}
+                />
+            )}
             {/* Loading overlay */}
             {
                 cargando && (
