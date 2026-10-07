@@ -3,3 +3,4 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/clinicac/eventos.clinicacentraldeleje.com
     - /bin/rsync -a --exclude='.git' --exclude='.env' --exclude='.cpanel.yml' --exclude='storage' --exclude='vendor' --exclude='node_modules' ./ $DEPLOYPATH/
+    - /bin/chmod 755 $DEPLOYPATH
