@@ -68,7 +68,7 @@ export default function AuthenticatedLayout({ header, children }) {
             )}
 
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-800 text-white transform transition-transform duration-300 ease-in-out ${sidebarAbierto ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-ink text-white transform transition-transform duration-300 ease-in-out ${sidebarAbierto ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="relative flex items-center justify-center p-4 border-b border-gray-700">
                     <Link href={route('dashboard')}>
                         <ApplicationLogo className="h-14 w-auto" />
@@ -152,7 +152,7 @@ export default function AuthenticatedLayout({ header, children }) {
             </nav>
 
             {header && (
-                <header className="bg-teal-600 shadow">
+                <header className="bg-primary-600 shadow">
                     <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
                         {header}
                     </div>

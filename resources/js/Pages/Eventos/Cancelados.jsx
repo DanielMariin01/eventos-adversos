@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -39,7 +40,7 @@ export default function Cancelados({ eventos }) {
             text: 'El evento volverá a estado En Proceso.',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#14b8a6',
+            confirmButtonColor: COLORS.primary,
             cancelButtonColor: '#6b7280',
             confirmButtonText: 'Sí, reabrir',
             cancelButtonText: 'Cancelar',
@@ -63,7 +64,7 @@ export default function Cancelados({ eventos }) {
             label: 'Evento',
             key: 'id_eventoAdverso',
             render: (fila) => (
-                <span className="font-bold text-teal-600">#{fila.id_eventoAdverso}</span>
+                <span className="font-bold text-primary-600">#{fila.id_eventoAdverso}</span>
             ),
         },
         {
@@ -116,14 +117,14 @@ export default function Cancelados({ eventos }) {
                                 setTimeout(() => reabrirEvento(), 0);
                             }}
                             title="Reabrir evento"
-                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-t-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineRefresh className="w-4 h-4" />
                         </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCancelacion(true); }}
                             title="Ver cancelación"
-                            className="w-8 h-8 rounded-b-full bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-b-full bg-secondary-600 hover:bg-secondary-700 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineEye className="w-4 h-4" />
                         </button>
@@ -174,7 +175,7 @@ export default function Cancelados({ eventos }) {
                         <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
                             <polyline
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
-                                strokeMiterlimit="10" strokeWidth="3" stroke="#009B9E" fill="none"
+                                strokeMiterlimit="10" strokeWidth="3" stroke={COLORS.secondary} fill="none"
                             />
                         </svg>
                         <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_0.8s_linear_infinite]" style={{ left: 0, right: 'auto' }} />
@@ -190,7 +191,7 @@ export default function Cancelados({ eventos }) {
                     <button
                         onClick={reabrirEvento}
                         disabled={!eventoSeleccionado}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Reabrir evento
@@ -199,17 +200,17 @@ export default function Cancelados({ eventos }) {
 
                 {/* ── Buscadores ── */}
                 <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
-                        <input type="text" value={busquedaEvento} onChange={e => setBusquedaEvento(e.target.value)} placeholder="Buscar evento..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
-                        <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
+                        <input type="text" value={busquedaEvento} onChange={e => setBusquedaEvento(e.target.value)} placeholder="Buscar evento..." className="flex-1 px-4 py-3 text-sm focus:outline-none" />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
                     </div>
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
-                        <input type="text" value={busquedaReportante} onChange={e => setBusquedaReportante(e.target.value)} placeholder="Buscar reportante..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
-                        <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
+                        <input type="text" value={busquedaReportante} onChange={e => setBusquedaReportante(e.target.value)} placeholder="Buscar reportante..." className="flex-1 px-4 py-3 text-sm focus:outline-none" />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
                     </div>
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
-                        <input type="text" value={busquedaPaciente} onChange={e => setBusquedaPaciente(e.target.value)} placeholder="Buscar paciente..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
-                        <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
+                        <input type="text" value={busquedaPaciente} onChange={e => setBusquedaPaciente(e.target.value)} placeholder="Buscar paciente..." className="flex-1 px-4 py-3 text-sm focus:outline-none" />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
                     </div>
                 </div>
 
@@ -259,7 +260,7 @@ export default function Cancelados({ eventos }) {
                 />
 
                 {eventoSeleccionado && (
-                    <p className="mt-2 text-xs text-teal-600">
+                    <p className="mt-2 text-xs text-primary-600">
                         ✓ Evento #{eventoSeleccionado.id_eventoAdverso} seleccionado
                     </p>
                 )}

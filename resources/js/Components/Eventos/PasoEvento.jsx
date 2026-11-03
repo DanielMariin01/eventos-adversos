@@ -60,7 +60,7 @@ export default function PasoEvento({ data, setData, errors }) {
 
     return (
         <div className="space-y-6">
-            <div className="col-span-1 md:col-span-2 bg-teal-500 rounded-lg px-4 py-3">
+            <div className="col-span-1 md:col-span-2 bg-primary-500 rounded-lg px-4 py-3">
                 <h3 className="text-white font-semibold text-xs uppercase">Información del evento adverso</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -69,14 +69,14 @@ export default function PasoEvento({ data, setData, errors }) {
                         type="date"
                         value={data.fecha_evento}
                         onChange={e => setData('fecha_evento', e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                        className="w-full rounded-lg border-2 border-primary-300 px-4 py-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                     />
                 </Campo>
 
             </div>
 
             <Campo label="Descripción del evento *" error={errors.descripcion}>
-                <div className={`flex items-end gap-2 bg-white border rounded-2xl px-4 py-2 shadow-sm transition ${grabando ? 'border-red-400 ring-1 ring-red-400' : 'border-gray-300 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500'
+                <div className={`flex items-end gap-2 bg-white border-2 rounded-2xl px-4 py-2 shadow-sm transition ${grabando ? 'border-red-400 ring-1 ring-red-400' : 'border-primary-300 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500'
                     }`}>
                     <textarea
                         value={data.descripcion}
@@ -90,7 +90,7 @@ export default function PasoEvento({ data, setData, errors }) {
                         onClick={toggleGrabacion}
                         className={`flex-shrink-0 mb-1 p-2 rounded-full transition ${grabando
                                 ? 'bg-red-500 text-white animate-pulse'
-                                : 'bg-teal-500 text-white hover:bg-teal-600'
+                                : 'bg-primary-500 text-white hover:bg-primary-600'
                             }`}
                     >
                         {grabando ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}

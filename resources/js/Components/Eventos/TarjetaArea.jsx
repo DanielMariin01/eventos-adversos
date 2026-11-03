@@ -62,7 +62,7 @@ export default function TarjetaArea({ area, seleccionada, onClick }) {
 
             {/* Avatar — centrado sobre la línea imagen/contenido */}
             <div className="absolute top-[76px] w-[80px] h-[80px] bg-white rounded-full flex justify-center items-center shadow-md border-4 border-white">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${seleccionada ? 'bg-cyan-500' : 'bg-cyan-500'}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${seleccionada ? 'bg-secondary-500' : 'bg-secondary-500'}`}>
                     <Icono className="w-8 h-8 text-white" />
                 </div>
             </div>
@@ -80,8 +80,8 @@ export default function TarjetaArea({ area, seleccionada, onClick }) {
                     <span className={`
                         px-3 py-1 text-xs font-bold uppercase border-2 rounded transition duration-200
                         ${seleccionada
-                            ? 'bg-teal-500 border-teal-500 text-white'
-                            : 'bg-cyan-500 border-cyan-500 text-white hover:bg-cyan-600'}
+                            ? 'bg-primary-500 border-primary-500 text-white'
+                            : 'bg-secondary-500 border-secondary-500 text-white hover:bg-secondary-600'}
                     `}>
                         {seleccionada ? '✓ Seleccionada' : 'Seleccionar'}
                     </span>

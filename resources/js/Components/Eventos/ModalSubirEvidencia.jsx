@@ -103,14 +103,14 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
             onDragOver={e => e.preventDefault()}
             onDrop={e => e.preventDefault()}
         >
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-card shadow-card w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <div className="bg-teal-600 px-6 py-4 flex items-center justify-between flex-shrink-0 rounded-t-xl">
+                <div className="bg-primary-600 px-6 py-4 flex items-center justify-between flex-shrink-0 rounded-t-xl">
                     <h2 className="text-white font-bold text-lg">
                         Subir Evidencia — Evento N°: {evento.id_eventoAdverso}
                     </h2>
-                    <button onClick={onClose} className="text-white hover:text-teal-200 transition">
+                    <button onClick={onClose} className="text-white hover:text-primary-200 transition">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -129,16 +129,16 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                                         href={`/storage/${archivo.ruta}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-teal-50 hover:border-teal-300 transition group"
+                                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-celeste hover:border-primary-300 transition group"
                                     >
-                                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-100">
+                                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-100">
                                             {getIcono(archivo.extension)}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-gray-800 truncate">{archivo.nombre}</p>
                                             <p className="text-xs text-gray-400 uppercase">{archivo.extension}</p>
                                         </div>
-                                        <span className="text-xs text-teal-600 font-semibold">Ver →</span>
+                                        <span className="text-xs text-primary-600 font-semibold">Ver →</span>
                                     </a>
                                 ))}
                             </div>
@@ -155,12 +155,12 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                             onDragOver={onDragOverZona}
                             onDragLeave={onDragLeaveZona}
                             onDrop={onDropZona}
-                            className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-teal-50 hover:border-teal-400 transition ${arrastrando ? 'bg-teal-50 border-teal-400' : 'border-gray-300'}`}
+                            className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-celeste hover:border-primary-400 transition ${arrastrando ? 'bg-celeste border-primary-400' : 'border-gray-300'}`}
                         >
                             <div className="flex flex-col items-center gap-2">
-                                <Upload className="w-8 h-8 text-teal-400" />
+                                <Upload className="w-8 h-8 text-primary-400" />
                                 <p className="text-sm text-gray-500">
-                                    <span className="font-semibold text-teal-600">Haz clic</span> o arrastra los archivos aquí
+                                    <span className="font-semibold text-primary-600">Haz clic</span> o arrastra los archivos aquí
                                 </p>
                                 <p className="text-xs text-gray-400">PDF, JPG, PNG — máx. 10MB</p>
                             </div>
@@ -180,8 +180,8 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                         {data.archivos.length > 0 && (
                             <div className="mt-3 space-y-2">
                                 {data.archivos.map((file, index) => (
-                                    <div key={index} className="flex items-center gap-3 p-2 bg-teal-50 border border-teal-200 rounded-lg">
-                                        <Paperclip className="w-4 h-4 text-teal-500 flex-shrink-0" />
+                                    <div key={index} className="flex items-center gap-3 p-2 bg-celeste border border-primary-200 rounded-lg">
+                                        <Paperclip className="w-4 h-4 text-primary-500 flex-shrink-0" />
                                         <p className="text-sm text-gray-700 truncate flex-1">{file.name}</p>
                                         <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(0)} KB</p>
                                         <button
@@ -211,7 +211,7 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                     <button
                         onClick={submit}
                         disabled={processing}
-                        className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition disabled:opacity-50"
                     >
                         <Upload className="w-4 h-4" />
                         Subir evidencia

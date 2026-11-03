@@ -22,7 +22,7 @@ function BotonBarra({ onClick, activo, children, title }) {
             onClick={onClick}
             title={title}
             className={`p-1.5 rounded text-sm transition ${activo
-                    ? 'bg-teal-500 text-white'
+                    ? 'bg-primary-500 text-white'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
         >
@@ -57,7 +57,7 @@ export default function Editor({ value = '', onChange, placeholder = 'Escribe aq
     if (!editor) return null;
 
     return (
-        <div className="border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
+        <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500">
 
             {/* Barra de herramientas */}
             <div className="flex items-center gap-1 px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex-wrap">

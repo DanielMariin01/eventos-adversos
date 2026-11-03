@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -18,7 +19,7 @@ import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 
 const BADGE_ESTADO = {
     analizado: 'bg-blue-500 text-white',
-    en_mejora: 'bg-teal-500 text-white',
+    en_mejora: 'bg-primary-500 text-white',
     radicado: 'bg-purple-500 text-white',
     procesado: 'bg-green-500 text-white',
     cerrado: 'bg-gray-700 text-white',
@@ -92,7 +93,7 @@ export default function Index({ eventos, jefes, categorias }) {
             label: 'Evento',
             key: 'id_eventoAdverso',
             render: (fila) => (
-                <span className="font-bold text-teal-600">#{fila.id_eventoAdverso}</span>
+                <span className="font-bold text-primary-600">#{fila.id_eventoAdverso}</span>
             ),
         },
         {
@@ -138,7 +139,7 @@ export default function Index({ eventos, jefes, categorias }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalAnalisis(true); }}
                             title="Ver análisis"
-                            className="w-8 h-8 rounded-t-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-t-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition"
                         >
                             <HiOutlineEye className="w-4 h-4" />
                         </button>
@@ -152,7 +153,7 @@ export default function Index({ eventos, jefes, categorias }) {
                         <button
                             onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalCrear(true); }}
                             title="Crear/Editar mejora"
-                            className="w-8 h-8 bg-teal-700  hover:bg-teal-800 text-white flex items-center justify-center transition"
+                            className="w-8 h-8 bg-primary-700  hover:bg-primary-800 text-white flex items-center justify-center transition"
                         >
                             <HiOutlinePencil className="w-4 h-4" />
                         </button>
@@ -167,7 +168,7 @@ export default function Index({ eventos, jefes, categorias }) {
                             <button
                                 onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalTipo(true); }}
                                 title="Cambiar tipo"
-                                className="w-8 h-8 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
+                                className="w-8 h-8 bg-secondary-600 hover:bg-secondary-700 text-white flex items-center justify-center transition"
                             >
                                 <RefreshCw className="w-4 h-4" />
                             </button>
@@ -234,7 +235,7 @@ export default function Index({ eventos, jefes, categorias }) {
             text: 'El evento pasará a estado Cerrado.',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#14b8a6',
+            confirmButtonColor: COLORS.primary,
             cancelButtonColor: '#6b7280',
             confirmButtonText: 'Sí, cerrar',
             cancelButtonText: 'Cancelar',
@@ -276,7 +277,7 @@ export default function Index({ eventos, jefes, categorias }) {
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
                                 strokeMiterlimit="10"
                                 strokeWidth="3"
-                                stroke="#009B9E"
+                                stroke={COLORS.secondary}
                                 fill="none"
                             />
                         </svg>
@@ -296,7 +297,7 @@ export default function Index({ eventos, jefes, categorias }) {
                         onClick={abrirCrearMejora}
                         disabled={!eventoSeleccionado}
                         title="Crear/Editar mejora"
-                        className="w-9 h-9 rounded-l-xs bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="w-9 h-9 rounded-l-xs bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <PlusCircle className="w-4 h-4" />
                     </button>
@@ -333,7 +334,7 @@ export default function Index({ eventos, jefes, categorias }) {
                             onClick={abrirCambiarTipo}
                             disabled={!eventoSeleccionado}
                             title="Cambiar tipo de evento"
-                            className="w-9 h-9 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-9 h-9 bg-secondary-600 hover:bg-secondary-700 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             <RefreshCw className="w-4 h-4" />
                         </button>
@@ -359,23 +360,23 @@ export default function Index({ eventos, jefes, categorias }) {
 
                 {/* ── Buscadores ── */}
                 <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
-                        <input type="text" value={busquedaEvento} onChange={e => setBusquedaEvento(e.target.value)} placeholder="Buscar evento..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
-                        <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
+                        <input type="text" value={busquedaEvento} onChange={e => setBusquedaEvento(e.target.value)} placeholder="Buscar evento..." className="flex-1 px-4 py-3 text-sm focus:outline-none" />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
                     </div>
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
-                        <input type="text" value={busquedaReportante} onChange={e => setBusquedaReportante(e.target.value)} placeholder="Buscar reportante..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
-                        <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
+                        <input type="text" value={busquedaReportante} onChange={e => setBusquedaReportante(e.target.value)} placeholder="Buscar reportante..." className="flex-1 px-4 py-3 text-sm focus:outline-none" />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
                     </div>
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
-                        <input type="text" value={busquedaPaciente} onChange={e => setBusquedaPaciente(e.target.value)} placeholder="Buscar paciente..." className="flex-1 px-4 py-2.5 text-sm focus:outline-none" />
-                        <div className="bg-cyan-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
+                        <input type="text" value={busquedaPaciente} onChange={e => setBusquedaPaciente(e.target.value)} placeholder="Buscar paciente..." className="flex-1 px-4 py-3 text-sm focus:outline-none" />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
                     </div>
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500">
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500">
                         <select
                             value={filtroEstado}
                             onChange={e => setFiltroEstado(e.target.value)}
-                            className="flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white"
+                            className="flex-1 px-4 py-3 text-sm focus:outline-none bg-white"
                         >
                             <option value="">Todos los estados</option>
                             <option value="analizado">Analizado</option>
@@ -383,7 +384,7 @@ export default function Index({ eventos, jefes, categorias }) {
                             <option value="radicado">Radicado</option>
                             <option value="cerrado">Cerrado</option>
                         </select>
-                        <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0">
+                        <div className="bg-secondary-500 px-3 py-2.5 flex-shrink-0">
                             <Filter className="w-4 h-4 text-white" />
                         </div>
                     </div>
@@ -438,7 +439,7 @@ export default function Index({ eventos, jefes, categorias }) {
                 />
 
                 {eventoSeleccionado && (
-                    <p className="mt-2 text-xs text-teal-600">
+                    <p className="mt-2 text-xs text-primary-600">
                         ✓ Evento #{eventoSeleccionado.id_eventoAdverso} seleccionado
                     </p>
                 )}

@@ -40,7 +40,7 @@ export default function GraficaCard({ titulo, subtitulo, datos = [], children })
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-base p-6">
+        <div className="bg-white rounded-card border border-gray-200 shadow-card p-6">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div>
@@ -57,7 +57,7 @@ export default function GraficaCard({ titulo, subtitulo, datos = [], children })
                     <button
                         onClick={descargarPNG}
                         title="Descargar imagen PNG"
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition"
                     >
                         <Download className="w-3.5 h-3.5" />
                         PNG

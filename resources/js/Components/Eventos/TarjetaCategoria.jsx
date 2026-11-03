@@ -27,7 +27,7 @@ export default function TarjetaCategoria({ categoria, seleccionada, onClick }) {
         flex items-center gap-4 sm:gap-6
         hover:shadow-md hover:scale-[1.07]
         ${seleccionada
-                    ? 'border-teal-500 bg-teal-50 shadow-md'
+                    ? 'border-primary-500 bg-celeste shadow-md'
                     : 'border-transparent bg-white'}
     `}
         >
@@ -57,7 +57,7 @@ export default function TarjetaCategoria({ categoria, seleccionada, onClick }) {
 
             {/* Check si está seleccionada */}
             {seleccionada && (
-                <div className="w-7 h-7 rounded-full bg-teal-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
                     <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>

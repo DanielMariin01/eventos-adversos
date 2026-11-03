@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import TextInput from '@/Components/TextInput';
@@ -47,9 +48,9 @@ export default function Index({ usuarios, roles }) {
                     html: `
                         <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0">
                             <div style="display:flex;gap:12px;align-items:center;">
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
+                                <div style="width:20px;height:20px;background:${COLORS.primary};border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
+                                <div style="width:20px;height:20px;background:${COLORS.primary};border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
+                                <div style="width:20px;height:20px;background:${COLORS.primary};border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
                             </div>
                             <p style="color:#9ca3af;font-size:12px;margin:0">Por favor espera un momento...</p>
                         </div>
@@ -104,9 +105,9 @@ export default function Index({ usuarios, roles }) {
                     html: `
                         <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0">
                             <div style="display:flex;gap:12px;align-items:center;">
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
-                                <div style="width:20px;height:20px;background:#14b8a6;border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
+                                <div style="width:20px;height:20px;background:${COLORS.primary};border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0s;"></div>
+                                <div style="width:20px;height:20px;background:${COLORS.primary};border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></div>
+                                <div style="width:20px;height:20px;background:${COLORS.primary};border-radius:50%;animation:bounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></div>
                             </div>
                             <p style="color:#9ca3af;font-size:12px;margin:0">Por favor espera un momento...</p>
                         </div>
@@ -139,7 +140,7 @@ export default function Index({ usuarios, roles }) {
             text: 'Esta acción no se puede deshacer.',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#14b8a6',
+            confirmButtonColor: COLORS.primary,
             cancelButtonColor: '#f43f5e',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
@@ -189,7 +190,7 @@ export default function Index({ usuarios, roles }) {
                 <div className="flex justify-end mb-6">
                     <button
                         onClick={() => setModalAbierto(true)}
-                        className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
+                        className="bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
                     >
                         + Crear usuario
                     </button>
@@ -207,9 +208,9 @@ export default function Index({ usuarios, roles }) {
             {/* Modal Crear */}
             {modalAbierto && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-lg px-8 py-8">
+                    <div className="bg-white rounded-card shadow-card w-full max-w-lg px-8 py-8">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-sm font-semibold text-teal-700 uppercase tracking-wider">
+                            <h2 className="text-sm font-semibold text-primary-700 uppercase tracking-wider">
                                 Crear nuevo usuario
                             </h2>
                             <button
@@ -258,7 +259,7 @@ export default function Index({ usuarios, roles }) {
                                 <select
                                     value={data.rol}
                                     onChange={e => setData('rol', e.target.value)}
-                                    className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm"
+                                    className="w-full mt-1 rounded-md border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
                                 >
                                     <option value="" disabled>Seleccionar rol</option>
                                     {roles.map(rol => (
@@ -270,7 +271,7 @@ export default function Index({ usuarios, roles }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2.5 rounded-lg transition duration-150 mt-4 disabled:opacity-50"
+                                className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 rounded-lg transition duration-150 mt-4 disabled:opacity-50"
                             >
                                 Crear usuario
                             </button>
@@ -282,7 +283,7 @@ export default function Index({ usuarios, roles }) {
             {/* Modal Editar */}
             {modalEditar && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-lg px-8 py-8">
+                    <div className="bg-white rounded-card shadow-card w-full max-w-lg px-8 py-8">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-sm font-semibold text-blue-700 uppercase tracking-wider">
                                 Editar usuario
@@ -330,7 +331,7 @@ export default function Index({ usuarios, roles }) {
                                 <select
                                     value={dataEditar.rol}
                                     onChange={e => setDataEditar('rol', e.target.value)}
-                                    className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm"
+                                    className="w-full mt-1 rounded-md border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
                                 >
                                     <option value="" disabled>Seleccionar rol</option>
                                     {roles.map(rol => (

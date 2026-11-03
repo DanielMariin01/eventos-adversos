@@ -3,6 +3,7 @@
  * Modal para cancelar un evento con observación y jefe responsable.
  */
 
+import { COLORS } from '@/theme';
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { X, XCircle } from 'lucide-react';
@@ -58,7 +59,7 @@ export default function ModalCancelarEvento({ evento, jefes = [], onClose }) {
                         <svg viewBox="0 0 150 73" height="73px" width="150px" xmlns="http://www.w3.org/2000/svg">
                             <polyline
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
-                                strokeMiterlimit="10" strokeWidth="3" stroke="#009B9E" fill="none"
+                                strokeMiterlimit="10" strokeWidth="3" stroke={COLORS.secondary} fill="none"
                             />
                         </svg>
                         <div className="absolute inset-0 bg-slate-100 animate-[heartRateIn_0.8s_linear_infinite]" style={{ left: 0, right: 'auto' }} />
@@ -66,7 +67,7 @@ export default function ModalCancelarEvento({ evento, jefes = [], onClose }) {
                     </div>
                 </div>
             )}
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div className="bg-white rounded-card shadow-card w-full max-w-lg">
 
                 {/* Header */}
                 <div className="bg-red-900 px-6 py-4 flex items-center justify-between rounded-t-xl">
@@ -87,7 +88,7 @@ export default function ModalCancelarEvento({ evento, jefes = [], onClose }) {
                             onChange={e => setData('observacion_cancelacion', e.target.value)}
                             placeholder="Ingrese el motivo de cancelación..."
                             rows={4}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 resize-none scroll-teal"
+                            className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 resize-none scroll-teal"
                         />
                     </Campo>
 
@@ -95,7 +96,7 @@ export default function ModalCancelarEvento({ evento, jefes = [], onClose }) {
                         <select
                             value={data.fk_jefe}
                             onChange={e => setData('fk_jefe', e.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-red-400"
+                            className="w-full rounded-lg border-2 border-primary-300 px-3 py-3 text-sm focus:outline-none focus:border-red-400"
                         >
                             <option value="">Seleccione el responsable (Opcional)...</option>
                             {jefes.map(jefe => (

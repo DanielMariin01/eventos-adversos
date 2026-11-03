@@ -10,14 +10,14 @@ export default function ModalRevisiones({ evento, onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-card shadow-card w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
                 <div className="bg-lime-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <h2 className="text-white font-bold text-lg">
                         Revisiones Evento N° {evento.id_eventoAdverso}
                     </h2>
-                    <button onClick={onClose} className="text-white hover:text-teal-200 transition">
+                    <button onClick={onClose} className="text-white hover:text-primary-200 transition">
                         <X className="w-5 h-5" />
                     </button>
                 </div>

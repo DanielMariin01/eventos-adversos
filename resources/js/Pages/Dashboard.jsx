@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GraficaCard from '@/Components/GraficaCard';
@@ -11,7 +12,7 @@ import {
 import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, TrendingDown, FileText } from 'lucide-react';
 
 const COLORES = [
-    '#14b8a6', // teal
+    COLORS.primary, // teal
     '#3b82f6', // blue
     '#f59e0b', // amber
     '#ef4444', // red
@@ -22,13 +23,13 @@ const COLORES = [
     '#ec4899', // pink
     '#84cc16', // lime
     '#6366f1', // indigo
-    '#14b8a6', // teal repeat
+    COLORS.secondary, // secundario
 ];
 
 const COLORES_ESTADO = {
     en_proceso: '#f59e0b',
     analizado: '#3b82f6',
-    en_mejora: '#14b8a6',
+    en_mejora: COLORS.primary,
     radicado: '#a855f7',
     procesado: '#22c55e',
     cancelado: '#ef4444',
@@ -47,7 +48,7 @@ const LABEL_ESTADO = {
 
 function TarjetaIndicador({ titulo, valor, icono: Icono, color, subtitulo }) {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-5 flex items-center gap-4">
+        <div className="bg-white rounded-card border border-gray-200 shadow-card p-5 flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
                 <Icono className="w-6 h-6 text-white" />
             </div>
@@ -333,7 +334,7 @@ export default function Dashboard({ estadisticas }) {
 
                 {/* ── Tarjetas de indicadores ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <TarjetaIndicador titulo="Total Eventos" valor={totalEventos} icono={FileText} color="bg-teal-500" />
+                    <TarjetaIndicador titulo="Total Eventos" valor={totalEventos} icono={FileText} color="bg-primary-500" />
                     <TarjetaIndicador
                         titulo="Eventos este mes"
                         valor={mesActual}
@@ -343,7 +344,7 @@ export default function Dashboard({ estadisticas }) {
                     />
                     <TarjetaIndicador titulo="En Proceso" valor={totalesPorEstado?.en_proceso ?? 0} icono={Clock} color="bg-yellow-500" />
                     {/* ── Tarjetas de indicadores plan vencido── */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card overflow-hidden">
                         <button
                             onClick={() => setVerPlanesVencidos(!verPlanesVencidos)}
                             className="w-full p-5 flex items-center gap-4 hover:bg-gray-50 transition"
@@ -386,7 +387,7 @@ export default function Dashboard({ estadisticas }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <TarjetaIndicador titulo="Analizado" valor={totalesPorEstado?.analizado ?? 0} icono={FileText} color="bg-blue-500" />
-                    <TarjetaIndicador titulo="En Mejora" valor={totalesPorEstado?.en_mejora ?? 0} icono={CheckCircle} color="bg-teal-600" />
+                    <TarjetaIndicador titulo="En Mejora" valor={totalesPorEstado?.en_mejora ?? 0} icono={CheckCircle} color="bg-primary-600" />
                     <TarjetaIndicador titulo="Radicado" valor={totalesPorEstado?.radicado ?? 0} icono={CheckCircle} color="bg-purple-500" />
                     <TarjetaIndicador titulo="Cancelados" valor={totalesPorEstado?.cancelado ?? 0} icono={XCircle} color="bg-red-400" />
                 </div>
@@ -396,13 +397,13 @@ export default function Dashboard({ estadisticas }) {
                     <div className="flex-1 h-px bg-gray-200"></div>
                 </div>
                 {/* ── Filtros globales ── */}
-                <div className="flex flex-wrap gap-3 mb-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <div className="flex flex-wrap gap-3 mb-4 bg-white p-4 rounded-card border border-gray-200 shadow-card">
                     <div className="flex items-center gap-2">
                         <label className="text-sm font-semibold text-gray-600">Año:</label>
                         <select
                             value={anio}
                             onChange={e => { setAnio(e.target.value); aplicarFiltros(e.target.value, null, null, null); }}
-                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                         >
                             {aniosDisponibles?.map(a => (
                                 <option key={a} value={a}>{a}</option>
@@ -415,7 +416,7 @@ export default function Dashboard({ estadisticas }) {
                         <select
                             value={periodo}
                             onChange={e => { setPeriodo(e.target.value); aplicarFiltros(null, e.target.value, null, null); }}
-                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                         >
                             <option value="anual">Anual</option>
                             <option value="semestral">Semestral</option>
@@ -429,7 +430,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={trimestre}
                                 onChange={e => { setTrimestre(e.target.value); aplicarFiltros(null, null, e.target.value, null); }}
-                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value={1}>T1 (Ene - Mar)</option>
                                 <option value={2}>T2 (Abr - Jun)</option>
@@ -445,7 +446,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={semestre}
                                 onChange={e => { setSemestre(e.target.value); aplicarFiltros(null, null, null, e.target.value); }}
-                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value={1}>S1 (Ene - Jun)</option>
                                 <option value={2}>S2 (Jul - Dic)</option>
@@ -458,7 +459,7 @@ export default function Dashboard({ estadisticas }) {
                         <select
                             value={categoriaGlobal}
                             onChange={e => { setCategoriaGlobal(e.target.value); aplicarFiltros(null, null, null, null, null, e.target.value, null); }}
-                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                         >
                             <option value="">Todas</option>
                             {estadisticas.categorias?.map(c => (
@@ -472,7 +473,7 @@ export default function Dashboard({ estadisticas }) {
                         <select
                             value={mesGlobal}
                             onChange={e => { setMesGlobal(e.target.value); aplicarFiltros(null, null, null, null, null, null, e.target.value); }}
-                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                         >
                             <option value="">Todos</option>
                             {meses.map((m, i) => (
@@ -485,7 +486,7 @@ export default function Dashboard({ estadisticas }) {
                         <select
                             value={entidadGlobal}
                             onChange={e => { setEntidadGlobal(e.target.value); aplicarFiltros(null, null, null, null, null, null, null, e.target.value); }}
-                            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                            className="border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                         >
                             <option value="">Todas</option>
                             {estadisticas.entidadesDisponibles?.map(e => (
@@ -502,7 +503,7 @@ export default function Dashboard({ estadisticas }) {
 
                 {/* ── Tiempos promedio ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card p-5">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
                                 <Clock className="w-5 h-5 text-white" />
@@ -513,9 +514,9 @@ export default function Dashboard({ estadisticas }) {
                         <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el equipo de calidad en revisar y clasificar un evento adverso desde que fue reportado</p>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card p-5">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center">
                                 <Clock className="w-5 h-5 text-white" />
                             </div>
                             <p className="text-sm font-semibold text-gray-600">Tiempo Plan de Mejora</p>
@@ -524,7 +525,7 @@ export default function Dashboard({ estadisticas }) {
                         <p className="text-xs text-gray-400 mt-1">Días promedio que tarda el equipo de calidad en crear el plan de mejora después de haber clasificado el evento</p>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card overflow-hidden">
                         <button
                             onClick={() => setVerDetalleEvidencia(!verDetalleEvidencia)}
                             className="w-full p-5 flex items-center gap-3 hover:bg-gray-50 transition"
@@ -592,7 +593,7 @@ export default function Dashboard({ estadisticas }) {
                             </div>
                         )}
                     </div>
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card p-5">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-xl bg-gray-700 flex items-center justify-center">
                                 <Clock className="w-5 h-5 text-white" />
@@ -612,7 +613,7 @@ export default function Dashboard({ estadisticas }) {
                 <div className="space-y-3">
 
                     {/* Tarjeta Revisados */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card overflow-hidden">
                         <button
                             onClick={() => setExpandido(expandido === 'revisados' ? null : 'revisados')}
                             className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition"
@@ -640,14 +641,14 @@ export default function Dashboard({ estadisticas }) {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {[
                                         { label: 'Analizado', valor: detalleRevisados?.analizado, color: 'bg-blue-500', key: 'analizado' },
-                                        { label: 'En Mejora', valor: detalleRevisados?.en_mejora, color: 'bg-teal-500', key: 'en_mejora' },
+                                        { label: 'En Mejora', valor: detalleRevisados?.en_mejora, color: 'bg-primary-500', key: 'en_mejora' },
                                         { label: 'Radicado', valor: detalleRevisados?.radicado, color: 'bg-purple-500', key: 'radicado' },
                                         { label: 'Cerrado', valor: detalleRevisados?.cerrado, color: 'bg-gray-600', key: 'cerrado' },
                                     ].map(item => (
                                         <div key={item.label}>
                                             <button
                                                 onClick={() => setExpandidoEstado(expandidoEstado === item.key ? null : item.key)}
-                                                className="w-full bg-white rounded-lg p-3 text-center border border-gray-200 hover:border-teal-400 transition"
+                                                className="w-full bg-white rounded-lg p-3 text-center border border-gray-200 hover:border-primary-400 transition"
                                             >
                                                 <p className="text-2xl font-bold text-gray-900">{item.valor ?? 0}</p>
                                                 <div className={`w-full h-1.5 rounded-full ${item.color} mt-1 mb-1`}></div>
@@ -656,13 +657,13 @@ export default function Dashboard({ estadisticas }) {
 
                                             {/* Jefes en mejora */}
                                             {expandidoEstado === 'en_mejora' && item.key === 'en_mejora' && (
-                                                <div className="mt-2 bg-white border border-teal-200 rounded-lg p-3">
+                                                <div className="mt-2 bg-white border border-primary-200 rounded-lg p-3">
                                                     <p className="text-xs font-bold text-gray-500 uppercase mb-2">Coordinadores responsables</p>
                                                     {detalleRevisados?.jefes_en_mejora?.map((j, i) => (
                                                         <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 last:border-0">
                                                             <span className="text-xs text-gray-700">{j.nombre}</span>
                                                             <div className="text-right">
-                                                                <span className="text-xs font-bold text-teal-600">{j.total} evento(s)</span>
+                                                                <span className="text-xs font-bold text-primary-600">{j.total} evento(s)</span>
                                                                 <p className="text-xs text-gray-400">#{j.eventos}</p>
                                                             </div>
                                                         </div>
@@ -719,7 +720,7 @@ export default function Dashboard({ estadisticas }) {
                     </div>
 
                     {/* Tarjeta Tramitados */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card overflow-hidden">
                         <button
                             onClick={() => setExpandido(expandido === 'tramitados' ? null : 'tramitados')}
                             className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition"
@@ -772,7 +773,7 @@ export default function Dashboard({ estadisticas }) {
                     </div>
 
                     {/* Tarjeta Cancelados */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-card border border-gray-200 shadow-card overflow-hidden">
                         <button
                             onClick={() => setExpandido(expandido === 'cancelados' ? null : 'cancelados')}
                             className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition"
@@ -841,7 +842,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={areaMesSeleccionada}
                                 onChange={e => setAreaMesSeleccionada(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las áreas</option>
                                 {estadisticas.areas?.map(a => (
@@ -851,7 +852,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={categoriaMesSeleccionada}
                                 onChange={e => setCategoriaMesSeleccionada(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las categorías</option>
                                 {estadisticas.categorias?.map(c => (
@@ -861,7 +862,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={mesSeleccionado}
                                 onChange={e => setMesSeleccionado(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todos los meses</option>
                                 {meses.map((m, i) => (
@@ -879,9 +880,9 @@ export default function Dashboard({ estadisticas }) {
                                     type="monotone"
                                     dataKey="total"
                                     name="Eventos"
-                                    stroke="#14b8a6"
+                                    stroke={COLORS.primary}
                                     strokeWidth={3}
-                                    dot={{ fill: '#14b8a6', r: 5 }}
+                                    dot={{ fill: COLORS.primary, r: 5 }}
                                     activeDot={{ r: 7 }}
                                 />
                             </LineChart>
@@ -893,7 +894,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={categoriaEstado}
                                 onChange={e => { setCategoriaEstado(e.target.value); aplicarFiltros(null, null, null, null, e.target.value); }}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las categorías</option>
                                 {estadisticas.categorias?.map(c => (
@@ -929,7 +930,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={categoriaSeleccionada}
                                 onChange={e => setCategoriaSeleccionada(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las categorías</option>
                                 {estadisticas.categorias?.map(c => (
@@ -939,7 +940,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={mesCategoriaSeleccionado}
                                 onChange={e => setMesCategoriaSeleccionado(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todos los meses</option>
                                 {meses.map((m, i) => (
@@ -971,7 +972,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={areaSeleccionada}
                                 onChange={e => setAreaSeleccionada(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las áreas</option>
                                 {estadisticas.areas?.map(a => (
@@ -981,7 +982,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={mesAreaSeleccionado}
                                 onChange={e => setMesAreaSeleccionado(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todos los meses</option>
                                 {meses.map((m, i) => (
@@ -991,7 +992,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={categoriaAreaSeleccionada}
                                 onChange={e => setCategoriaAreaSeleccionada(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las categorías</option>
                                 {estadisticas.categorias?.map(c => (
@@ -1029,7 +1030,7 @@ export default function Dashboard({ estadisticas }) {
                                     <select
                                         value={areaClasificacion}
                                         onChange={e => setAreaClasificacion(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                        className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                     >
                                         <option value="">Todas las áreas</option>
                                         {estadisticas.areas?.map(a => (
@@ -1039,7 +1040,7 @@ export default function Dashboard({ estadisticas }) {
                                     <select
                                         value={categoriaClasificacion}
                                         onChange={e => setCategoriaClasificacion(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                        className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                     >
                                         <option value="">Todas las clasificaciones</option>
                                         {estadisticas.clasificaciones?.map(c => (
@@ -1049,7 +1050,7 @@ export default function Dashboard({ estadisticas }) {
                                     <select
                                         value={mesClasificacion}
                                         onChange={e => setMesClasificacion(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                        className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                     >
                                         <option value="">Todos los meses</option>
                                         {meses.map((m, i) => (
@@ -1059,7 +1060,7 @@ export default function Dashboard({ estadisticas }) {
                                     <select
                                         value={categoriaEventoClasificacion}
                                         onChange={e => setCategoriaEventoClasificacion(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                        className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                     >
                                         <option value="">Todas las categorías</option>
                                         {estadisticas.categorias?.map(c => (
@@ -1094,7 +1095,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={relacionSeleccionada}
                                 onChange={e => setRelacionSeleccionada(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las relaciones</option>
                                 {estadisticas.relacionesEspecificas?.map(r => (
@@ -1104,7 +1105,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={areaRelacion}
                                 onChange={e => setAreaRelacion(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las áreas</option>
                                 {estadisticas.areas?.map(a => (
@@ -1114,7 +1115,7 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={mesRelacion}
                                 onChange={e => setMesRelacion(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todos los meses</option>
                                 {meses.map((m, i) => (
@@ -1124,14 +1125,14 @@ export default function Dashboard({ estadisticas }) {
                             <select
                                 value={categoriaRelacion}
                                 onChange={e => setCategoriaRelacion(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                             >
                                 <option value="">Todas las categorías</option>
                                 {estadisticas.categorias?.map(c => (
                                     <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
                                 ))}
                             </select>
-                            <div className="flex items-center gap-2 border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 col-span-2 md:col-span-2">
+                            <div className="flex items-center gap-2 border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500 col-span-2 md:col-span-2">
                                 <input
                                     type="number"
                                     value={egresos}
@@ -1140,7 +1141,7 @@ export default function Dashboard({ estadisticas }) {
                                     className="flex-1 px-3 py-2 text-sm focus:outline-none"
                                     min="1"
                                 />
-                                <div className="bg-cyan-500 px-3 py-2.5 flex-shrink-0 text-white text-xs font-semibold">
+                                <div className="bg-secondary-500 px-3 py-2.5 flex-shrink-0 text-white text-xs font-semibold">
                                     Egresos
                                 </div>
                             </div>
@@ -1158,7 +1159,7 @@ export default function Dashboard({ estadisticas }) {
                                     <YAxis tick={{ fontSize: 12 }} />
                                     <Tooltip content={<TooltipPersonalizado />} />
                                     <Legend />
-                                    <Bar dataKey="tasa" name={egresos ? "Tasa (eventos/egresos)" : "Total eventos"} fill="#14b8a6" radius={[4, 4, 0, 0]} label={{ position: 'top', fontSize: 10 }} />
+                                    <Bar dataKey="tasa" name={egresos ? "Tasa (eventos/egresos)" : "Total eventos"} fill={COLORS.primary} radius={[4, 4, 0, 0]} label={{ position: 'top', fontSize: 10 }} />
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
@@ -1173,7 +1174,7 @@ export default function Dashboard({ estadisticas }) {
                                 <select
                                     value={relacionGrafica}
                                     onChange={e => setRelacionGrafica(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                    className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                 >
                                     <option value="">Todas las relaciones</option>
                                     {estadisticas.todasRelaciones?.map(r => (
@@ -1183,7 +1184,7 @@ export default function Dashboard({ estadisticas }) {
                                 <select
                                     value={areaRelacionGrafica}
                                     onChange={e => setAreaRelacionGrafica(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                    className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                 >
                                     <option value="">Todas las áreas</option>
                                     {estadisticas.areas?.map(a => (
@@ -1193,7 +1194,7 @@ export default function Dashboard({ estadisticas }) {
                                 <select
                                     value={mesRelacionGrafica}
                                     onChange={e => setMesRelacionGrafica(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                    className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                 >
                                     <option value="">Todos los meses</option>
                                     {meses.map((m, i) => (
@@ -1203,7 +1204,7 @@ export default function Dashboard({ estadisticas }) {
                                 <select
                                     value={categoriaRelacionGrafica}
                                     onChange={e => setCategoriaRelacionGrafica(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
+                                    className="w-full border-2 border-primary-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500"
                                 >
                                     <option value="">Todas las categorías</option>
                                     {estadisticas.categorias?.map(c => (
@@ -1220,7 +1221,7 @@ export default function Dashboard({ estadisticas }) {
                                 <div className="overflow-x-auto scroll-teal">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="bg-teal-600 text-white">
+                                            <tr className="bg-primary-600 text-white">
                                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Evento</th>
                                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Área</th>
                                                 {mesesUnicos.map(mes => (

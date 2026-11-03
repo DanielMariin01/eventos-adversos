@@ -4,6 +4,7 @@
  * Tiene dos pestañas: Datos Básicos y Clasificación.
  */
 
+import { COLORS } from '@/theme';
 import { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import { X, User, Building2, Paperclip, Save, Mic, MicOff } from 'lucide-react';
@@ -351,7 +352,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
                                 strokeMiterlimit="10"
                                 strokeWidth="3"
-                                stroke="#009B9E"
+                                stroke={COLORS.secondary}
                                 fill="none"
                             />
                         </svg>
@@ -362,14 +363,14 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                     </div>
                 </div>
             )}
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-card shadow-card w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <div className="bg-teal-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                <div className="bg-primary-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <h2 className="text-white font-bold text-lg">
                         Análisis Evento {evento.categoria?.nombre} N°: {evento.id_eventoAdverso}
                     </h2>
-                    <button onClick={onClose} className="text-white hover:text-teal-200 transition">
+                    <button onClick={onClose} className="text-white hover:text-primary-200 transition">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -379,11 +380,11 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                     <button
                         onClick={() => setPestana('basicos')}
                         className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold transition border-b-2 ${pestana === 'basicos'
-                            ? 'border-teal-500 text-teal-600'
+                            ? 'border-primary-500 text-primary-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pestana === 'basicos' ? 'bg-teal-500' : 'bg-gray-200'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pestana === 'basicos' ? 'bg-primary-500' : 'bg-gray-200'}`}>
                             <User className={`w-4 h-4 ${pestana === 'basicos' ? 'text-white' : 'text-gray-500'}`} />
                         </div>
                         <div className="text-left">
@@ -395,11 +396,11 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                     <button
                         onClick={() => setPestana('clasificacion')}
                         className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold transition border-b-2 ${pestana === 'clasificacion'
-                            ? 'border-teal-500 text-teal-600'
+                            ? 'border-primary-500 text-primary-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pestana === 'clasificacion' ? 'bg-teal-500' : 'bg-gray-200'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pestana === 'clasificacion' ? 'bg-primary-500' : 'bg-gray-200'}`}>
                             <Building2 className={`w-4 h-4 ${pestana === 'clasificacion' ? 'text-white' : 'text-gray-500'}`} />
                         </div>
                         <div className="text-left">
@@ -419,7 +420,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                             <Campo label="Barreras Vulneradas" error={errors.barreras_vulneradas}>
                                 <select
                                     onChange={e => toggleArray('barreras_vulneradas', e.target.value)}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-2 scroll-teal"
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 mb-2 scroll-teal"
                                     value=""
                                 >
                                     <option value="">Seleccione la barrera...</option>
@@ -430,7 +431,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                 <div className="flex flex-wrap gap-1 mb-2">
                                     {(data.barreras_vulneradas ?? []).map(b => (
                                         <span key={b} onClick={() => toggleArray('barreras_vulneradas', b)}
-                                            className="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
+                                            className="bg-primary-100 text-primary-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
                                             {b} ✕
                                         </span>
                                     ))}
@@ -441,14 +442,14 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                         onChange={e => setData('barreras_descripcion', e.target.value)}
                                         placeholder="Ingrese la descripción de la barrera..."
                                         rows={3}
-                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                        className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-primary-500 resize-none scroll-teal"
                                     />
                                     <button
                                         type="button"
                                         onClick={toggleGrabacionBarrera}
                                         className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabandoBarrera
                                             ? 'bg-red-500 text-white animate-pulse'
-                                            : 'bg-teal-500 text-white hover:bg-teal-600'
+                                            : 'bg-primary-500 text-white hover:bg-primary-600'
                                             }`}
                                     >
                                         {grabandoBarrera ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -465,7 +466,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                             <Campo label="Acciones Inseguras" error={errors.acciones_inseguras}>
                                 <select
                                     onChange={e => toggleArray('acciones_inseguras', e.target.value)}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-2 scroll-teal"
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 mb-2 scroll-teal"
                                     value=""
                                 >
                                     <option value="">Seleccione la acción...</option>
@@ -476,7 +477,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                 <div className="flex flex-wrap gap-1 mb-2">
                                     {(data.acciones_inseguras ?? []).map(a => (
                                         <span key={a} onClick={() => toggleArray('acciones_inseguras', a)}
-                                            className="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
+                                            className="bg-primary-100 text-primary-700 text-xs px-2 py-1 rounded-full cursor-pointer hover:bg-red-100 hover:text-red-600">
                                             {a} ✕
                                         </span>
                                     ))}
@@ -486,7 +487,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                     onChange={e => setData('acciones_descripcion', e.target.value)}
                                     placeholder="Ingrese la descripción de la acción..."
                                     rows={3}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-primary-500 resize-none"
                                 />
                             </Campo>
 
@@ -500,7 +501,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                             setData('factores_contributivos', { ...actual, [factor]: '' });
                                         }
                                     }}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-3 scroll-teal"
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 mb-3 scroll-teal"
                                     value=""
                                 >
                                     <option value="">Seleccione el factor...</option>
@@ -512,7 +513,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                 {Object.entries(data.factores_contributivos ?? {}).map(([factor, descripcion]) => (
                                     <div key={factor} className="mb-3 border border-gray-200 rounded-lg p-3">
                                         <div className="flex items-center justify-between mb-1">
-                                            <span className="text-xs font-semibold text-teal-700">{factor}</span>
+                                            <span className="text-xs font-semibold text-primary-700">{factor}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -533,7 +534,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                             })}
                                             placeholder={`Descripción de ${factor}...`}
                                             rows={2}
-                                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                            className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-primary-500 resize-none scroll-teal"
                                         />
                                     </div>
                                 ))}
@@ -546,14 +547,14 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                         onChange={e => setData('descripcion_analisis', e.target.value)}
                                         placeholder="Ingrese la descripción del análisis o use el micrófono..."
                                         rows={10}
-                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-teal-500 resize-none scroll-teal"
+                                        className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:border-primary-500 resize-none scroll-teal"
                                     />
                                     <button
                                         type="button"
                                         onClick={toggleGrabacion}
                                         className={`absolute right-3 top-3 p-1.5 rounded-full transition ${grabando
                                             ? 'bg-red-500 text-white animate-pulse'
-                                            : 'bg-teal-500 text-white hover:bg-teal-600'
+                                            : 'bg-primary-500 text-white hover:bg-primary-600'
                                             }`}
                                     >
                                         {grabando ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -579,7 +580,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                     <select
                                         value={data.clasificacion}
                                         onChange={e => setData('clasificacion', e.target.value)}
-                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                        className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 scroll-teal"
                                     >
                                         <option value="">Seleccione la clasificación...</option>
                                         {CLASIFICACIONES.map(c => (
@@ -594,7 +595,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                         value={data.relacionado_con}
                                         onChange={e => setData('relacionado_con', e.target.value)}
                                         placeholder="Buscar o escribir relación..."
-                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                        className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 scroll-teal"
                                     />
                                     <datalist id="relacionado-list">
                                         {RELACIONADO_CON.map(r => (
@@ -607,7 +608,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                     <select
                                         value={data.categorizacion}
                                         onChange={e => setData('categorizacion', e.target.value)}
-                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                        className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 scroll-teal"
                                     >
                                         <option value="">Seleccione la categorización...</option>
                                         {CATEGORIZACIONES.map(c => (
@@ -619,7 +620,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                     <select
                                         value={data.fk_jefe}
                                         onChange={e => setData('fk_jefe', e.target.value)}
-                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 scroll-teal"
+                                        className="w-full rounded-lg border-2 border-primary-300 px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 scroll-teal"
                                     >
                                         <option value="">Seleccione el jefe...</option>
                                         {jefes.map(jefe => (
@@ -634,16 +635,16 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                     onDragOver={onDragOverZona}
                                     onDragLeave={onDragLeaveZona}
                                     onDrop={onDropZona}
-                                    className={`flex items-center gap-3 rounded-lg p-1 -m-1 border-2 border-dashed transition ${arrastrando ? 'bg-teal-50 border-teal-400' : 'border-transparent'}`}
+                                    className={`flex items-center gap-3 rounded-lg p-1 -m-1 border-2 border-dashed transition ${arrastrando ? 'bg-celeste border-primary-400' : 'border-transparent'}`}
                                 >
                                     <input
                                         type="text"
                                         readOnly
                                         value={data.archivos.length > 0 ? `${data.archivos.length} archivo(s) seleccionado(s)` : ''}
                                         placeholder="Seleccione o arrastre los archivos (Opcional)"
-                                        className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500"
+                                        className="flex-1 rounded-lg border-2 border-primary-300 bg-gray-50 px-3 py-2 text-sm text-gray-500"
                                     />
-                                    <label className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition">
+                                    <label className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition">
                                         <Paperclip className="w-4 h-4" />
                                         Examinar
                                         <input
@@ -662,8 +663,8 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                                 {data.archivos.length > 0 && (
                                     <div className="mt-3 space-y-2">
                                         {data.archivos.map((file, index) => (
-                                            <div key={index} className="flex items-center gap-3 p-2 bg-teal-50 border border-teal-200 rounded-lg">
-                                                <Paperclip className="w-4 h-4 text-teal-500 flex-shrink-0" />
+                                            <div key={index} className="flex items-center gap-3 p-2 bg-celeste border border-primary-200 rounded-lg">
+                                                <Paperclip className="w-4 h-4 text-primary-500 flex-shrink-0" />
                                                 <p className="text-sm text-gray-700 truncate flex-1">{file.name}</p>
                                                 <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(0)} KB</p>
                                                 <button
@@ -707,7 +708,7 @@ export default function ModalAnalisis({ evento, jefes = [], onClose }) {
                         type="button"
                         onClick={submit}
                         disabled={processing}
-                        className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition disabled:opacity-50"
                     >
                         <Save className="w-4 h-4" />
                         Guardar
