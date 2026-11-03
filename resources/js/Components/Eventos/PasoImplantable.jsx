@@ -22,12 +22,12 @@ function Campo({ label, error, children }) {
     );
 }
 
-const inputClase = "w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500";
+const inputClase = "w-full rounded-lg border-2 border-primary-300 px-4 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500";
 
 export default function PasoImplantable({ data, setData, errors }) {
     return (
         <div className="space-y-6">
-            <div className="col-span-1 md:col-span-2 bg-teal-500 rounded-lg px-4 py-3">
+            <div className="col-span-1 md:col-span-2 bg-primary-500 rounded-lg px-4 py-3">
                 <h3 className="text-white font-semibold text-xs uppercase">Registro y control de implantables</h3>
             </div>
 

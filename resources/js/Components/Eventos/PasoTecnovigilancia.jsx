@@ -21,7 +21,7 @@ function Campo({ label, error, children }) {
     );
 }
 
-const inputClase = "w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500";
+const inputClase = "w-full rounded-lg border-2 border-primary-300 px-4 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500";
 
 const OPCIONES_DETECCION = ['Antes del uso del DM', 'Durante el uso del DM', 'Después del uso del DM'];
 const OPCIONES_CLASIFICACION = [
@@ -43,7 +43,7 @@ const OPCIONES_DESENLACE = [
 export default function PasoTecnovigilancia({ data, setData, errors }) {
     return (
         <div className="space-y-6">
-            <div className="col-span-1 md:col-span-2 bg-teal-500 rounded-lg px-4 py-3">
+            <div className="col-span-1 md:col-span-2 bg-primary-500 rounded-lg px-4 py-3">
                 <h3 className="text-white font-semibold text-xs uppercase">Tecnovigilancia</h3>
             </div>
 
