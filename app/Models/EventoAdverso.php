@@ -95,4 +95,12 @@ class EventoAdverso extends Model
     {
         return $this->belongsTo(User::class, 'fk_usuario_calidad');
     }
+    public function implantable()
+    {
+        return $this->hasOne(Implantable::class, 'fk_evento', 'id_eventoAdverso');
+    }
+    public function tecnovigilancia()
+    {
+        return $this->hasOne(Tecnovigilancia::class, 'fk_evento', 'id_eventoAdverso');
+    }
 }

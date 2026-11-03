@@ -70,8 +70,9 @@ export default function PasoPaciente({ data, setData, errors }) {
             console.log('respuesta:', json);
 
             if (json) {
-                setData('pac_nombres', json.nombres ?? '');
-                setData('pac_apellidos', json.apellidos ?? '');
+                setData('pac_nombres', (json.nombres ?? '').toUpperCase());
+                setData('pac_apellidos', (json.apellidos ?? '').toUpperCase());
+                setData('pac_sexo', json.sexo ?? '');
                 setData('pac_telefono', json.telefono ?? '');
                 setData('pac_edad', json.edad ?? '');
                 setData('pac_edad_unidad', json.edad_unidad ?? 'Años');
@@ -121,9 +122,9 @@ export default function PasoPaciente({ data, setData, errors }) {
                 <input
                     type="text"
                     value={data.pac_nombres}
-                    onChange={e => setData('pac_nombres', e.target.value)}
+                    onChange={e => setData('pac_nombres', e.target.value.toUpperCase())}
                     placeholder="Ingrese los nombres"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 />
             </Campo>
 
@@ -131,10 +132,22 @@ export default function PasoPaciente({ data, setData, errors }) {
                 <input
                     type="text"
                     value={data.pac_apellidos}
-                    onChange={e => setData('pac_apellidos', e.target.value)}
+                    onChange={e => setData('pac_apellidos', e.target.value.toUpperCase())}
                     placeholder="Ingrese los apellidos"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 />
+            </Campo>
+
+            <Campo label="Sexo" error={errors.pac_sexo}>
+                <select
+                    value={data.pac_sexo}
+                    onChange={e => setData('pac_sexo', e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                >
+                    <option value="">Seleccione el sexo...</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                </select>
             </Campo>
 
             <Campo label="Teléfono" error={errors.pac_telefono}>

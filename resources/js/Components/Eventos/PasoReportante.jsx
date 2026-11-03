@@ -47,6 +47,7 @@ function Campo({ label, error, children }) {
 export default function PasoReportante({ data, setData, errors }) {
     const [buscando, setBuscando] = useState(false);
     const [autocompletado, setAutocompletado] = useState(false);
+    const [cargoEsOtro, setCargoEsOtro] = useState(data.rep_cargo !== '' && !CARGOS.includes(data.rep_cargo));
 
     const buscarReportante = async (cedula) => {
         if (!cedula || cedula.length < 5) return;
@@ -62,10 +63,12 @@ export default function PasoReportante({ data, setData, errors }) {
             const json = await response.json();
 
             if (json) {
-                setData('rep_nombres', json.nombres ?? '');
-                setData('rep_apellidos', json.apellidos ?? '');
-                setData('rep_cargo', json.cargo ?? '');
+                const cargo = json.cargo ?? '';
+                setData('rep_nombres', (json.nombres ?? '').toUpperCase());
+                setData('rep_apellidos', (json.apellidos ?? '').toUpperCase());
+                setData('rep_cargo', cargo);
                 setData('rep_empresa', json.empresa ?? '');
+                setCargoEsOtro(cargo !== '' && !CARGOS.includes(cargo));
                 setAutocompletado(true);
             }
         } catch {
@@ -110,9 +113,9 @@ export default function PasoReportante({ data, setData, errors }) {
                 <input
                     type="text"
                     value={data.rep_nombres}
-                    onChange={e => setData('rep_nombres', e.target.value)}
+                    onChange={e => setData('rep_nombres', e.target.value.toUpperCase())}
                     placeholder="Ingrese los nombres"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 />
             </Campo>
 
@@ -120,16 +123,25 @@ export default function PasoReportante({ data, setData, errors }) {
                 <input
                     type="text"
                     value={data.rep_apellidos}
-                    onChange={e => setData('rep_apellidos', e.target.value)}
+                    onChange={e => setData('rep_apellidos', e.target.value.toUpperCase())}
                     placeholder="Ingrese los apellidos"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 />
             </Campo>
 
             <Campo label="Cargo" error={errors.rep_cargo}>
                 <select
-                    value={data.rep_cargo}
-                    onChange={e => setData('rep_cargo', e.target.value)}
+                    value={cargoEsOtro ? 'Otro' : data.rep_cargo}
+                    onChange={e => {
+                        const valor = e.target.value;
+                        if (valor === 'Otro') {
+                            setCargoEsOtro(true);
+                            setData('rep_cargo', '');
+                        } else {
+                            setCargoEsOtro(false);
+                            setData('rep_cargo', valor);
+                        }
+                    }}
                     className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 >
                     <option value="">Seleccione el cargo...</option>
@@ -138,6 +150,19 @@ export default function PasoReportante({ data, setData, errors }) {
                     ))}
                 </select>
             </Campo>
+
+            {cargoEsOtro && (
+                <Campo label="¿Cuál cargo?" error={errors.rep_cargo}>
+                    <input
+                        type="text"
+                        value={data.rep_cargo}
+                        onChange={e => setData('rep_cargo', e.target.value.toUpperCase())}
+                        placeholder="Escriba el cargo"
+                        autoFocus
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    />
+                </Campo>
+            )}
 
 
 

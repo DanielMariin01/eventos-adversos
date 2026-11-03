@@ -8,7 +8,10 @@ use App\Models\Categoria;
 use App\Models\EventoAdverso;
 use App\Models\Reportante;
 use App\Models\Paciente;
+use App\Models\Implantable;
+use App\Models\Tecnovigilancia;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -35,7 +38,16 @@ class EventoController extends Controller
             'fk_categoria' => 'required|exists:categorias,id_categoria',
         ]);
 
-        $areas = Area::with('jefe')->where('activo', 1)->get();
+        $categoria = Categoria::findOrFail($request->fk_categoria);
+
+        // Si la categoría tiene áreas asignadas en area_categoria, se muestran
+        // solo esas. Si no tiene ninguna, se muestran todas las áreas activas
+        // (comportamiento por defecto, igual que antes).
+        $areasAsignadas = $categoria->areas()->where('activo', 1)->with('jefe')->get();
+
+        $areas = $areasAsignadas->isNotEmpty()
+            ? $areasAsignadas
+            : Area::with('jefe')->where('activo', 1)->get();
 
         return response()->json(['areas' => $areas]);
     }
@@ -65,6 +77,7 @@ class EventoController extends Controller
         return response()->json([
             'nombres'     => $paciente->nombres,
             'apellidos'   => $paciente->apellidos,
+            'sexo'        => $paciente->sexo,
             'telefono'    => $paciente->telefono,
             'edad'        => $paciente->edad,
             'edad_unidad' => $paciente->edad_unidad,
@@ -75,6 +88,12 @@ class EventoController extends Controller
     // ── Guardar evento adverso ──
     public function store(Request $request)
     {
+        $categoriaSeleccionada = Categoria::find($request->fk_categoria);
+        $esImplantable = $categoriaSeleccionada?->nombre === 'Implantables';
+        $esTecnovigilancia = $categoriaSeleccionada?->nombre === 'Tecnovigilancia';
+        $reglaImplantable = $esImplantable ? 'required' : 'nullable';
+        $reglaTecno = $esTecnovigilancia ? 'required' : 'nullable';
+
         $request->validate([
             'fk_categoria'    => 'required|exists:categorias,id_categoria',
             'fk_area'         => 'required|exists:areas,id_area',
@@ -86,12 +105,48 @@ class EventoController extends Controller
             'pac_cedula'      => 'nullable|string|max:20',
             'pac_nombres'     => 'required|string|max:100',
             'pac_apellidos'   => 'required|string|max:100',
+            'pac_sexo'        => 'nullable|in:Masculino,Femenino',
             'pac_telefono'    => 'nullable|string|max:20',
             'pac_edad'        => 'nullable|integer|min:0|max:120',
             'pac_edad_unidad' => 'nullable|string|max:10',
             'pac_entidad'     => 'nullable|string|max:100',
             'fecha_evento'    => 'required|date',
             'descripcion'     => 'required|string',
+
+            // Registro de implantables (solo obligatorios si la categoría es "Implantables")
+            'imp_procedimiento_cx'           => "{$reglaImplantable}|string|max:255",
+            'imp_nombre_cirujano'            => "{$reglaImplantable}|string|max:150",
+            'imp_especialidad'               => "{$reglaImplantable}|string|max:150",
+            'imp_descripcion_material'       => "{$reglaImplantable}|string",
+            'imp_marca'                      => "{$reglaImplantable}|string|max:150",
+            'imp_registro_invima'            => "{$reglaImplantable}|string|max:100",
+            'imp_serie'                      => "{$reglaImplantable}|string|max:100",
+            'imp_lote'                       => "{$reglaImplantable}|string|max:100",
+            'imp_fecha_vencimiento'          => "{$reglaImplantable}|date",
+
+            // Tecnovigilancia (solo obligatorios si la categoría es "Tecnovigilancia")
+            'tec_diagnostico_inicial'     => "{$reglaTecno}|string",
+            'tec_nombre_dispositivo'      => "{$reglaTecno}|string|max:255",
+            'tec_marca'                   => "{$reglaTecno}|string|max:150",
+            'tec_modelo'                  => "{$reglaTecno}|string|max:150",
+            'tec_serie'                   => "{$reglaTecno}|string|max:100",
+            'tec_area_funcionamiento_dm'  => "{$reglaTecno}|string|max:150",
+            'tec_uso_mas_de_una_vez'      => "{$reglaTecno}|in:si,no",
+            'tec_deteccion_evento'        => "{$reglaTecno}|in:Antes del uso del DM,Durante el uso del DM,Después del uso del DM",
+            'tec_clasificacion'           => "{$reglaTecno}|in:Evento adverso no serio,Evento adverso serio,Incidente adverso no serio,Incidente adverso serio",
+            'tec_desenlace'               => [
+                $reglaTecno,
+                'string',
+                Rule::in([
+                    'Muerte',
+                    'Enfermedad o daño que amenace la vida',
+                    'Daño de una función o estructura corporal',
+                    'Hospitalización inicial o prolongada',
+                    'Requiere intervención médica o quirúrgica, para prevenir un daño permanente de una estructura o función corporal',
+                    'No hubo daño',
+                    'Otro',
+                ]),
+            ],
         ]);
 
         $reportante = Reportante::updateOrCreate(
@@ -109,6 +164,7 @@ class EventoController extends Controller
             [
                 'nombres'     => $request->pac_nombres,
                 'apellidos'   => $request->pac_apellidos,
+                'sexo'        => $request->pac_sexo,
                 'telefono'    => $request->pac_telefono,
                 'edad'        => $request->pac_edad,
                 'edad_unidad' => $request->pac_edad_unidad ?? 'Años',
@@ -126,6 +182,38 @@ class EventoController extends Controller
             'estado'        => 'en_proceso',
             'fk_usuario'    => Auth::id(),
         ]);
+
+        if ($esImplantable) {
+            Implantable::create([
+                'fk_evento'                   => $evento->id_eventoAdverso,
+                'procedimiento_cx'            => $request->imp_procedimiento_cx,
+                'nombre_cirujano'             => $request->imp_nombre_cirujano,
+                'especialidad'                => $request->imp_especialidad,
+                'descripcion_material'        => $request->imp_descripcion_material,
+                'marca'                       => $request->imp_marca,
+                'registro_invima'             => $request->imp_registro_invima,
+                'serie'                       => $request->imp_serie,
+                'lote'                        => $request->imp_lote,
+                'fecha_vencimiento'           => $request->imp_fecha_vencimiento,
+                'nombre_funcionario_reporta'  => trim($reportante->nombres . ' ' . $reportante->apellidos),
+            ]);
+        }
+
+        if ($esTecnovigilancia) {
+            Tecnovigilancia::create([
+                'fk_evento'               => $evento->id_eventoAdverso,
+                'diagnostico_inicial'     => $request->tec_diagnostico_inicial,
+                'nombre_dispositivo'      => $request->tec_nombre_dispositivo,
+                'marca'                   => $request->tec_marca,
+                'modelo'                  => $request->tec_modelo,
+                'serie'                   => $request->tec_serie,
+                'area_funcionamiento_dm'  => $request->tec_area_funcionamiento_dm,
+                'uso_mas_de_una_vez'      => $request->tec_uso_mas_de_una_vez === 'si',
+                'deteccion_evento'        => $request->tec_deteccion_evento,
+                'clasificacion'           => $request->tec_clasificacion,
+                'desenlace'               => $request->tec_desenlace,
+            ]);
+        }
 
         // Enviar correo de notificación
         $evento->load(['categoria', 'area', 'reportante', 'paciente']);

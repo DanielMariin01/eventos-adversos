@@ -13,6 +13,8 @@ const ICONOS = {
     'Farmacia': '/imagenes/iconos/farmacia.svg',
     'IAAS': '/imagenes/iconos/iaas.svg',
     'Seguridad del Paciente': '/imagenes/iconos/seguridad.svg',
+    'Implantables': '/imagenes/iconos/implantables.svg',
+    'Tecnovigilancia': '/imagenes/iconos/tecnovigilancia.svg',
 };
 
 export default function TarjetaCategoria({ categoria, seleccionada, onClick }) {

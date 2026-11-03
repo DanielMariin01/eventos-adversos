@@ -14,6 +14,7 @@ class Paciente extends Model
         'cedula',
         'nombres',
         'apellidos',
+        'sexo',
         'telefono',
         'edad',
         'edad_unidad',

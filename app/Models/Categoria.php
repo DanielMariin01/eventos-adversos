@@ -21,4 +21,10 @@ class Categoria extends Model
     {
         return $this->hasMany(EventoAdverso::class, 'fk_categoria');
     }
+
+    // Áreas permitidas para esta categoría (vacío = se permiten todas)
+    public function areas()
+    {
+        return $this->belongsToMany(Area::class, 'area_categoria', 'id_categoria', 'id_area');
+    }
 }

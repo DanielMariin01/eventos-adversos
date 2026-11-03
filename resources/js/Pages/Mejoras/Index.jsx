@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter, CheckCircle } from 'lucide-react';
+import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter, CheckCircle, MapPin } from 'lucide-react';
 import ModalCrearMejora from '@/Components/Mejoras/ModalCrearMejora';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
@@ -13,6 +13,7 @@ import * as XLSX from 'xlsx';
 import { FaFileExcel } from 'react-icons/fa';
 import { HiOutlineSpeakerphone, HiOutlineStop, HiOutlinePencilAlt } from 'react-icons/hi';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
+import ModalCambiarArea from '@/Components/Eventos/ModalCambiarArea';
 
 
 const BADGE_ESTADO = {
@@ -31,19 +32,38 @@ const LABEL_ESTADO = {
     cerrado: 'Cerrado',
 };
 
-export default function Index({ eventos, jefes }) {
+export default function Index({ eventos, jefes, areas = [], filtros = {} }) {
 
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-    const [busquedaEvento, setBusquedaEvento] = useState('');
-    const [busquedaReportante, setBusquedaReportante] = useState('');
-    const [busquedaPaciente, setBusquedaPaciente] = useState('');
+    const [busquedaEvento, setBusquedaEvento] = useState(filtros.evento ?? '');
+    const [busquedaReportante, setBusquedaReportante] = useState(filtros.reportante ?? '');
+    const [busquedaPaciente, setBusquedaPaciente] = useState(filtros.paciente ?? '');
     const [modalCrear, setModalCrear] = useState(false);
     const [modalAnalisis, setModalAnalisis] = useState(false);
     const [modalPlan, setModalPlan] = useState(false);
     const [modalRevisiones, setModalRevisiones] = useState(false);
     const [cargando, setCargando] = useState(false);
-    const [filtroEstado, setFiltroEstado] = useState('');
+    const [filtroEstado, setFiltroEstado] = useState(filtros.estado ?? '');
     const [modalEditarAnalisis, setModalEditarAnalisis] = useState(false);
+    const [modalArea, setModalArea] = useState(false);
+
+    // ── Búsqueda en servidor (para que funcione a través de todas las páginas) ──
+    const esPrimerRender = useRef(true);
+    useEffect(() => {
+        if (esPrimerRender.current) {
+            esPrimerRender.current = false;
+            return;
+        }
+        const timeout = setTimeout(() => {
+            router.get(route('mejoras.index'), {
+                evento: busquedaEvento || undefined,
+                reportante: busquedaReportante || undefined,
+                paciente: busquedaPaciente || undefined,
+                estado: filtroEstado || undefined,
+            }, { preserveState: true, preserveScroll: true, replace: true });
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [busquedaEvento, busquedaReportante, busquedaPaciente, filtroEstado]);
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -74,6 +94,11 @@ export default function Index({ eventos, jefes }) {
     const abrirRevisiones = () => {
         if (!eventoSeleccionado) return alertSeleccionar();
         setModalRevisiones(true);
+    };
+
+    const abrirCambiarArea = () => {
+        if (!eventoSeleccionado) return alertSeleccionar();
+        setModalArea(true);
     };
 
     // ── Columnas ──
@@ -154,6 +179,13 @@ export default function Index({ eventos, jefes }) {
                             <HiOutlinePencilAlt className="w-4 h-4" />
                         </button>
                         <button
+                            onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalArea(true); }}
+                            title="Cambiar área"
+                            className="w-8 h-8 bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center transition"
+                        >
+                            <MapPin className="w-4 h-4" />
+                        </button>
+                        <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setEventoSeleccionado(fila);
@@ -191,20 +223,6 @@ export default function Index({ eventos, jefes }) {
         },
     ];
 
-    // ── Filtro ──
-    const eventosFiltrados = {
-        ...eventos,
-        data: eventos.data.filter(e =>
-            (filtroEstado === '' || e.estado === filtroEstado) &&
-            (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
-            (busquedaReportante === '' ||
-                e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
-                e.reportante?.cedula?.includes(busquedaReportante)) &&
-            (busquedaPaciente === '' ||
-                e.paciente?.nombres?.toLowerCase().includes(busquedaPaciente.toLowerCase()) ||
-                e.paciente?.cedula?.includes(busquedaPaciente))
-        ),
-    };
     const cerrarCaso = () => {
         if (!eventoSeleccionado) return alertSeleccionar();
         if (eventoSeleccionado.estado !== 'radicado') {
@@ -310,6 +328,15 @@ export default function Index({ eventos, jefes }) {
                     </button>
 
                     <button
+                        onClick={abrirCambiarArea}
+                        disabled={!eventoSeleccionado}
+                        title="Cambiar área"
+                        className="w-9 h-9 bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <MapPin className="w-4 h-4" />
+                    </button>
+
+                    <button
                         onClick={cerrarCaso}
                         disabled={!eventoSeleccionado}
                         title="Cerrar caso"
@@ -362,7 +389,7 @@ export default function Index({ eventos, jefes }) {
                 {/* ── Tabla ── */}
                 <Tabla
                     columnas={columnas}
-                    datos={eventosFiltrados}
+                    datos={eventos}
                     mensajeVacio="No hay eventos en plan de mejora."
                     onRowClick={(fila) => setEventoSeleccionado(
                         eventoSeleccionado?.id_eventoAdverso === fila.id_eventoAdverso ? null : fila
@@ -448,6 +475,14 @@ export default function Index({ eventos, jefes }) {
                     evento={eventoSeleccionado}
                     jefes={jefes}
                     onClose={() => setModalEditarAnalisis(false)}
+                />
+            )}
+
+            {modalArea && (
+                <ModalCambiarArea
+                    evento={eventoSeleccionado}
+                    areas={areas}
+                    onClose={() => setModalArea(false)}
                 />
             )}
 

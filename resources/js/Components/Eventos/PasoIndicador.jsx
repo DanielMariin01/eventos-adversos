@@ -7,16 +7,20 @@
  */
 import { Check } from 'lucide-react';
 
-const PASOS = [
+const PASOS_BASE = [
     { numero: 1, label: 'Reportante' },
     { numero: 2, label: 'Paciente' },
     { numero: 3, label: 'Evento' },
 ];
 
-export default function PasoIndicador({ pasoActual }) {
+export default function PasoIndicador({ pasoActual, labelPaso3 }) {
+    const pasos = labelPaso3
+        ? PASOS_BASE.map(p => p.numero === 3 ? { ...p, label: labelPaso3 } : p)
+        : PASOS_BASE;
+
     return (
         <div className="flex items-center justify-center gap-2 mb-8">
-            {PASOS.map(({ numero, label }, index) => {
+            {pasos.map(({ numero, label }, index) => {
                 const activo = pasoActual === numero;
                 const completado = pasoActual > numero;
 
@@ -42,7 +46,7 @@ export default function PasoIndicador({ pasoActual }) {
                         </div>
 
                         {/* Línea conectora */}
-                        {index < PASOS.length - 1 && (
+                        {index < pasos.length - 1 && (
                             <div className={`w-12 sm:w-20 h-0.5 mx-2 ${completado ? 'bg-teal-500' : 'bg-gray-200'}`} />
                         )}
                     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Archivo;
+use App\Models\Area;
 use App\Models\EventoAdverso;
 use App\Models\PlanMejora;
 use App\Models\Revision;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Mail;
 class PlanMejoraController extends Controller
 {
     // ── Lista de eventos analizado y en_mejora ──
-    public function index()
+    public function index(Request $request)
     {
         $eventos = EventoAdverso::with([
             'categoria',
@@ -29,13 +30,40 @@ class PlanMejoraController extends Controller
             'revisiones.usuario',
         ])
             ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado', 'procesado'])
+            ->when($request->filled('evento'), function ($query) use ($request) {
+                $query->where('id_eventoAdverso', 'like', '%' . $request->evento . '%');
+            })
+            ->when($request->filled('reportante'), function ($query) use ($request) {
+                $query->whereHas('reportante', function ($q) use ($request) {
+                    $busqueda = $request->reportante;
+                    $q->where('cedula', 'like', "%{$busqueda}%")
+                        ->orWhere('nombres', 'like', "%{$busqueda}%")
+                        ->orWhere('apellidos', 'like', "%{$busqueda}%");
+                });
+            })
+            ->when($request->filled('paciente'), function ($query) use ($request) {
+                $query->whereHas('paciente', function ($q) use ($request) {
+                    $busqueda = $request->paciente;
+                    $q->where('cedula', 'like', "%{$busqueda}%")
+                        ->orWhere('nombres', 'like', "%{$busqueda}%")
+                        ->orWhere('apellidos', 'like', "%{$busqueda}%");
+                });
+            })
+            ->when($request->filled('estado'), function ($query) use ($request) {
+                $query->where('estado', $request->estado);
+            })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
+
         $jefes = User::role('jefe')->get(['id', 'name']);
+        $areas = Area::where('activo', 1)->get(['id_area', 'nombre']);
 
         return Inertia::render('Mejoras/Index', [
             'eventos' => $eventos,
             'jefes'   => $jefes,
+            'areas'   => $areas,
+            'filtros' => $request->only(['evento', 'reportante', 'paciente', 'estado']),
         ]);
     }
 

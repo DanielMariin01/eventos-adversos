@@ -7,6 +7,8 @@ import PasoIndicador from '@/Components/Eventos/PasoIndicador';
 import PasoReportante from '@/Components/Eventos/PasoReportante';
 import PasoPaciente from '@/Components/Eventos/PasoPaciente';
 import PasoEvento from '@/Components/Eventos/PasoEvento';
+import PasoImplantable from '@/Components/Eventos/PasoImplantable';
+import PasoTecnovigilancia from '@/Components/Eventos/PasoTecnovigilancia';
 import Swal from 'sweetalert2';
 import { Search } from 'lucide-react';
 
@@ -36,6 +38,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         pac_cedula: '',
         pac_nombres: '',
         pac_apellidos: '',
+        pac_sexo: '',
         pac_telefono: '',
         pac_edad: '',
         pac_edad_unidad: 'Años',
@@ -50,7 +53,35 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         clasificacion: '',
         relacionado_con: '',
         categorizacion: '',
+
+        // Implantables (solo cuando la categoría es "Implantables")
+        imp_procedimiento_cx: '',
+        imp_nombre_cirujano: '',
+        imp_especialidad: '',
+        imp_descripcion_material: '',
+        imp_marca: '',
+        imp_registro_invima: '',
+        imp_serie: '',
+        imp_lote: '',
+        imp_fecha_vencimiento: '',
+
+        // Tecnovigilancia (solo cuando la categoría es "Tecnovigilancia")
+        tec_diagnostico_inicial: '',
+        tec_nombre_dispositivo: '',
+        tec_marca: '',
+        tec_modelo: '',
+        tec_serie: '',
+        tec_area_funcionamiento_dm: '',
+        tec_uso_mas_de_una_vez: '',
+        tec_deteccion_evento: '',
+        tec_clasificacion: '',
+        tec_desenlace: '',
     });
+
+    // ── ¿Qué categoría está seleccionada? ──
+    const categoriaSeleccionada = categorias.find(c => c.id_categoria === data.fk_categoria);
+    const esImplantable = categoriaSeleccionada?.nombre === 'Implantables';
+    const esTecnovigilancia = categoriaSeleccionada?.nombre === 'Tecnovigilancia';
 
     // ── Selección de categoría ──
     const seleccionarCategoria = async (idCategoria) => {
@@ -133,6 +164,31 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         const nuevosErrores = {};
         if (!data.fecha_evento) nuevosErrores.fecha_evento = 'La fecha del evento es obligatoria';
         if (!data.descripcion) nuevosErrores.descripcion = 'La descripción es obligatoria';
+
+        if (esImplantable) {
+            if (!data.imp_procedimiento_cx) nuevosErrores.imp_procedimiento_cx = 'El procedimiento CX es obligatorio';
+            if (!data.imp_nombre_cirujano) nuevosErrores.imp_nombre_cirujano = 'El nombre del cirujano es obligatorio';
+            if (!data.imp_especialidad) nuevosErrores.imp_especialidad = 'La especialidad es obligatoria';
+            if (!data.imp_descripcion_material) nuevosErrores.imp_descripcion_material = 'La descripción del material es obligatoria';
+            if (!data.imp_marca) nuevosErrores.imp_marca = 'La marca es obligatoria';
+            if (!data.imp_registro_invima) nuevosErrores.imp_registro_invima = 'El registro INVIMA es obligatorio';
+            if (!data.imp_serie) nuevosErrores.imp_serie = 'La serie es obligatoria';
+            if (!data.imp_lote) nuevosErrores.imp_lote = 'El número de lote es obligatorio';
+            if (!data.imp_fecha_vencimiento) nuevosErrores.imp_fecha_vencimiento = 'La fecha de vencimiento es obligatoria';
+        }
+
+        if (esTecnovigilancia) {
+            if (!data.tec_diagnostico_inicial) nuevosErrores.tec_diagnostico_inicial = 'El diagnóstico inicial es obligatorio';
+            if (!data.tec_nombre_dispositivo) nuevosErrores.tec_nombre_dispositivo = 'El nombre del dispositivo es obligatorio';
+            if (!data.tec_marca) nuevosErrores.tec_marca = 'La marca es obligatoria';
+            if (!data.tec_modelo) nuevosErrores.tec_modelo = 'El modelo es obligatorio';
+            if (!data.tec_serie) nuevosErrores.tec_serie = 'La serie es obligatoria';
+            if (!data.tec_area_funcionamiento_dm) nuevosErrores.tec_area_funcionamiento_dm = 'El área de funcionamiento es obligatoria';
+            if (!data.tec_uso_mas_de_una_vez) nuevosErrores.tec_uso_mas_de_una_vez = 'Este campo es obligatorio';
+            if (!data.tec_deteccion_evento) nuevosErrores.tec_deteccion_evento = 'La detección del evento es obligatoria';
+            if (!data.tec_clasificacion) nuevosErrores.tec_clasificacion = 'La clasificación es obligatoria';
+            if (!data.tec_desenlace) nuevosErrores.tec_desenlace = 'El desenlace es obligatorio';
+        }
 
         if (Object.keys(nuevosErrores).length > 0) {
             setErroresPaso(nuevosErrores);
@@ -234,7 +290,6 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                         </div>
 
                         {/* Buscador */}
-                        {/* Buscador */}
                         <div className="mb-6 flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
                             <div className="bg-cyan-500 px-3 py-2.5 flex items-center justify-center border-r border-cyan-500">
                                 <Search className="w-5 h-5 text-white" />
@@ -258,17 +313,6 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            {areas.map(area => (
-                                <TarjetaArea
-                                    key={area.id_area}
-                                    area={area}
-                                    seleccionada={data.fk_area === area.id_area}
-                                    onClick={() => seleccionarArea(area.id_area)}
-                                />
-                            ))}
-                        </div>
-
                         <button
                             type="button"
                             onClick={() => setEtapa('categoria')}
@@ -282,12 +326,18 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {/* ── ETAPA 3: Formulario de 3 pasos ── */}
                 {etapa === 'formulario' && (
                     <div>
-                        <PasoIndicador pasoActual={paso} />
+                        <PasoIndicador pasoActual={paso} labelPaso3={esImplantable ? 'Implantable' : esTecnovigilancia ? 'Tecnovigilancia' : 'Evento'} />
 
                         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-6">
                             {paso === 1 && <PasoReportante data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
                             {paso === 2 && <PasoPaciente data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
-                            {paso === 3 && <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
+                            {paso === 3 && (
+                                esImplantable
+                                    ? <PasoImplantable data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
+                                    : esTecnovigilancia
+                                        ? <PasoTecnovigilancia data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
+                                        : <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
+                            )}
                         </div>
 
                         <div className="flex justify-between">
@@ -314,7 +364,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                     disabled={processing}
                                     className="px-6 py-2.5 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-50"
                                 >
-                                    Registrar evento
+                                    Registrar
                                 </button>
                             )}
                         </div>
