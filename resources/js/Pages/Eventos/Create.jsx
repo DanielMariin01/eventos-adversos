@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -211,12 +212,12 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                     title: '¡Evento registrado!',
                     html: `
             <p class="text-gray-600 mb-2">El evento adverso fue reportado correctamente.</p>
-            <div class="inline-block bg-teal-50 border border-teal-200 rounded-lg px-6 py-3 mt-2">
-                <p class="text-xs text-teal-600 font-semibold uppercase tracking-wider mb-1">N° de Evento</p>
-                <p class="text-3xl font-bold text-teal-600">${page.props.flash?.success?.match(/\d+/)?.[0] ?? ''}</p>
+            <div class="inline-block bg-celeste border border-primary-200 rounded-lg px-6 py-3 mt-2">
+                <p class="text-xs text-primary-600 font-semibold uppercase tracking-wider mb-1">N° de Evento</p>
+                <p class="text-3xl font-bold text-primary-600">${page.props.flash?.success?.match(/\d+/)?.[0] ?? ''}</p>
             </div>
         `,
-                    confirmButtonColor: '#14b8a6',
+                    confirmButtonColor: COLORS.primary,
                     confirmButtonText: 'Aceptar',
                 });
             },
@@ -247,7 +248,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
                                 strokeMiterlimit="10"
                                 strokeWidth="3"
-                                stroke="#009B9E"
+                                stroke={COLORS.secondary}
                                 fill="none"
                             />
                         </svg>
@@ -265,7 +266,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                     <div>
                         {cargandoAreas ? (
                             <div className="flex justify-center py-12">
-                                <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -286,12 +287,12 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {etapa === 'area' && (
                     <div>
                         <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-bold text-teal-600 mb-2">¿En cuál área ocurrió el evento?</h2>
+                            <h2 className="text-2xl font-bold text-primary-600 mb-2">¿En cuál área ocurrió el evento?</h2>
                         </div>
 
                         {/* Buscador */}
-                        <div className="mb-6 flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
-                            <div className="bg-cyan-500 px-3 py-2.5 flex items-center justify-center border-r border-cyan-500">
+                        <div className="mb-6 flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500">
+                            <div className="bg-secondary-500 px-3 py-2.5 flex items-center justify-center border-r border-secondary-500">
                                 <Search className="w-5 h-5 text-white" />
                             </div>
                             <input
@@ -299,7 +300,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                 value={busquedaArea}
                                 onChange={e => setBusquedaArea(e.target.value)}
                                 placeholder="Buscar área..."
-                                className="flex-1 px-4 py-2.5 text-sm focus:outline-none"
+                                className="flex-1 px-4 py-3 text-sm focus:outline-none"
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -316,7 +317,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                         <button
                             type="button"
                             onClick={() => setEtapa('categoria')}
-                            className="text-sm text-gray-500 hover:text-teal-600 transition"
+                            className="text-sm text-gray-500 hover:text-primary-600 transition"
                         >
                             ← Volver a categorías
                         </button>
@@ -328,7 +329,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                     <div>
                         <PasoIndicador pasoActual={paso} labelPaso3={esImplantable ? 'Implantable' : esTecnovigilancia ? 'Tecnovigilancia' : 'Evento'} />
 
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-6">
+                        <div className="bg-white rounded-card border border-gray-200 shadow-card p-8 mb-6">
                             {paso === 1 && <PasoReportante data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
                             {paso === 2 && <PasoPaciente data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
                             {paso === 3 && (
@@ -353,7 +354,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                 <button
                                     type="button"
                                     onClick={siguiente}
-                                    className="px-6 py-2.5 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition"
+                                    className="px-6 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition"
                                 >
                                     Siguiente →
                                 </button>
@@ -362,7 +363,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                     type="button"
                                     onClick={submit}
                                     disabled={processing}
-                                    className="px-6 py-2.5 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition disabled:opacity-50"
+                                    className="px-6 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition disabled:opacity-50"
                                 >
                                     Registrar
                                 </button>

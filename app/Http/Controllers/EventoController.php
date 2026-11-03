@@ -18,6 +18,7 @@ use Inertia\Inertia;
 use App\Models\Revision;
 use App\Mail\EventoReportado;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class EventoController extends Controller
 {
@@ -386,12 +387,18 @@ class EventoController extends Controller
             'observacion'  => 'nullable|string',
         ]);
 
+        if (in_array($evento->estado, ['cerrado', 'procesado'])) {
+            throw ValidationException::withMessages([
+                'fk_categoria' => 'No se puede cambiar el tipo de un evento cerrado o procesado.',
+            ]);
+        }
+
         $evento->update([
             'fk_categoria'    => $request->fk_categoria,
             'observacion_tipo' => $request->observacion,
         ]);
 
-        return redirect()->route('eventos.index')
+        return redirect()->back()
             ->with('success', 'Tipo de evento actualizado correctamente.');
     }
 

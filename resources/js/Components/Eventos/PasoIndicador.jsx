@@ -30,15 +30,15 @@ export default function PasoIndicador({ pasoActual, labelPaso3 }) {
                         <div className="flex flex-col items-center gap-1">
                             <div className={`
             w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition
-            ${activo ? 'bg-cyan-500 text-white shadow-md' : ''}
-            ${completado ? 'bg-teal-500 text-white' : ''}
+            ${activo ? 'bg-secondary-500 text-white shadow-md' : ''}
+            ${completado ? 'bg-primary-500 text-white' : ''}
             ${!activo && !completado ? 'bg-gray-100 text-gray-400' : ''}
         `}>
                                 {completado ? <Check className="w-5 h-5" /> : numero}
                             </div>
                             <span className={`text-xs font-medium hidden sm:block
-            ${activo ? 'text-cyan-500' : ''}
-            ${completado ? 'text-teal-500' : ''}
+            ${activo ? 'text-secondary-500' : ''}
+            ${completado ? 'text-primary-500' : ''}
             ${!activo && !completado ? 'text-gray-400' : ''}
         `}>
                                 {label}
@@ -47,7 +47,7 @@ export default function PasoIndicador({ pasoActual, labelPaso3 }) {
 
                         {/* Línea conectora */}
                         {index < pasos.length - 1 && (
-                            <div className={`w-12 sm:w-20 h-0.5 mx-2 ${completado ? 'bg-teal-500' : 'bg-gray-200'}`} />
+                            <div className={`w-12 sm:w-20 h-0.5 mx-2 ${completado ? 'bg-primary-500' : 'bg-gray-200'}`} />
                         )}
                     </div>
                 );

@@ -39,7 +39,7 @@ export default function Tabla({
             {/* Tabla */}
             <div className="bg-white border border-gray-200 rounded-sm shadow overflow-x-auto">
                 <table className="w-full text-sm">
-                    <thead className="bg-teal-600 text-white">
+                    <thead className="bg-primary-600 text-white">
                         <tr>
                             {columnas.map((col) => (
                                 <th
@@ -79,7 +79,7 @@ export default function Tabla({
                                                 border-b border-gray-100 transition
                                                 ${onRowClick ? 'cursor-pointer' : ''}
                                                 ${seleccionada
-                                                    ? 'bg-teal-50 border-l-4 border-l-teal-500'
+                                                    ? 'bg-celeste border-l-4 border-l-primary-500'
                                                     : 'hover:bg-gray-50'}
                                             `}
                                         >
@@ -128,7 +128,7 @@ export default function Tabla({
                             <select
                                 value={porPagina}
                                 onChange={e => onPorPaginaCambio(Number(e.target.value))}
-                                className="border border-gray-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:border-teal-400"
+                                className="border-2 border-primary-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:border-primary-400"
                             >
                                 <option value={5}>5</option>
                                 <option value={10}>10</option>

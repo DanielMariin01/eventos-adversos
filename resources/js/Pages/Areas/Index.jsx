@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -41,7 +42,7 @@ export default function Index({ areas, jefes }) {
             label: 'Jefe Asignado',
             key: 'jefe',
             render: (fila) => fila.jefe
-                ? <span className="bg-teal-100 text-teal-700 text-xs font-semibold px-2.5 py-1 rounded-full">{fila.jefe.name}</span>
+                ? <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-2.5 py-1 rounded-full">{fila.jefe.name}</span>
                 : <span className="bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-full">Sin asignar</span>,
         },
     ];
@@ -49,7 +50,7 @@ export default function Index({ areas, jefes }) {
     const acciones = (fila) => (
         <button
             onClick={() => abrirEditar(fila)}
-            className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+            className="bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
         >
             Asignar jefe
         </button>
@@ -68,7 +69,7 @@ export default function Index({ areas, jefes }) {
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
                                 strokeMiterlimit="10"
                                 strokeWidth="3"
-                                stroke="#009B9E"
+                                stroke={COLORS.secondary}
                                 fill="none"
                             />
                         </svg>
@@ -92,13 +93,13 @@ export default function Index({ areas, jefes }) {
             {/* Modal asignar jefe */}
             {modalEditar && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+                    <div className="bg-white rounded-card shadow-card w-full max-w-md">
 
-                        <div className="bg-teal-600 px-6 py-4 flex items-center justify-between rounded-t-xl">
+                        <div className="bg-primary-600 px-6 py-4 flex items-center justify-between rounded-t-xl">
                             <h2 className="text-white font-bold text-lg">
                                 Asignar Jefe — {areaSeleccionada?.nombre}
                             </h2>
-                            <button onClick={() => setModalEditar(false)} className="text-white hover:text-teal-200 transition">
+                            <button onClick={() => setModalEditar(false)} className="text-white hover:text-primary-200 transition">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -111,7 +112,7 @@ export default function Index({ areas, jefes }) {
                                 <select
                                     value={fkJefe}
                                     onChange={e => setFkJefe(e.target.value)}
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500"
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-3 text-sm focus:outline-none focus:border-primary-500"
                                 >
                                     <option value="">Sin asignar</option>
                                     {jefes.map(jefe => (
@@ -130,7 +131,7 @@ export default function Index({ areas, jefes }) {
                             </button>
                             <button
                                 onClick={guardar}
-                                className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition"
+                                className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition"
                             >
                                 <Save className="w-4 h-4" />
                                 Guardar

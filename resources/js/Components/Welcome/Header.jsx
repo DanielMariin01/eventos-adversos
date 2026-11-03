@@ -21,7 +21,7 @@ export default function Header() {
 
                     <Link
                         href={getHref()}
-                        className="rounded-md bg-teal-500 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-600 transition"
+                        className="rounded-md bg-primary-500 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 transition"
                     >
                         {auth.user ? 'Ingresar' : 'Ingresar'}
                     </Link>

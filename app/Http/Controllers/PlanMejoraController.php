@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Archivo;
 use App\Models\Area;
+use App\Models\Categoria;
 use App\Models\EventoAdverso;
 use App\Models\PlanMejora;
 use App\Models\Revision;
@@ -58,12 +59,14 @@ class PlanMejoraController extends Controller
 
         $jefes = User::role('jefe')->get(['id', 'name']);
         $areas = Area::where('activo', 1)->get(['id_area', 'nombre']);
+        $categorias = Categoria::where('activo', 1)->get();
 
         return Inertia::render('Mejoras/Index', [
-            'eventos' => $eventos,
-            'jefes'   => $jefes,
-            'areas'   => $areas,
-            'filtros' => $request->only(['evento', 'reportante', 'paciente', 'estado']),
+            'eventos'    => $eventos,
+            'jefes'      => $jefes,
+            'areas'      => $areas,
+            'categorias' => $categorias,
+            'filtros'    => $request->only(['evento', 'reportante', 'paciente', 'estado']),
         ]);
     }
 

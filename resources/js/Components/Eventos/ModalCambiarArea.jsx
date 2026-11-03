@@ -1,3 +1,4 @@
+import { COLORS } from '@/theme';
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { X, MapPin } from 'lucide-react';
@@ -56,7 +57,7 @@ export default function ModalCambiarArea({ evento, areas = [], onClose }) {
                                 points="0,45.486 38.514,45.486 44.595,33.324 50.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 84.122,45.486 97.297,45.486 103.379,40.419 110.473,45.486 150,45.486"
                                 strokeMiterlimit="10"
                                 strokeWidth="3"
-                                stroke="#009B9E"
+                                stroke={COLORS.secondary}
                                 fill="none"
                             />
                         </svg>
@@ -72,7 +73,7 @@ export default function ModalCambiarArea({ evento, areas = [], onClose }) {
                 </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div className="bg-white rounded-card shadow-card w-full max-w-lg">
                 {/* Header */}
                 <div className="bg-orange-500 px-6 py-4 flex items-center justify-between rounded-t-xl">
                     <h2 className="text-white font-bold text-lg flex items-center gap-2">
@@ -101,7 +102,7 @@ export default function ModalCambiarArea({ evento, areas = [], onClose }) {
                         <select
                             value={data.fk_area}
                             onChange={e => setData('fk_area', e.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                            className="w-full rounded-lg border-2 border-primary-300 px-3 py-3 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                         >
                             <option value="">Seleccione el área...</option>
                             {areas.map(area => (
@@ -119,7 +120,7 @@ export default function ModalCambiarArea({ evento, areas = [], onClose }) {
                             onChange={e => setData('observacion', e.target.value)}
                             placeholder="Ingrese el motivo del cambio de área..."
                             rows={3}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none"
+                            className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none"
                         />
                     </Campo>
                 </div>

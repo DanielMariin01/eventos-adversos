@@ -25,15 +25,15 @@ export default function Login({ status, canResetPassword }) {
         <AuthBackground>
             <Head title="Log in" />
 
-            <Link href="/" className="flex items-center mb-6">
-                <ApplicationLogo className="h-28 w-auto" />
-            </Link>
-
             <div className="w-full bg-white rounded-lg shadow sm:max-w-md">
                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-                    <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                        Iniciar sesión
-                    </h1>
+                    <Link href="/" className="flex justify-center">
+                        <ApplicationLogo className="h-24 w-auto" />
+                    </Link>
+
+                    <p className="text-center text-sm text-gray-500">
+                        Bienvenido, por favor ingresar los datos de su cuenta.
+                    </p>
 
                     {status && (
                         <div className="text-sm font-medium text-green-600">
@@ -51,7 +51,7 @@ export default function Login({ status, canResetPassword }) {
                                 type="email"
                                 name="email"
                                 value={data.email}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
+                                className="bg-gray-50 border-2 border-primary-300 text-gray-900 rounded-lg block w-full p-3"
                                 placeholder="nombre@clinica.com"
                                 autoComplete="username"
                                 isFocused={true}
@@ -69,7 +69,7 @@ export default function Login({ status, canResetPassword }) {
                                 type="password"
                                 name="password"
                                 value={data.password}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
+                                className="bg-gray-50 border-2 border-primary-300 text-gray-900 rounded-lg block w-full p-3"
                                 placeholder="••••••••"
                                 autoComplete="current-password"
                                 onChange={(e) => setData('password', e.target.value)}

@@ -4,6 +4,7 @@
  * Autocompleta los datos si la cédula ya existe en la BD.
  */
 
+import { COLORS } from '@/theme';
 import { useState } from 'react';
 import Select from 'react-select';
 
@@ -88,7 +89,7 @@ export default function PasoPaciente({ data, setData, errors }) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="col-span-1 md:col-span-2 bg-teal-500 rounded-lg px-4 py-3">
+            <div className="col-span-1 md:col-span-2 bg-primary-500 rounded-lg px-4 py-3">
                 <h3 className="text-white font-semibold text-xs uppercase">Datos de identificación del paciente</h3>
             </div>
 
@@ -103,16 +104,16 @@ export default function PasoPaciente({ data, setData, errors }) {
                         }}
                         onBlur={e => buscarPaciente(e.target.value)}
                         placeholder="Ingrese la cédula"
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                        className="w-full rounded-lg border-2 border-primary-300 px-4 py-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                     />
                     {buscando && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     )}
                 </div>
                 {autocompletado && (
-                    <p className="text-teal-600 text-xs mt-1 flex items-center gap-1">
+                    <p className="text-primary-600 text-xs mt-1 flex items-center gap-1">
                         <span>✓</span> Datos autocompletados
                     </p>
                 )}
@@ -124,7 +125,7 @@ export default function PasoPaciente({ data, setData, errors }) {
                     value={data.pac_nombres}
                     onChange={e => setData('pac_nombres', e.target.value.toUpperCase())}
                     placeholder="Ingrese los nombres"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border-2 border-primary-300 px-4 py-3 text-sm uppercase focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                 />
             </Campo>
 
@@ -134,7 +135,7 @@ export default function PasoPaciente({ data, setData, errors }) {
                     value={data.pac_apellidos}
                     onChange={e => setData('pac_apellidos', e.target.value.toUpperCase())}
                     placeholder="Ingrese los apellidos"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm uppercase focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border-2 border-primary-300 px-4 py-3 text-sm uppercase focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                 />
             </Campo>
 
@@ -142,7 +143,7 @@ export default function PasoPaciente({ data, setData, errors }) {
                 <select
                     value={data.pac_sexo}
                     onChange={e => setData('pac_sexo', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border-2 border-primary-300 px-4 py-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                 >
                     <option value="">Seleccione el sexo...</option>
                     <option value="Masculino">Masculino</option>
@@ -156,7 +157,7 @@ export default function PasoPaciente({ data, setData, errors }) {
                     value={data.pac_telefono}
                     onChange={e => setData('pac_telefono', e.target.value)}
                     placeholder="Ingrese el número de teléfono"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-lg border-2 border-primary-300 px-4 py-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                 />
             </Campo>
 
@@ -169,12 +170,12 @@ export default function PasoPaciente({ data, setData, errors }) {
                         placeholder="Ingrese la edad"
                         min="0"
                         max="120"
-                        className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                        className="flex-1 rounded-lg border-2 border-primary-300 px-4 py-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                     />
                     <select
                         value={data.pac_edad_unidad}
                         onChange={e => setData('pac_edad_unidad', e.target.value)}
-                        className="w-28 rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                        className="w-28 rounded-lg border-2 border-primary-300 px-3 py-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                     >
                         {UNIDADES_EDAD.map(u => (
                             <option key={u} value={u}>{u}</option>
@@ -194,15 +195,15 @@ export default function PasoPaciente({ data, setData, errors }) {
                         control: (base, state) => ({
                             ...base,
                             borderRadius: '0.5rem',
-                            borderColor: state.isFocused ? '#14b8a6' : '#d1d5db',
-                            boxShadow: state.isFocused ? '0 0 0 1px #14b8a6' : 'none',
-                            '&:hover': { borderColor: '#14b8a6' },
+                            borderColor: state.isFocused ? COLORS.primary : '#d1d5db',
+                            boxShadow: state.isFocused ? `0 0 0 1px ${COLORS.primary}` : 'none',
+                            '&:hover': { borderColor: COLORS.primary },
                             fontSize: '0.875rem',
                             minHeight: '42px',
                         }),
                         option: (base, state) => ({
                             ...base,
-                            backgroundColor: state.isSelected ? '#14b8a6' : state.isFocused ? '#ccfbf1' : 'white',
+                            backgroundColor: state.isSelected ? COLORS.primary : state.isFocused ? COLORS.primary100 : 'white',
                             color: state.isSelected ? 'white' : '#374151',
                             fontSize: '0.875rem',
                         }),

@@ -57,11 +57,11 @@ export default function ChatBot() {
                             onChange={e => setMensaje(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && enviar()}
                             placeholder="Escribe un mensaje..."
-                            className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary-500"
                         />
                         <button
                             onClick={enviar}
-                            className="bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-2 rounded-lg transition"
+                            className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-2 rounded-lg transition"
                         >
                             <Send className="w-4 h-4" />
                         </button>
@@ -84,7 +84,7 @@ export default function ChatBot() {
                     className="group relative w-16 h-16"
                 >
                     {/* Anillo con degradado */}
-                    <span className="absolute inset-0 rounded-full to-cyan-400 p-[3px] transition-transform duration-200 group-hover:scale-105">
+                    <span className="absolute inset-0 rounded-full to-secondary-400 p-[3px] transition-transform duration-200 group-hover:scale-105">
                         <span className="flex items-center justify-center w-full h-full rounded-full border-2 border-violet-700 bg-white shadow-lg overflow-hidden relative">
                             {abierto ? (
                                 <span className="flex items-center justify-center w-full h-full rounded-full bg-violet-600">

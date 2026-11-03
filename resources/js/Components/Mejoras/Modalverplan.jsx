@@ -37,16 +37,16 @@ function ListaArchivos({ archivos, titulo }) {
                         href={`/storage/${archivo.ruta}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-teal-50 hover:border-teal-300 transition group"
+                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-celeste hover:border-primary-300 transition group"
                     >
-                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-100">
+                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-100">
                             {getIcono(archivo.extension)}
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-800 truncate">{archivo.nombre}</p>
                             <p className="text-xs text-gray-400 uppercase">{archivo.extension}</p>
                         </div>
-                        <span className="text-xs text-teal-600 font-semibold">Ver →</span>
+                        <span className="text-xs text-primary-600 font-semibold">Ver →</span>
                     </a>
                 ))}
             </div>
@@ -61,7 +61,7 @@ export default function ModalVerPlan({ evento, onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-card shadow-card w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
                 <div className="bg-blue-600 px-6 py-4 flex items-center justify-between flex-shrink-0 rounded-t-xl">
