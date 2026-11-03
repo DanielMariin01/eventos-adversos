@@ -26,6 +26,9 @@ const getIcono = (extension) => {
     return <FaFileAlt className="text-gray-500 text-lg" />;
 };
 
+const EXTENSIONES_PERMITIDAS = ['pdf', 'jpg', 'jpeg', 'png'];
+const MAX_BYTES = 10 * 1024 * 1024; // 10 MB, igual que el backend
+
 export default function ModalCrearMejora({ evento, jefes, onClose }) {
 
     const plan = evento.plan_mejora;
@@ -42,6 +45,46 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
         fk_jefe: plan?.fk_jefe ?? evento.fk_jefe ?? evento.area?.jefe?.id ?? '',
         archivo: null,
     });
+
+    const [arrastrando, setArrastrando] = useState(false);
+
+    // ── Seleccionar archivo (clic o arrastre) validando tipo y tamaño. Solo admite uno. ──
+    const seleccionarArchivo = (lista) => {
+        if (lista.length === 0) return;
+
+        const file = lista[0];
+        const ext = file.name.split('.').pop().toLowerCase();
+        let motivo = null;
+
+        if (!EXTENSIONES_PERMITIDAS.includes(ext)) motivo = 'formato no permitido';
+        else if (file.size > MAX_BYTES) motivo = 'supera 10MB';
+
+        if (motivo) {
+            Swal.fire({ icon: 'warning', title: 'Archivo no agregado', text: `${file.name} (${motivo})` });
+            return;
+        }
+
+        if (lista.length > 1) {
+            Swal.fire({ icon: 'info', title: 'Solo se admite un archivo', text: `Se adjuntó ${file.name}.` });
+        }
+
+        setData('archivo', file);
+    };
+
+    const onDragOverZona = (e) => {
+        e.preventDefault();
+        setArrastrando(true);
+    };
+
+    const onDragLeaveZona = (e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setArrastrando(false);
+    };
+
+    const onDropZona = (e) => {
+        e.preventDefault();
+        setArrastrando(false);
+        seleccionarArchivo(Array.from(e.dataTransfer.files));
+    };
 
     const toggleGrabacion = () => {
         if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -96,7 +139,12 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        // preventDefault en el contenedor: soltar un archivo fuera de la zona no debe abrirlo ni descargarlo
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onDragOver={e => e.preventDefault()}
+            onDrop={e => e.preventDefault()}
+        >
 
             {/* Loading */}
             {cargando && (
@@ -202,14 +250,29 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
 
                     {/* Nuevo archivo */}
                     <Campo label="Adjuntar nuevo archivo (Opcional)" error={errors.archivo}>
-                        <div className="flex items-center gap-3">
+                        <div
+                            onDragOver={onDragOverZona}
+                            onDragLeave={onDragLeaveZona}
+                            onDrop={onDropZona}
+                            className={`flex items-center gap-3 rounded-lg p-1 -m-1 border-2 border-dashed transition ${arrastrando ? 'bg-teal-50 border-teal-400' : 'border-transparent'}`}
+                        >
                             <input
                                 type="text"
                                 readOnly
                                 value={data.archivo ? data.archivo.name : ''}
-                                placeholder="Seleccione el archivo (Opcional)"
+                                placeholder="Seleccione o arrastre el archivo (Opcional)"
                                 className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500"
                             />
+                            {data.archivo && (
+                                <button
+                                    type="button"
+                                    onClick={() => setData('archivo', null)}
+                                    title="Quitar archivo"
+                                    className="text-gray-400 hover:text-red-500 transition"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
                             <label className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition">
                                 <Paperclip className="w-4 h-4" />
                                 Examinar
@@ -217,7 +280,10 @@ export default function ModalCrearMejora({ evento, jefes, onClose }) {
                                     type="file"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     className="hidden"
-                                    onChange={e => setData('archivo', e.target.files[0])}
+                                    onChange={e => {
+                                        seleccionarArchivo(Array.from(e.target.files));
+                                        e.target.value = '';
+                                    }}
                                 />
                             </label>
                         </div>

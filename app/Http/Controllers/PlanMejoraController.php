@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Archivo;
+use App\Models\Categoria;
 use App\Models\EventoAdverso;
 use App\Models\PlanMejora;
 use App\Models\Revision;
@@ -32,10 +33,12 @@ class PlanMejoraController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         $jefes = User::role('jefe')->get(['id', 'name']);
+        $categorias = Categoria::where('activo', 1)->get();
 
         return Inertia::render('Mejoras/Index', [
-            'eventos' => $eventos,
-            'jefes'   => $jefes,
+            'eventos'    => $eventos,
+            'jefes'      => $jefes,
+            'categorias' => $categorias,
         ]);
     }
 

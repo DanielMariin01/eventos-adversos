@@ -15,13 +15,65 @@ const getIcono = (extension) => {
     return <FaFileAlt className="text-gray-500 text-lg" />;
 };
 
+const EXTENSIONES_PERMITIDAS = ['pdf', 'jpg', 'jpeg', 'png'];
+const MAX_BYTES = 10 * 1024 * 1024; // 10 MB, igual que el backend
+
 export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
 
     const archivosJefe = evento.archivos?.filter(a => a.tipo === 'jefe') ?? [];
+    const [arrastrando, setArrastrando] = useState(false);
 
     const { data, setData, post, processing } = useForm({
         archivos: [],
     });
+
+    // ── Agregar archivos (clic o arrastre) validando tipo y tamaño ──
+    const agregarArchivos = (lista) => {
+        const validos = [];
+        const rechazados = [];
+
+        lista.forEach(file => {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!EXTENSIONES_PERMITIDAS.includes(ext)) {
+                rechazados.push(`${file.name} (formato no permitido)`);
+            } else if (file.size > MAX_BYTES) {
+                rechazados.push(`${file.name} (supera 10MB)`);
+            } else if (!data.archivos.some(a => a.name === file.name && a.size === file.size)) {
+                validos.push(file);
+            }
+        });
+
+        if (rechazados.length > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Algunos archivos no se agregaron',
+                html: rechazados.join('<br>'),
+            });
+        }
+
+        if (validos.length > 0) {
+            setData('archivos', [...data.archivos, ...validos]);
+        }
+    };
+
+    const quitarArchivo = (index) => {
+        setData('archivos', data.archivos.filter((_, i) => i !== index));
+    };
+
+    const onDragOverZona = (e) => {
+        e.preventDefault();
+        setArrastrando(true);
+    };
+
+    const onDragLeaveZona = (e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setArrastrando(false);
+    };
+
+    const onDropZona = (e) => {
+        e.preventDefault();
+        setArrastrando(false);
+        agregarArchivos(Array.from(e.dataTransfer.files));
+    };
 
     const submit = () => {
         if (data.archivos.length === 0) {
@@ -45,7 +97,12 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        // preventDefault en el contenedor: soltar un archivo fuera de la zona no debe abrirlo ni descargarlo
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onDragOver={e => e.preventDefault()}
+            onDrop={e => e.preventDefault()}
+        >
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
 
                 {/* Header */}
@@ -94,7 +151,12 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                             Adjuntar evidencia * <span className="text-gray-400 font-normal">(PDF, JPG, PNG)</span>
                         </p>
 
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-teal-50 hover:border-teal-400 transition">
+                        <label
+                            onDragOver={onDragOverZona}
+                            onDragLeave={onDragLeaveZona}
+                            onDrop={onDropZona}
+                            className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-teal-50 hover:border-teal-400 transition ${arrastrando ? 'bg-teal-50 border-teal-400' : 'border-gray-300'}`}
+                        >
                             <div className="flex flex-col items-center gap-2">
                                 <Upload className="w-8 h-8 text-teal-400" />
                                 <p className="text-sm text-gray-500">
@@ -107,7 +169,10 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                                 multiple
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 className="hidden"
-                                onChange={e => setData('archivos', Array.from(e.target.files))}
+                                onChange={e => {
+                                    agregarArchivos(Array.from(e.target.files));
+                                    e.target.value = '';
+                                }}
                             />
                         </label>
 
@@ -119,6 +184,14 @@ export default function ModalSubirEvidencia({ evento, onClose, setCargando }) {
                                         <Paperclip className="w-4 h-4 text-teal-500 flex-shrink-0" />
                                         <p className="text-sm text-gray-700 truncate flex-1">{file.name}</p>
                                         <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(0)} KB</p>
+                                        <button
+                                            type="button"
+                                            onClick={() => quitarArchivo(index)}
+                                            title="Quitar archivo"
+                                            className="text-gray-400 hover:text-red-500 transition"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
                                     </div>
                                 ))}
                             </div>

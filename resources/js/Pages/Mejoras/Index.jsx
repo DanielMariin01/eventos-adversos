@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter, CheckCircle } from 'lucide-react';
+import { Search, PlusCircle, Eye, FileText, ClipboardList, Filter, CheckCircle, RefreshCw } from 'lucide-react';
 import ModalCrearMejora from '@/Components/Mejoras/ModalCrearMejora';
 import ModalVerAnalisis from '@/Components/Mejoras/ModalVerAnalisis';
 import ModalVerPlan from '@/Components/Mejoras/ModalVerPlan';
@@ -13,6 +13,7 @@ import * as XLSX from 'xlsx';
 import { FaFileExcel } from 'react-icons/fa';
 import { HiOutlineSpeakerphone, HiOutlineStop, HiOutlinePencilAlt } from 'react-icons/hi';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
+import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 
 
 const BADGE_ESTADO = {
@@ -31,7 +32,10 @@ const LABEL_ESTADO = {
     cerrado: 'Cerrado',
 };
 
-export default function Index({ eventos, jefes }) {
+// Estados en los que ya no se permite cambiar el tipo del evento
+const ESTADOS_SIN_CAMBIO_TIPO = ['cerrado', 'procesado'];
+
+export default function Index({ eventos, jefes, categorias }) {
 
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [busquedaEvento, setBusquedaEvento] = useState('');
@@ -44,6 +48,7 @@ export default function Index({ eventos, jefes }) {
     const [cargando, setCargando] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState('');
     const [modalEditarAnalisis, setModalEditarAnalisis] = useState(false);
+    const [modalTipo, setModalTipo] = useState(false);
 
     const alertSeleccionar = () => {
         Swal.fire({
@@ -74,6 +79,11 @@ export default function Index({ eventos, jefes }) {
     const abrirRevisiones = () => {
         if (!eventoSeleccionado) return alertSeleccionar();
         setModalRevisiones(true);
+    };
+
+    const abrirCambiarTipo = () => {
+        if (!eventoSeleccionado) return alertSeleccionar();
+        setModalTipo(true);
     };
 
     // ── Columnas ──
@@ -153,6 +163,15 @@ export default function Index({ eventos, jefes }) {
                         >
                             <HiOutlinePencilAlt className="w-4 h-4" />
                         </button>
+                        {!ESTADOS_SIN_CAMBIO_TIPO.includes(fila.estado) && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalTipo(true); }}
+                                title="Cambiar tipo"
+                                className="w-8 h-8 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition"
+                            >
+                                <RefreshCw className="w-4 h-4" />
+                            </button>
+                        )}
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -309,6 +328,17 @@ export default function Index({ eventos, jefes }) {
                         <Eye className="w-4 h-4" />
                     </button>
 
+                    {!ESTADOS_SIN_CAMBIO_TIPO.includes(eventoSeleccionado?.estado) && (
+                        <button
+                            onClick={abrirCambiarTipo}
+                            disabled={!eventoSeleccionado}
+                            title="Cambiar tipo de evento"
+                            className="w-9 h-9 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
+                    )}
+
                     <button
                         onClick={cerrarCaso}
                         disabled={!eventoSeleccionado}
@@ -441,6 +471,13 @@ export default function Index({ eventos, jefes }) {
                 <ModalRevisiones
                     evento={eventoSeleccionado}
                     onClose={() => setModalRevisiones(false)}
+                />
+            )}
+            {modalTipo && (
+                <ModalCambiarTipo
+                    evento={eventoSeleccionado}
+                    categorias={categorias}
+                    onClose={() => setModalTipo(false)}
                 />
             )}
             {modalEditarAnalisis && (
