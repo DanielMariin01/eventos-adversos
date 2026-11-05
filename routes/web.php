@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\PlanMejoraController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\PortalSsoController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -18,6 +19,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// Ingreso único desde el Portal Corporativo (el token se valida dentro del controlador).
+Route::get('/sso', PortalSsoController::class)->middleware('throttle:20,1')->name('sso');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'role:administrador|calidad|jefe'])
