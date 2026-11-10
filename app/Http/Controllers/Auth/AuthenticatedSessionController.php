@@ -33,21 +33,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = Auth::user();
-
-        if ($user->hasRole('calidad')) {
-            return redirect()->route('dashboard');
-        }
-
-        if ($user->hasRole('jefe')) {
-            return redirect()->route('dashboard');
-        }
-        if ($user->hasRole('administrador')) {
-            return redirect()->route('dashboard');
-        }
-
-        // reportante → va al formulario
-        return redirect()->route('eventos.create');
+        // calidad, jefe y administrador → dashboard; reportante → formulario
+        return redirect()->route(Auth::user()->rutaDeInicio());
     }
     /**
      * Destroy an authenticated session.

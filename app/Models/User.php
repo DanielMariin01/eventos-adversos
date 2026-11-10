@@ -23,6 +23,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    /** Nombre de la ruta a la que llega el usuario al iniciar sesión, según su rol. */
+    public function rutaDeInicio(): string
+    {
+        return $this->hasAnyRole(['calidad', 'jefe', 'administrador']) ? 'dashboard' : 'eventos.create';
+    }
+
     protected function casts(): array
     {
         return [
