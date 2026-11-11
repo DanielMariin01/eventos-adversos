@@ -55,3 +55,7 @@ AuroraQ: sistema (sector salud, Clínica Central del Eje) para reportar y gestio
 - El correo a Calidad se envía síncrono a una dirección fija en `EventoController@store`.
 - Pacientes sin cédula se guardan con `uniqid('pac_')` como cédula.
 - Convenciones: código, columnas, rutas (`modulo.accion`) y textos de UI en español; comentarios de sección `// ── Título ──`.
+
+## Estilos de diseño
+
+Al crear o modificar cualquier UI (páginas, componentes, CSS, correos, gráficas) aplicar siempre el skill `estilos-aurora` (`.claude/skills/estilos-aurora/SKILL.md`): usar los tokens de marca de Tailwind (`primary`, `secondary`, `accent`, `celeste`, `ink`), Poppins, `rounded-card`/`shadow-card` y los componentes existentes; no introducir colores hex nuevos.
