@@ -26,7 +26,11 @@ class User extends Authenticatable
     /** Nombre de la ruta a la que llega el usuario al iniciar sesión, según su rol. */
     public function rutaDeInicio(): string
     {
-        return $this->hasAnyRole(['calidad', 'jefe', 'administrador']) ? 'dashboard' : 'eventos.create';
+        if ($this->hasAnyRole(['calidad', 'jefe', 'administrador'])) {
+            return 'dashboard';
+        }
+
+        return $this->hasRole('tecnovigilancia') ? 'tecnovigilancia.index' : 'eventos.create';
     }
 
     protected function casts(): array

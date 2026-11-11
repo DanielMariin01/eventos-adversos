@@ -17,11 +17,36 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Revision;
 use App\Mail\EventoReportado;
+use App\Mail\EventoRedirigidoTecnovigilancia;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class EventoController extends Controller
 {
+    // ── Restricciones del rol tecnovigilancia ──
+    // Un usuario solo con rol tecnovigilancia no puede usar las funciones de Calidad:
+    // solo gestiona eventos de la categoría Tecnovigilancia.
+    private function esSoloTecnovigilancia(): bool
+    {
+        $user = Auth::user();
+
+        return $user->hasRole('tecnovigilancia') && !$user->hasAnyRole(['administrador', 'calidad']);
+    }
+
+    private function soloCalidad(): void
+    {
+        abort_if($this->esSoloTecnovigilancia(), 403);
+    }
+
+    private function autorizarEvento(EventoAdverso $evento): void
+    {
+        abort_if(
+            $this->esSoloTecnovigilancia() && $evento->categoria?->nombre !== 'Tecnovigilancia',
+            403,
+            'Solo puedes gestionar eventos de Tecnovigilancia.'
+        );
+    }
+
     // ── Paso 0: Selección de categoría ──
     public function create()
     {
@@ -218,7 +243,12 @@ class EventoController extends Controller
 
         // Enviar correo de notificación
         $evento->load(['categoria', 'area', 'reportante', 'paciente']);
-        Mail::to('coordinacion.calidad@clinicacentraldeleje.com')
+        // Tecnovigilancia → líder biomédico. Seguridad del Paciente (y cualquier otra categoría) → Calidad.
+        $destinatario = $esTecnovigilancia
+            ? 'lider.biomedico@clinicacentraldeleje.com'
+            : 'coordinacion.calidad@clinicacentraldeleje.com';
+
+        Mail::to($destinatario)
             ->send(new EventoReportado($evento));
 
         return redirect()->route('eventos.create')
@@ -228,6 +258,7 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
+        $this->soloCalidad();
         $jefes  = \App\Models\User::role('jefe')->get(['id', 'name']);
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('estado', ['en_proceso'])
@@ -248,6 +279,7 @@ class EventoController extends Controller
     // ── Ver detalle de evento ──
     public function show(EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $evento->load(['categoria', 'area', 'reportante', 'paciente', 'usuario', 'archivos']);
 
         return Inertia::render('Eventos/Show', [
@@ -258,6 +290,7 @@ class EventoController extends Controller
     // ── Guardar análisis (calidad) ──
     public function guardarAnalisis(Request $request, EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
 
         $clasificacionesCierre = [
             'Evento adverso no prevenible',
@@ -338,25 +371,27 @@ class EventoController extends Controller
                 'observacion' => 'El evento N° ' . $evento->id_eventoAdverso . ' fue cerrado automáticamente por clasificación: ' . $request->clasificacion,
             ]);
         }
-        return redirect()->route('eventos.index')
+        return redirect()->back()
             ->with('success', 'Análisis guardado correctamente.');
     }
 
     // ── Cerrar análisis ──
     public function cerrarAnalisis(EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $evento->update([
             'estado'       => 'procesado',
             'fecha_cierre' => now(),
         ]);
 
-        return redirect()->route('eventos.index')
+        return redirect()->back()
             ->with('success', 'Evento cerrado correctamente.');
     }
 
     // ── Cancelar evento ──
     public function cancelarEvento(Request $request, EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $request->validate([
             'observacion_cancelacion' => 'required|string',
             'fk_jefe'                 => 'nullable|exists:users,id',
@@ -375,13 +410,14 @@ class EventoController extends Controller
             'observacion' => 'El evento N° ' . $evento->id_eventoAdverso . ' fue cancelado. Motivo: ' . $request->observacion_cancelacion,
         ]);
 
-        return redirect()->route('eventos.index')
+        return redirect()->back()
             ->with('success', 'Evento cancelado correctamente.');
     }
 
     // ── Cambiar tipo de evento ──
     public function cambiarTipo(Request $request, EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $request->validate([
             'fk_categoria' => 'required|exists:categorias,id_categoria',
             'observacion'  => 'nullable|string',
@@ -393,10 +429,34 @@ class EventoController extends Controller
             ]);
         }
 
+        $categoriaAnterior = $evento->categoria?->nombre;
+        $categoriaNueva    = Categoria::find($request->fk_categoria);
+
         $evento->update([
             'fk_categoria'    => $request->fk_categoria,
             'observacion_tipo' => $request->observacion,
         ]);
+
+        Revision::create([
+            'fk_evento'   => $evento->id_eventoAdverso,
+            'fk_usuario'  => Auth::id(),
+            'tipo'        => 'Cambio de Tipo',
+            'observacion' => 'Se cambió el tipo del evento N° ' . $evento->id_eventoAdverso .
+                ' de "' . $categoriaAnterior . '" a "' . $categoriaNueva?->nombre . '"' .
+                ($request->observacion ? '. Motivo: ' . $request->observacion : ''),
+        ]);
+
+        // ── Si pasa a Tecnovigilancia, se notifica al líder biomédico ──
+        if ($categoriaNueva?->nombre === 'Tecnovigilancia' && $categoriaAnterior !== 'Tecnovigilancia') {
+            try {
+                $evento->load(['categoria', 'area', 'reportante', 'paciente']);
+                Mail::to('lider.biomedico@clinicacentraldeleje.com')
+                    ->send(new EventoRedirigidoTecnovigilancia($evento, $categoriaAnterior, $request->observacion));
+            } catch (\Throwable $e) {
+                // El cambio de tipo ya quedó guardado; un fallo de correo no debe revertirlo.
+                report($e);
+            }
+        }
 
         return redirect()->back()
             ->with('success', 'Tipo de evento actualizado correctamente.');
@@ -405,6 +465,7 @@ class EventoController extends Controller
     // ── Cambiar area ──
     public function cambiarArea(Request $request, EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $request->validate([
             'fk_area'    => 'required|exists:areas,id_area',
             'observacion' => 'nullable|string',
@@ -425,7 +486,7 @@ class EventoController extends Controller
                 ($request->observacion ? '. Motivo: ' . $request->observacion : ''),
         ]);
 
-        return redirect()->route('eventos.index')
+        return redirect()->back()
             ->with('success', 'Área actualizada correctamente.');
     }
 
@@ -433,6 +494,7 @@ class EventoController extends Controller
     // ── Eventos del jefe ──
     public function misEventos()
     {
+        $this->soloCalidad();
         $user = Auth::user();
 
         $eventos = EventoAdverso::with([
@@ -492,6 +554,7 @@ class EventoController extends Controller
     // ── Subir evidencia jefe ──
     public function subirEvidencia(Request $request, EventoAdverso $evento)
     {
+        $this->soloCalidad();
         $request->validate([
             'archivos.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
@@ -531,6 +594,7 @@ class EventoController extends Controller
     }
     public function cancelados()
     {
+        $this->soloCalidad();
         $eventos = EventoAdverso::with([
             'categoria',
             'area',
@@ -550,6 +614,7 @@ class EventoController extends Controller
 
     public function reabrir(EventoAdverso $evento)
     {
+        $this->soloCalidad();
         $evento->update(['estado' => 'en_proceso']);
 
         Revision::create([
@@ -566,6 +631,7 @@ class EventoController extends Controller
 
     public function exportar()
     {
+        $this->soloCalidad();
         $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')

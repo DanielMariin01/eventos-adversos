@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\PlanMejoraController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TecnovigilanciaController;
 use App\Http\Controllers\Auth\PortalSsoController;
 
 Route::get('/', function () {
@@ -80,6 +81,12 @@ Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
     Route::get('/mejoras/{evento}/revisiones', [PlanMejoraController::class, 'revisiones'])->name('mejoras.revisiones');
     Route::post('/mejoras/{plan}/update', [PlanMejoraController::class, 'update'])->name('mejoras.update');
     Route::patch('/mejoras/{evento}/cerrar', [PlanMejoraController::class, 'cerrarCaso'])->name('mejoras.cerrar');
+});
+
+// ── Rutas de tecnovigilancia ──
+Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group(function () {
+    Route::get('/tecnovigilancia', [TecnovigilanciaController::class, 'index'])->name('tecnovigilancia.index');
+    Route::get('/tecnovigilancia/exportar', [TecnovigilanciaController::class, 'exportar'])->name('tecnovigilancia.exportar');
 });
 
 // ── Rutas de áreas (solo administrador) ──

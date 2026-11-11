@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu } from 'lucide-react';
 import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -35,6 +35,12 @@ export default function AuthenticatedLayout({ header, children }) {
             url: route('eventos.index'),
             icon: FileText,
             roles: ['administrador', 'calidad'],
+        },
+        {
+            title: 'Tecnovigilancia',
+            url: route('tecnovigilancia.index'),
+            icon: Cpu,
+            roles: ['administrador', 'calidad', 'tecnovigilancia'],
         },
         {
             title: 'Planes de Mejora',

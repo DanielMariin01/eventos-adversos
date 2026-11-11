@@ -13,7 +13,8 @@ class RoleSeeder extends Seeder
         Role::firstOrCreate(['name' => 'reportante', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'calidad',    'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'jefe',       'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tecnovigilancia', 'guard_name' => 'web']);
 
-        $this->command->info('✅ Roles creados: reportante, calidad, jefe');
+        $this->command->info('✅ Roles creados: reportante, calidad, jefe, tecnovigilancia');
     }
 }
