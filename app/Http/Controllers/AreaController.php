@@ -20,6 +20,25 @@ class AreaController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'nombre'      => 'required|string|max:255|unique:areas,nombre',
+            'responsable' => 'nullable|string|max:255',
+            'fk_jefe'     => 'nullable|exists:users,id',
+        ]);
+
+        Area::create([
+            'nombre'      => $data['nombre'],
+            'responsable' => $data['responsable'] ?? null,
+            'fk_jefe'     => $data['fk_jefe'] ?? null,
+            'activo'      => 1,
+        ]);
+
+        return redirect()->route('areas.index')
+            ->with('success', 'Área creada correctamente.');
+    }
+
     public function update(Request $request, Area $area)
     {
         $request->validate([

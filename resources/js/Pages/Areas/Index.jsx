@@ -1,10 +1,10 @@
 import { COLORS } from '@/theme';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
-import { X, Save } from 'lucide-react';
+import { X, Save, Plus } from 'lucide-react';
 
 export default function Index({ areas, jefes }) {
 
@@ -14,7 +14,22 @@ export default function Index({ areas, jefes }) {
     const [cargando, setCargando] = useState(false);
 
 
-    const abrirEditar = (area) => {
+    // ── Crear área ──
+    const [mostrarForm, setMostrarForm] = useState(false);
+    const form = useForm({ nombre: '', responsable: '', fk_jefe: '' });
+
+    const crear = (e) => {
+        e.preventDefault();
+        form.post(route('areas.store'), {
+            onSuccess: () => {
+                form.reset();
+                setMostrarForm(false);
+                Swal.fire({ icon: 'success', title: 'Área creada correctamente.' });
+            },
+        });
+    };
+
+    const abrirEditar =(area) => {
         setAreaSeleccionada(area);
         setFkJefe(area.fk_jefe ?? '');
         setModalEditar(true);
@@ -81,7 +96,70 @@ export default function Index({ areas, jefes }) {
                 </div>
             )}
 
-            <div className="max-w-5xl mx-auto py-8 px-6">
+            <div className="max-w-5xl mx-auto py-8 px-6 space-y-6">
+                {/* ── Crear área ── */}
+                <div className="flex justify-end">
+                    <button
+                        onClick={() => { setMostrarForm(!mostrarForm); form.clearErrors(); }}
+                        className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white text-xs font-semibold uppercase tracking-widest px-4 py-2.5 rounded-btn transition"
+                    >
+                        {mostrarForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                        {mostrarForm ? 'Cancelar' : 'Crear'}
+                    </button>
+                </div>
+
+                {mostrarForm && (
+                    <form onSubmit={crear} className="bg-white rounded-card shadow-card p-6 space-y-4">
+                        <h3 className="text-ink font-semibold">Nueva área</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-ink mb-1">Nombre del área</label>
+                                <input
+                                    type="text"
+                                    value={form.data.nombre}
+                                    onChange={e => form.setData('nombre', e.target.value)}
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-primary-500 focus:ring-0"
+                                />
+                                {form.errors.nombre && <p className="text-red-600 text-xs mt-1">{form.errors.nombre}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-ink mb-1">Responsable</label>
+                                <input
+                                    type="text"
+                                    value={form.data.responsable}
+                                    onChange={e => form.setData('responsable', e.target.value)}
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-primary-500 focus:ring-0"
+                                />
+                                {form.errors.responsable && <p className="text-red-600 text-xs mt-1">{form.errors.responsable}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-ink mb-1">Jefe del área</label>
+                                <select
+                                    value={form.data.fk_jefe}
+                                    onChange={e => form.setData('fk_jefe', e.target.value)}
+                                    className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-primary-500 focus:ring-0"
+                                >
+                                    <option value="">Sin asignar</option>
+                                    {jefes.map(jefe => (
+                                        <option key={jefe.id} value={jefe.id}>{jefe.name}</option>
+                                    ))}
+                                </select>
+                                {form.errors.fk_jefe && <p className="text-red-600 text-xs mt-1">{form.errors.fk_jefe}</p>}
+                            </div>
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={form.processing}
+                                className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white text-xs font-semibold uppercase tracking-widest px-4 py-2.5 rounded-btn transition disabled:opacity-25"
+                            >
+                                <Save className="w-4 h-4" />
+                                Guardar área
+                            </button>
+                        </div>
+                    </form>
+                )}
+
                 <Tabla
                     columnas={columnas}
                     datos={areas}

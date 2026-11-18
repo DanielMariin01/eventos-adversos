@@ -92,6 +92,7 @@ Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group
 // ── Rutas de áreas (solo administrador) ──
 Route::middleware(['auth', 'role:administrador'])->group(function () {
     Route::get('/areas', [AreaController::class, 'index'])->name('areas.index');
+    Route::post('/areas', [AreaController::class, 'store'])->name('areas.store');
     Route::patch('/areas/{area}', [AreaController::class, 'update'])->name('areas.update');
 });
 
