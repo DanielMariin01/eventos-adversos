@@ -8,7 +8,7 @@ import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
-    const rol = usePage().props.auth.rol;
+    const roles = usePage().props.auth.roles ?? [];
     const [sidebarAbierto, setSidebarAbierto] = useState(false);
 
     const menus = [
@@ -86,7 +86,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 <nav className="p-4 space-y-1">
                     {menus
-                        .filter(item => item.roles.includes(rol))
+                        .filter(item => item.roles.some(r => roles.includes(r)))
                         .map(item => (
                             <Link
                                 key={item.title}

@@ -38,6 +38,12 @@ class EventoController extends Controller
         abort_if($this->esSoloTecnovigilancia(), 403);
     }
 
+    // Acciones del jefe: permitidas también a un usuario tecnovigilancia que además sea jefe.
+    private function soloCalidadOJefe(): void
+    {
+        abort_if($this->esSoloTecnovigilancia() && !Auth::user()->hasRole('jefe'), 403);
+    }
+
     private function autorizarEvento(EventoAdverso $evento): void
     {
         abort_if(
@@ -494,7 +500,7 @@ class EventoController extends Controller
     // ── Eventos del jefe ──
     public function misEventos()
     {
-        $this->soloCalidad();
+        $this->soloCalidadOJefe();
         $user = Auth::user();
 
         $eventos = EventoAdverso::with([
@@ -554,7 +560,7 @@ class EventoController extends Controller
     // ── Subir evidencia jefe ──
     public function subirEvidencia(Request $request, EventoAdverso $evento)
     {
-        $this->soloCalidad();
+        $this->soloCalidadOJefe();
         $request->validate([
             'archivos.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);

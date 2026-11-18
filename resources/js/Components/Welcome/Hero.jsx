@@ -16,8 +16,10 @@ export default function Hero() {
 
     const getHref = () => {
         if (!auth.user) return route('login');
-        if (auth.rol === 'administrador' || auth.rol === 'calidad') return route('dashboard');
-        if (auth.rol === 'jefe') return route('dashboard');
+        const roles = auth.roles ?? [];
+        if (roles.includes('administrador') || roles.includes('calidad')) return route('dashboard');
+        if (roles.includes('tecnovigilancia')) return route('tecnovigilancia.index');
+        if (roles.includes('jefe')) return route('dashboard');
         return route('eventos.create');
     };
     return (

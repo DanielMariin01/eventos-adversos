@@ -20,7 +20,7 @@ class UserController extends Controller
                 'id'    => $user->id,
                 'name'  => $user->name,
                 'email' => $user->email,
-                'rol'   => $user->getRoleNames()->first(),
+                'roles' => $user->getRoleNames()->values(),
             ]);
 
         $roles = Role::pluck('name');
@@ -47,7 +47,11 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'rol'      => 'required|exists:roles,name',
+            'roles'    => 'required|array|min:1',
+            'roles.*'  => 'exists:roles,name',
+        ], [
+            'roles.required' => 'Selecciona al menos un rol.',
+            'roles.min'      => 'Selecciona al menos un rol.',
         ]);
 
         $user = User::create([
@@ -56,7 +60,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->assignRole($request->rol);
+        $user->syncRoles($request->roles);
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario creado correctamente.');
@@ -72,7 +76,7 @@ class UserController extends Controller
                 'id'    => $user->id,
                 'name'  => $user->name,
                 'email' => $user->email,
-                'rol'   => $user->getRoleNames()->first(),
+                'roles' => $user->getRoleNames()->values(),
             ],
             'roles' => $roles,
         ]);
@@ -85,7 +89,11 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
-            'rol'      => 'required|exists:roles,name',
+            'roles'    => 'required|array|min:1',
+            'roles.*'  => 'exists:roles,name',
+        ], [
+            'roles.required' => 'Selecciona al menos un rol.',
+            'roles.min'      => 'Selecciona al menos un rol.',
         ]);
 
         $user->update([
@@ -96,7 +104,7 @@ class UserController extends Controller
                 : []),
         ]);
 
-        $user->syncRoles($request->rol);
+        $user->syncRoles($request->roles);
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario actualizado correctamente.');

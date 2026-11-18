@@ -7,6 +7,10 @@ import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
 import { useState } from 'react';
 
+// ── Agregar o quitar un rol de la selección ──
+const alternarRol = (actuales, rol) =>
+    actuales.includes(rol) ? actuales.filter(r => r !== rol) : [...actuales, rol];
+
 export default function Index({ usuarios, roles }) {
 
     const [modalAbierto, setModalAbierto] = useState(false);
@@ -17,14 +21,14 @@ export default function Index({ usuarios, roles }) {
         name: '',
         email: '',
         password: '',
-        rol: '',
+        roles: [],
     });
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
         password: '',
-        rol: '',
+        roles: [],
     });
 
     const abrirEditar = (usuario) => {
@@ -32,7 +36,7 @@ export default function Index({ usuarios, roles }) {
         setDataEditar('name', usuario.name);
         setDataEditar('email', usuario.email);
         setDataEditar('password', '');
-        setDataEditar('rol', usuario.rol ?? '');
+        setDataEditar('roles', usuario.roles ?? []);
         setModalEditar(true);
     };
 
@@ -84,7 +88,7 @@ export default function Index({ usuarios, roles }) {
         if (!data.name) camposVacios.push('Nombre');
         if (!data.email) camposVacios.push('Correo');
         if (!data.password) camposVacios.push('Contraseña');
-        if (!data.rol) camposVacios.push('Rol');
+        if (data.roles.length === 0) camposVacios.push('Rol (al menos uno)');
 
         if (camposVacios.length > 0) {
             Swal.fire({
@@ -157,8 +161,8 @@ export default function Index({ usuarios, roles }) {
         { label: 'Correo', key: 'email' },
         {
             label: 'Rol',
-            key: 'rol',
-
+            key: 'roles',
+            render: (fila) => (fila.roles ?? []).join(', ') || '—',
         },
     ];
 
@@ -255,18 +259,21 @@ export default function Index({ usuarios, roles }) {
                                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                             </div>
                             <div>
-                                <InputLabel value="Rol" />
-                                <select
-                                    value={data.rol}
-                                    onChange={e => setData('rol', e.target.value)}
-                                    className="w-full mt-1 rounded-md border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
-                                >
-                                    <option value="" disabled>Seleccionar rol</option>
+                                <InputLabel value="Roles" />
+                                <div className="mt-1 grid grid-cols-2 gap-2">
                                     {roles.map(rol => (
-                                        <option key={rol} value={rol}>{rol}</option>
+                                        <label key={rol} className="flex items-center gap-2 text-sm text-ink capitalize">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.roles.includes(rol)}
+                                                onChange={() => setData('roles', alternarRol(data.roles, rol))}
+                                                className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                                            />
+                                            {rol}
+                                        </label>
                                     ))}
-                                </select>
-                                {errors.rol && <p className="text-red-500 text-xs mt-1">{errors.rol}</p>}
+                                </div>
+                                {errors.roles && <p className="text-red-500 text-xs mt-1">{errors.roles}</p>}
                             </div>
                             <button
                                 type="submit"
@@ -327,18 +334,21 @@ export default function Index({ usuarios, roles }) {
                                 {errorsEditar.password && <p className="text-red-500 text-xs mt-1">{errorsEditar.password}</p>}
                             </div>
                             <div>
-                                <InputLabel value="Rol" />
-                                <select
-                                    value={dataEditar.rol}
-                                    onChange={e => setDataEditar('rol', e.target.value)}
-                                    className="w-full mt-1 rounded-md border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
-                                >
-                                    <option value="" disabled>Seleccionar rol</option>
+                                <InputLabel value="Roles" />
+                                <div className="mt-1 grid grid-cols-2 gap-2">
                                     {roles.map(rol => (
-                                        <option key={rol} value={rol}>{rol}</option>
+                                        <label key={rol} className="flex items-center gap-2 text-sm text-ink capitalize">
+                                            <input
+                                                type="checkbox"
+                                                checked={dataEditar.roles.includes(rol)}
+                                                onChange={() => setDataEditar('roles', alternarRol(dataEditar.roles, rol))}
+                                                className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                                            />
+                                            {rol}
+                                        </label>
                                     ))}
-                                </select>
-                                {errorsEditar.rol && <p className="text-red-500 text-xs mt-1">{errorsEditar.rol}</p>}
+                                </div>
+                                {errorsEditar.roles && <p className="text-red-500 text-xs mt-1">{errorsEditar.roles}</p>}
                             </div>
                             <button
                                 type="submit"
