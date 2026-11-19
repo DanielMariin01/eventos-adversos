@@ -18,10 +18,54 @@ use Illuminate\Support\Facades\Mail;
 
 class PlanMejoraController extends Controller
 {
+    // ── Categorías que puede gestionar el usuario según su rol ──
+    // administrador: todas (null). calidad: Seguridad del Paciente. tecnovigilancia: Tecnovigilancia.
+    // Con varios roles se suman las categorías de cada uno.
+    private function categoriasPermitidas(): ?array
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('administrador')) {
+            return null;
+        }
+
+        $categorias = [];
+        if ($user->hasRole('calidad')) {
+            $categorias[] = 'Seguridad del Paciente';
+        }
+        if ($user->hasRole('tecnovigilancia')) {
+            $categorias[] = 'Tecnovigilancia';
+        }
+
+        return $categorias;
+    }
+
+    private function filtrarPorRol($query)
+    {
+        $categorias = $this->categoriasPermitidas();
+
+        if ($categorias !== null) {
+            $query->whereHas('categoria', fn($q) => $q->whereIn('nombre', $categorias));
+        }
+
+        return $query;
+    }
+
+    private function autorizarEvento(EventoAdverso $evento): void
+    {
+        $categorias = $this->categoriasPermitidas();
+
+        abort_if(
+            $categorias !== null && !in_array($evento->categoria?->nombre, $categorias, true),
+            403,
+            'No tienes permiso para gestionar eventos de esta categoría.'
+        );
+    }
+
     // ── Lista de eventos analizado y en_mejora ──
     public function index(Request $request)
     {
-        $eventos = EventoAdverso::with([
+        $eventos = $this->filtrarPorRol(EventoAdverso::query())->with([
             'categoria',
             'area.jefe',
             'reportante',
@@ -74,6 +118,7 @@ class PlanMejoraController extends Controller
     // ── Crear plan de mejora ──
     public function store(Request $request, EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $request->validate([
             'descripcion'     => 'required|string',
             'fecha_ejecucion' => 'required|date',
@@ -132,6 +177,7 @@ class PlanMejoraController extends Controller
     // ── Ver revisiones del evento ──
     public function revisiones(EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         $revisiones = Revision::with('usuario')
             ->where('fk_evento', $evento->id_eventoAdverso)
             ->orderBy('created_at', 'desc')
@@ -142,6 +188,7 @@ class PlanMejoraController extends Controller
 
     public function update(Request $request, PlanMejora $plan)
     {
+        $this->autorizarEvento($plan->evento);
         $request->validate([
             'descripcion'     => 'required|string',
             'fecha_ejecucion' => 'required|date',
@@ -182,6 +229,7 @@ class PlanMejoraController extends Controller
 
     public function cerrarCaso(EventoAdverso $evento)
     {
+        $this->autorizarEvento($evento);
         if ($evento->estado !== 'radicado') {
             return redirect()->back()
                 ->with('error', 'Solo se pueden cerrar eventos con estado Radicado.');
@@ -207,7 +255,7 @@ class PlanMejoraController extends Controller
 
     public function exportar()
     {
-        $eventos = EventoAdverso::with([
+        $eventos = $this->filtrarPorRol(EventoAdverso::query())->with([
             'categoria',
             'area',
             'reportante',

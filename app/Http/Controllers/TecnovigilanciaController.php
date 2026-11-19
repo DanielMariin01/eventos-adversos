@@ -119,7 +119,8 @@ class TecnovigilanciaController extends Controller
         $evento->update([
             'descripcion_analisis' => $datos['descripcion_analisis'],
             'fk_jefe'              => $datos['fk_jefe'],
-            'estado'               => 'analizado',
+            // Al editar un análisis ya avanzado no se retrocede el estado
+            'estado'               => $evento->estado === 'en_proceso' ? 'analizado' : $evento->estado,
             'fk_usuario_calidad'   => Auth::id(),
             'fecha_analisis'       => now(),
         ]);
