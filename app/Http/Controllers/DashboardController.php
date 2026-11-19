@@ -15,6 +15,16 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        // ── Rol calidad (sin administrador/tecnovigilancia): solo eventos de Seguridad del Paciente ──
+        // El scope global afecta todas las consultas de EventoAdverso, incluidas las relaciones (whereHas('evento')).
+        $user = $request->user();
+        $soloSeguridad = $user->hasRole('calidad') && !$user->hasAnyRole(['administrador', 'tecnovigilancia']);
+        if ($soloSeguridad) {
+            EventoAdverso::addGlobalScope('seguridad_paciente', function ($q) {
+                $q->whereHas('categoria', fn($c) => $c->where('nombre', 'Seguridad del Paciente'));
+            });
+        }
+
         $anio    = $request->get('anio', now()->year);
         $periodo = $request->get('periodo', 'anual');
 
@@ -349,7 +359,9 @@ class DashboardController extends Controller
                 'porClasificacionMes'        => $datosClasificacion,
                 'porClasificacionRaw'        => $porClasificacionMes,
                 'clasificaciones'            => $todasClasificaciones,
-                'categorias'                 => Categoria::where('activo', 1)->get(['id_categoria', 'nombre']),
+                'categorias'                 => Categoria::where('activo', 1)
+                    ->when($soloSeguridad, fn($q) => $q->where('nombre', 'Seguridad del Paciente'))
+                    ->get(['id_categoria', 'nombre']),
                 'areas'                      => Area::where('activo', 1)->get(['id_area', 'nombre']),
                 'aniosDisponibles'           => $aniosDisponibles,
                 'anioSeleccionado'           => (int) $anio,
