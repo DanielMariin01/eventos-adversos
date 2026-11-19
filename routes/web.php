@@ -10,6 +10,7 @@ use App\Http\Controllers\PlanMejoraController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TecnovigilanciaController;
+use App\Http\Controllers\FarmacovigilanciaController;
 use App\Http\Controllers\Auth\PortalSsoController;
 
 Route::get('/', function () {
@@ -74,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ── Rutas de planes de mejora ──
-Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group(function () {
+Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia|farmacovigilancia'])->group(function () {
     Route::get('/mejoras', [PlanMejoraController::class, 'index'])->name('mejoras.index');
     Route::get('/mejoras/exportar', [PlanMejoraController::class, 'exportar'])->name('mejoras.exportar');
     Route::post('/mejoras/{evento}', [PlanMejoraController::class, 'store'])->name('mejoras.store');
@@ -88,6 +89,13 @@ Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group
     Route::get('/tecnovigilancia', [TecnovigilanciaController::class, 'index'])->name('tecnovigilancia.index');
     Route::get('/tecnovigilancia/exportar', [TecnovigilanciaController::class, 'exportar'])->name('tecnovigilancia.exportar');
     Route::post('/tecnovigilancia/{evento}/analisis', [TecnovigilanciaController::class, 'guardarAnalisis'])->name('tecnovigilancia.analisis');
+});
+
+// ── Rutas de farmacovigilancia (categoría IAAS) ──
+Route::middleware(['auth', 'role:administrador|farmacovigilancia'])->group(function () {
+    Route::get('/farmacovigilancia', [FarmacovigilanciaController::class, 'index'])->name('farmacovigilancia.index');
+    Route::get('/farmacovigilancia/exportar', [FarmacovigilanciaController::class, 'exportar'])->name('farmacovigilancia.exportar');
+    Route::post('/farmacovigilancia/{evento}/analisis', [FarmacovigilanciaController::class, 'guardarAnalisis'])->name('farmacovigilancia.analisis');
 });
 
 // ── Rutas de áreas (solo administrador) ──

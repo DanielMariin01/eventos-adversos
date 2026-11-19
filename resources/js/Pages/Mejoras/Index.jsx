@@ -15,6 +15,7 @@ import { FaFileExcel } from 'react-icons/fa';
 import { HiOutlineSpeakerphone, HiOutlineStop, HiOutlinePencilAlt } from 'react-icons/hi';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
 import ModalAnalisisTecnovigilancia from '@/Components/Eventos/ModalAnalisisTecnovigilancia';
+import ModalAnalisisFarmacovigilancia from '@/Components/Eventos/ModalAnalisisFarmacovigilancia';
 import ModalCambiarArea from '@/Components/Eventos/ModalCambiarArea';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 
@@ -512,6 +513,12 @@ export default function Index({ eventos, jefes, areas = [], categorias, filtros 
             {modalEditarAnalisis && (
                 eventoSeleccionado?.categoria?.nombre === 'Tecnovigilancia' ? (
                     <ModalAnalisisTecnovigilancia
+                        evento={eventoSeleccionado}
+                        jefes={jefes}
+                        onClose={() => setModalEditarAnalisis(false)}
+                    />
+                ) : eventoSeleccionado?.categoria?.nombre === 'IAAS' ? (
+                    <ModalAnalisisFarmacovigilancia
                         evento={eventoSeleccionado}
                         jefes={jefes}
                         onClose={() => setModalEditarAnalisis(false)}
