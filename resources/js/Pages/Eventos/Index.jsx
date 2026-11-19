@@ -415,6 +415,7 @@ export default function Index({ eventos, categorias, jefes, areas }) {
                     eventoSeleccionado?.categoria?.nombre === 'Tecnovigilancia' ? (
                         <ModalAnalisisTecnovigilancia
                             evento={eventoSeleccionado}
+                            jefes={jefes}
                             onClose={() => setModalAnalisis(false)}
                         />
                     ) : (

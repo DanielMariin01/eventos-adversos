@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Revision;
 use App\Mail\EventoReportado;
+use App\Mail\AnalisisRealizado;
 use App\Mail\EventoRedirigidoTecnovigilancia;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -400,8 +401,28 @@ class EventoController extends Controller
                 'observacion' => 'El evento N° ' . $evento->id_eventoAdverso . ' fue cerrado automáticamente por clasificación: ' . $request->clasificacion,
             ]);
         }
+        // Avisar al jefe responsable del análisis
+        $this->notificarAnalisis($evento);
+
         return redirect()->back()
             ->with('success', 'Análisis guardado correctamente.');
+    }
+
+    // ── Correo al jefe responsable: se realizó el análisis de su evento ──
+    // Un fallo de correo no debe deshacer el análisis ya guardado.
+    private function notificarAnalisis(EventoAdverso $evento): void
+    {
+        $evento->load(['categoria', 'area', 'jefe', 'tecnovigilancia']);
+
+        if (!$evento->jefe?->email) {
+            return;
+        }
+
+        try {
+            Mail::to($evento->jefe->email)->send(new AnalisisRealizado($evento));
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     // ── Cerrar análisis ──
@@ -532,10 +553,11 @@ class EventoController extends Controller
             'reportante',
             'paciente',
             'planMejora.jefe',
+            'tecnovigilancia',
             'archivos',
             'revisiones.usuario',
         ])
-            ->whereIn('estado', ['en_mejora', 'radicado', 'cerrado', 'cancelado'])
+            ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado', 'cancelado'])
             ->where(function ($q) use ($user) {
                 $q->whereHas('area', fn($q) => $q->where('fk_jefe', $user->id))
                     ->orWhere('fk_jefe', $user->id);
@@ -584,6 +606,7 @@ class EventoController extends Controller
     public function subirEvidencia(Request $request, EventoAdverso $evento)
     {
         $this->soloCalidadOJefe();
+        abort_if($evento->estado === 'analizado', 422, 'Aún no se ha creado el plan de mejora de este evento.');
         $request->validate([
             'archivos.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);

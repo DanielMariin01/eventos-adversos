@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use App\Models\Categoria;
+use App\Mail\AnalisisRealizado;
+use App\Models\Archivo;
 use App\Models\EventoAdverso;
 use App\Models\Revision;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -86,7 +89,7 @@ class TecnovigilanciaController extends Controller
     }
 
     // ── Guardar análisis de tecnovigilancia ──
-    // No cambia el estado: el evento sigue en proceso hasta usar "Cerrar análisis".
+    // Igual que Calidad: el evento pasa a 'analizado', se asigna al jefe y se le avisa por correo.
     public function guardarAnalisis(Request $request, EventoAdverso $evento)
     {
         abort_if($evento->categoria?->nombre !== self::CATEGORIA, 403, 'Solo eventos de Tecnovigilancia.');
@@ -102,27 +105,57 @@ class TecnovigilanciaController extends Controller
             'fecha_reporte_fabricante' => 'nullable|required_if:reportado_fabricante,1|date|before_or_equal:today',
             'dm_disponible_evaluacion' => 'required|boolean',
             'dm_enviado_fabricante'    => 'required|boolean',
+            'descripcion_analisis'     => 'required|string',
+            'fk_jefe'                  => 'required|exists:users,id',
+            'archivos.*'               => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         if (!$datos['reportado_fabricante']) {
             $datos['fecha_reporte_fabricante'] = null;
         }
 
-        $tecno->update($datos);
+        $tecno->update(collect($datos)->except(['descripcion_analisis', 'fk_jefe', 'archivos'])->all());
 
         $evento->update([
-            'fk_usuario_calidad' => Auth::id(),
-            'fecha_analisis'     => now(),
+            'descripcion_analisis' => $datos['descripcion_analisis'],
+            'fk_jefe'              => $datos['fk_jefe'],
+            'estado'               => 'analizado',
+            'fk_usuario_calidad'   => Auth::id(),
+            'fecha_analisis'       => now(),
         ]);
+
+        // Guardar evidencia
+        if ($request->hasFile('archivos')) {
+            foreach ($request->file('archivos') as $file) {
+                Archivo::create([
+                    'fk_evento'  => $evento->id_eventoAdverso,
+                    'fk_usuario' => Auth::id(),
+                    'tipo'       => 'calidad',
+                    'nombre'     => $file->getClientOriginalName(),
+                    'ruta'       => $file->store('eventos/calidad', 'public'),
+                    'extension'  => $file->getClientOriginalExtension(),
+                ]);
+            }
+        }
 
         Revision::create([
             'fk_evento'   => $evento->id_eventoAdverso,
             'fk_usuario'  => Auth::id(),
             'tipo'        => 'Análisis de Tecnovigilancia',
-            'observacion' => 'Se realizó el análisis de tecnovigilancia del evento N° ' . $evento->id_eventoAdverso .
+            'observacion' => 'Se realizó el análisis de tecnovigilancia del evento N° ' . $evento->id_eventoAdverso . ' y se asignó al jefe ID ' . $datos['fk_jefe'] .
                 '. Causa probable: ' . implode(', ', $datos['causa_probable']) .
                 '. Fecha: ' . now()->format('Y-m-d') . ' a las ' . now()->format('H:i'),
         ]);
+
+        // Avisar al jefe responsable (un fallo de correo no deshace el análisis)
+        $evento->load(['categoria', 'area', 'jefe', 'tecnovigilancia']);
+        if ($evento->jefe?->email) {
+            try {
+                Mail::to($evento->jefe->email)->send(new AnalisisRealizado($evento));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return redirect()->back()->with('success', 'Análisis de tecnovigilancia guardado correctamente.');
     }

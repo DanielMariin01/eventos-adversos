@@ -7,7 +7,7 @@
 import { COLORS } from '@/theme';
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
-import { X, Save } from 'lucide-react';
+import { X, Save, Paperclip } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 // Debe coincidir con CAUSAS_PROBABLES en TecnovigilanciaController.php
@@ -86,7 +86,10 @@ function SiNo({ value, onChange }) {
     );
 }
 
-export default function ModalAnalisisTecnovigilancia({ evento, onClose }) {
+const EXTENSIONES_PERMITIDAS = ['pdf', 'jpg', 'jpeg', 'png'];
+const MAX_BYTES = 10 * 1024 * 1024; // 10 MB, igual que el backend
+
+export default function ModalAnalisisTecnovigilancia({ evento, jefes = [], onClose }) {
     const [cargando, setCargando] = useState(false);
     const tecno = evento.tecnovigilancia ?? {};
 
@@ -97,6 +100,9 @@ export default function ModalAnalisisTecnovigilancia({ evento, onClose }) {
         fecha_reporte_fabricante: tecno.fecha_reporte_fabricante ?? '',
         dm_disponible_evaluacion: tecno.dm_disponible_evaluacion ?? null,
         dm_enviado_fabricante: tecno.dm_enviado_fabricante ?? null,
+        descripcion_analisis: evento.descripcion_analisis ?? '',
+        fk_jefe: evento.fk_jefe ?? evento.area?.fk_jefe ?? '',
+        archivos: [],
     });
 
     const toggleCausa = (valor) => {
@@ -105,6 +111,37 @@ export default function ModalAnalisisTecnovigilancia({ evento, onClose }) {
             ? data.causa_probable.filter(v => v !== valor)
             : [...data.causa_probable, valor]
         );
+    };
+
+    // ── Agregar archivos validando tipo y tamaño ──
+    const agregarArchivos = (lista) => {
+        const validos = [];
+        const rechazados = [];
+
+        lista.forEach(file => {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!EXTENSIONES_PERMITIDAS.includes(ext)) {
+                rechazados.push(`${file.name} (formato no permitido)`);
+            } else if (file.size > MAX_BYTES) {
+                rechazados.push(`${file.name} (supera 10MB)`);
+            } else if (!data.archivos.some(a => a.name === file.name && a.size === file.size)) {
+                validos.push(file);
+            }
+        });
+
+        if (rechazados.length > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Algunos archivos no se agregaron',
+                html: rechazados.join('<br>'),
+            });
+        }
+
+        if (validos.length > 0) setData('archivos', [...data.archivos, ...validos]);
+    };
+
+    const quitarArchivo = (index) => {
+        setData('archivos', data.archivos.filter((_, i) => i !== index));
     };
 
     const submit = () => {
@@ -117,6 +154,8 @@ export default function ModalAnalisisTecnovigilancia({ evento, onClose }) {
             faltantes.push('La fecha de reporte al fabricante es obligatoria');
         if (data.dm_disponible_evaluacion === null) faltantes.push('Indique si el dispositivo médico está disponible para evaluación');
         if (data.dm_enviado_fabricante === null) faltantes.push('Indique si envió el DM al fabricante/importador/distribuidor');
+        if (!data.descripcion_analisis.trim()) faltantes.push('La descripción del análisis es obligatoria');
+        if (!data.fk_jefe) faltantes.push('Seleccione el jefe responsable de ejecución');
 
         if (faltantes.length > 0) {
             Swal.fire({
@@ -129,6 +168,7 @@ export default function ModalAnalisisTecnovigilancia({ evento, onClose }) {
 
         setCargando(true);
         post(route('tecnovigilancia.analisis', evento.id_eventoAdverso), {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 setCargando(false);
@@ -236,6 +276,70 @@ export default function ModalAnalisisTecnovigilancia({ evento, onClose }) {
                             <SiNo value={data.dm_enviado_fabricante} onChange={v => setData('dm_enviado_fabricante', v)} />
                         </Campo>
                     </div>
+
+                    <Campo label="Descripción del Análisis" error={errors.descripcion_analisis}>
+                        <textarea
+                            value={data.descripcion_analisis}
+                            onChange={e => setData('descripcion_analisis', e.target.value)}
+                            placeholder="Ingrese la descripción del análisis..."
+                            rows={6}
+                            className="w-full rounded-lg border-2 border-primary-300 px-3 py-2 text-sm focus:outline-none focus:border-primary-500 resize-none scroll-teal"
+                        />
+                    </Campo>
+
+                    <Campo label="Responsable de Ejecución" error={errors.fk_jefe}>
+                        <select
+                            value={data.fk_jefe}
+                            onChange={e => setData('fk_jefe', e.target.value)}
+                            className={clase}
+                        >
+                            <option value="">Seleccione el jefe...</option>
+                            {jefes.map(jefe => (
+                                <option key={jefe.id} value={jefe.id}>{jefe.name}</option>
+                            ))}
+                        </select>
+                    </Campo>
+
+                    <Campo label="Adjuntar Evidencia (PDF, JPG, PNG)" error={errors.archivos}>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="text"
+                                readOnly
+                                value={data.archivos.length > 0 ? `${data.archivos.length} archivo(s) seleccionado(s)` : ''}
+                                placeholder="Seleccione los archivos (Opcional)"
+                                className="flex-1 rounded-lg border-2 border-primary-300 bg-gray-50 px-3 py-2 text-sm text-gray-500"
+                            />
+                            <label className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer transition">
+                                <Paperclip className="w-4 h-4" />
+                                Examinar
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    className="hidden"
+                                    onChange={e => {
+                                        agregarArchivos(Array.from(e.target.files));
+                                        e.target.value = '';
+                                    }}
+                                />
+                            </label>
+                        </div>
+                        {data.archivos.length > 0 && (
+                            <div className="mt-3 space-y-2">
+                                {data.archivos.map((file, index) => (
+                                    <div key={index} className="flex items-center gap-3 p-2 bg-celeste border border-primary-200 rounded-lg">
+                                        <Paperclip className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                                        <p className="text-sm text-gray-700 truncate flex-1">{file.name}</p>
+                                        <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(0)} KB</p>
+                                        <button type="button" onClick={() => quitarArchivo(index)} title="Quitar archivo"
+                                            className="text-gray-400 hover:text-red-500 transition">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Campo>
                 </div>
 
                 {/* Footer */}

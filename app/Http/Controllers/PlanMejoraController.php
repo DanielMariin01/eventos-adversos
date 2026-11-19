@@ -28,6 +28,7 @@ class PlanMejoraController extends Controller
             'paciente',
             'planMejora.jefe',
             'archivos',
+            'tecnovigilancia',
             'revisiones.usuario',
         ])
             ->whereIn('estado', ['analizado', 'en_mejora', 'radicado', 'cerrado', 'procesado'])

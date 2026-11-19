@@ -357,7 +357,7 @@ export default function Index({ eventos, categorias, jefes, areas }) {
 
             {/* ── Modales ── */}
             {modalAnalisis && (
-                <ModalAnalisisTecnovigilancia evento={eventoSeleccionado} onClose={() => setModalAnalisis(false)} />
+                <ModalAnalisisTecnovigilancia evento={eventoSeleccionado} jefes={jefes} onClose={() => setModalAnalisis(false)} />
             )}
             {modalTipo && (
                 <ModalCambiarTipo evento={eventoSeleccionado} categorias={categorias} onClose={() => setModalTipo(false)} />
