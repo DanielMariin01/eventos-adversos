@@ -33,6 +33,23 @@ class EventoController extends Controller
         return $user->hasRole('tecnovigilancia') && !$user->hasAnyRole(['administrador', 'calidad']);
     }
 
+    // Un usuario con rol calidad (sin administrador ni tecnovigilancia) solo gestiona eventos de Seguridad del Paciente.
+    private function esSoloCalidadSeguridad(): bool
+    {
+        $user = Auth::user();
+
+        return $user->hasRole('calidad') && !$user->hasAnyRole(['administrador', 'tecnovigilancia']);
+    }
+
+    private function filtrarPorRol($query)
+    {
+        if ($this->esSoloCalidadSeguridad()) {
+            $query->whereHas('categoria', fn($q) => $q->where('nombre', 'Seguridad del Paciente'));
+        }
+
+        return $query;
+    }
+
     private function soloCalidad(): void
     {
         abort_if($this->esSoloTecnovigilancia(), 403);
@@ -46,6 +63,11 @@ class EventoController extends Controller
 
     private function autorizarEvento(EventoAdverso $evento): void
     {
+        abort_if(
+            $this->esSoloCalidadSeguridad() && $evento->categoria?->nombre !== 'Seguridad del Paciente',
+            403,
+            'Solo puedes gestionar eventos de Seguridad del Paciente.'
+        );
         abort_if(
             $this->esSoloTecnovigilancia() && $evento->categoria?->nombre !== 'Tecnovigilancia',
             403,
@@ -266,7 +288,8 @@ class EventoController extends Controller
     {
         $this->soloCalidad();
         $jefes  = \App\Models\User::role('jefe')->get(['id', 'name']);
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
+        $eventos = $this->filtrarPorRol(EventoAdverso::query())
+            ->with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -601,7 +624,7 @@ class EventoController extends Controller
     public function cancelados()
     {
         $this->soloCalidad();
-        $eventos = EventoAdverso::with([
+        $eventos = $this->filtrarPorRol(EventoAdverso::query())->with([
             'categoria',
             'area',
             'reportante',
@@ -638,7 +661,8 @@ class EventoController extends Controller
     public function exportar()
     {
         $this->soloCalidad();
-        $eventos = EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente'])
+        $eventos = $this->filtrarPorRol(EventoAdverso::query())
+            ->with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')
             ->get();
