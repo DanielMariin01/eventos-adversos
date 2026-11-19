@@ -145,7 +145,7 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
                                 >
                                     <HiOutlineClipboardList className="w-4 h-4" />
                                 </button>
-                                {fila.estado !== 'cerrado' && (
+                                {fila.estado !== 'cerrado' && fila.estado !== 'analizado' && (
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setEventoSeleccionado(fila); setModalEvidencia(true); }}
                                         title="Subir evidencia"
@@ -230,7 +230,7 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
                 <div className="flex flex-wrap gap-2 mb-4">
                     <button
                         onClick={abrirSubirEvidencia}
-                        disabled={!eventoSeleccionado || eventoSeleccionado?.estado === 'cerrado' || eventoSeleccionado?.estado === 'cancelado'}
+                        disabled={!eventoSeleccionado || ['cerrado', 'cancelado', 'analizado'].includes(eventoSeleccionado?.estado)}
                         className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <Upload className="w-4 h-4" />
@@ -313,6 +313,7 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
                             className="flex-1 px-4 py-3 text-sm focus:outline-none bg-white"
                         >
                             <option value="">Todos los estados</option>
+                            <option value="analizado">Analizado</option>
                             <option value="en_mejora">En Mejora</option>
                             <option value="radicado">Radicado</option>
                             <option value="cerrado">Cerrado</option>

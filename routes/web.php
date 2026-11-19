@@ -74,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ── Rutas de planes de mejora ──
-Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
+Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group(function () {
     Route::get('/mejoras', [PlanMejoraController::class, 'index'])->name('mejoras.index');
     Route::get('/mejoras/exportar', [PlanMejoraController::class, 'exportar'])->name('mejoras.exportar');
     Route::post('/mejoras/{evento}', [PlanMejoraController::class, 'store'])->name('mejoras.store');
@@ -87,6 +87,7 @@ Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
 Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group(function () {
     Route::get('/tecnovigilancia', [TecnovigilanciaController::class, 'index'])->name('tecnovigilancia.index');
     Route::get('/tecnovigilancia/exportar', [TecnovigilanciaController::class, 'exportar'])->name('tecnovigilancia.exportar');
+    Route::post('/tecnovigilancia/{evento}/analisis', [TecnovigilanciaController::class, 'guardarAnalisis'])->name('tecnovigilancia.analisis');
 });
 
 // ── Rutas de áreas (solo administrador) ──

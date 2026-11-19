@@ -105,6 +105,40 @@ export default function ModalVerAnalisis({ evento, onClose }) {
                         </p>
                     )}
 
+                    {/* Análisis de tecnovigilancia */}
+                    {evento.categoria?.nombre === 'Tecnovigilancia' && evento.tecnovigilancia && (
+                        <div className="space-y-1 border-t border-gray-200 pt-3">
+                            <p className="font-bold text-secondary-600 uppercase text-xs tracking-wide">Análisis de tecnovigilancia</p>
+                            <p>
+                                <span className="font-bold text-gray-800">Causa probable: </span>
+                                <span className="text-gray-700">{(evento.tecnovigilancia.causa_probable ?? []).join(', ') || '—'}</span>
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-800">Acciones correctivas y preventivas: </span>
+                                <span className="text-gray-700">{evento.tecnovigilancia.acciones_correctivas || '—'}</span>
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-800">Reportó al fabricante/importador/distribuidor: </span>
+                                <span className="text-gray-700">
+                                    {evento.tecnovigilancia.reportado_fabricante == null ? '—' : evento.tecnovigilancia.reportado_fabricante ? 'Sí' : 'No'}
+                                    {evento.tecnovigilancia.fecha_reporte_fabricante && ` (${evento.tecnovigilancia.fecha_reporte_fabricante.split('-').reverse().join('/')})`}
+                                </span>
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-800">DM disponible para evaluación: </span>
+                                <span className="text-gray-700">
+                                    {evento.tecnovigilancia.dm_disponible_evaluacion == null ? '—' : evento.tecnovigilancia.dm_disponible_evaluacion ? 'Sí' : 'No'}
+                                </span>
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-800">DM enviado al fabricante/importador/distribuidor: </span>
+                                <span className="text-gray-700">
+                                    {evento.tecnovigilancia.dm_enviado_fabricante == null ? '—' : evento.tecnovigilancia.dm_enviado_fabricante ? 'Sí' : 'No'}
+                                </span>
+                            </p>
+                        </div>
+                    )}
+
                     {/* Archivos */}
                     <div>
                         <span className="font-bold text-gray-800">Archivos Adjuntos: </span>

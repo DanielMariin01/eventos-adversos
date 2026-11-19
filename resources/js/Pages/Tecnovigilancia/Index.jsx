@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
 import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter, MapPin } from 'lucide-react';
-import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
+import ModalAnalisisTecnovigilancia from '@/Components/Eventos/ModalAnalisisTecnovigilancia';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import ModalCambiarArea from '@/Components/Eventos/ModalCambiarArea';
 import ModalCancelarEvento from '@/Components/Eventos/ModalCancelarEvento';
@@ -357,7 +357,7 @@ export default function Index({ eventos, categorias, jefes, areas }) {
 
             {/* ── Modales ── */}
             {modalAnalisis && (
-                <ModalAnalisis evento={eventoSeleccionado} jefes={jefes} onClose={() => setModalAnalisis(false)} />
+                <ModalAnalisisTecnovigilancia evento={eventoSeleccionado} jefes={jefes} onClose={() => setModalAnalisis(false)} />
             )}
             {modalTipo && (
                 <ModalCambiarTipo evento={eventoSeleccionado} categorias={categorias} onClose={() => setModalTipo(false)} />

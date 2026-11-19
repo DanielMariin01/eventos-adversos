@@ -6,6 +6,7 @@ import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
 import { Search, ClipboardList, XCircle, RefreshCw, Lock, Filter, MapPin } from 'lucide-react';
 import ModalAnalisis from '@/Components/Eventos/ModalAnalisis';
+import ModalAnalisisTecnovigilancia from '@/Components/Eventos/ModalAnalisisTecnovigilancia';
 import ModalCambiarTipo from '@/Components/Eventos/ModalCambiarTipo';
 import ModalCambiarArea from '@/Components/Eventos/ModalCambiarArea';
 import { HiOutlineSpeakerphone } from 'react-icons/hi';
@@ -411,11 +412,19 @@ export default function Index({ eventos, categorias, jefes, areas }) {
             {/* ── Modal Análisis ── */}
             {
                 modalAnalisis && (
-                    <ModalAnalisis
-                        evento={eventoSeleccionado}
-                        jefes={jefes}
-                        onClose={() => setModalAnalisis(false)}
-                    />
+                    eventoSeleccionado?.categoria?.nombre === 'Tecnovigilancia' ? (
+                        <ModalAnalisisTecnovigilancia
+                            evento={eventoSeleccionado}
+                            jefes={jefes}
+                            onClose={() => setModalAnalisis(false)}
+                        />
+                    ) : (
+                        <ModalAnalisis
+                            evento={eventoSeleccionado}
+                            jefes={jefes}
+                            onClose={() => setModalAnalisis(false)}
+                        />
+                    )
                 )
             }
 

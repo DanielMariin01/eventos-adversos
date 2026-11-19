@@ -46,7 +46,7 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Planes de Mejora',
             url: route('mejoras.index'),
             icon: ClipboardCheck,
-            roles: ['administrador', 'calidad'],
+            roles: ['administrador', 'calidad', 'tecnovigilancia'],
         },
         {
             title: 'Mis Eventos',

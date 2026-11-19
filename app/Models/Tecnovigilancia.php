@@ -22,10 +22,21 @@ class Tecnovigilancia extends Model
         'deteccion_evento',
         'clasificacion',
         'desenlace',
+        'causa_probable',
+        'acciones_correctivas',
+        'reportado_fabricante',
+        'fecha_reporte_fabricante',
+        'dm_disponible_evaluacion',
+        'dm_enviado_fabricante',
     ];
 
     protected $casts = [
         'uso_mas_de_una_vez' => 'boolean',
+        'causa_probable' => 'array',
+        'reportado_fabricante' => 'boolean',
+        'fecha_reporte_fabricante' => 'date:Y-m-d',
+        'dm_disponible_evaluacion' => 'boolean',
+        'dm_enviado_fabricante' => 'boolean',
     ];
 
     public function evento()
