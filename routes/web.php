@@ -87,6 +87,7 @@ Route::middleware(['auth', 'role:administrador|calidad'])->group(function () {
 Route::middleware(['auth', 'role:administrador|calidad|tecnovigilancia'])->group(function () {
     Route::get('/tecnovigilancia', [TecnovigilanciaController::class, 'index'])->name('tecnovigilancia.index');
     Route::get('/tecnovigilancia/exportar', [TecnovigilanciaController::class, 'exportar'])->name('tecnovigilancia.exportar');
+    Route::post('/tecnovigilancia/{evento}/analisis', [TecnovigilanciaController::class, 'guardarAnalisis'])->name('tecnovigilancia.analisis');
 });
 
 // ── Rutas de áreas (solo administrador) ──

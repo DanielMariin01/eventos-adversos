@@ -289,7 +289,7 @@ class EventoController extends Controller
         $this->soloCalidad();
         $jefes  = \App\Models\User::role('jefe')->get(['id', 'name']);
         $eventos = $this->filtrarPorRol(EventoAdverso::query())
-            ->with(['categoria', 'area', 'reportante', 'paciente'])
+            ->with(['categoria', 'area', 'reportante', 'paciente', 'tecnovigilancia'])
             ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
