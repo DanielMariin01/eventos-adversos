@@ -10,6 +10,7 @@ import PasoPaciente from '@/Components/Eventos/PasoPaciente';
 import PasoEvento from '@/Components/Eventos/PasoEvento';
 import PasoImplantable from '@/Components/Eventos/PasoImplantable';
 import PasoTecnovigilancia from '@/Components/Eventos/PasoTecnovigilancia';
+import PasoFarmacovigilancia from '@/Components/Eventos/PasoFarmacovigilancia';
 import Swal from 'sweetalert2';
 import { Search } from 'lucide-react';
 
@@ -66,6 +67,9 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         imp_lote: '',
         imp_fecha_vencimiento: '',
 
+        // Farmacovigilancia (solo cuando la categoría es "IAAS")
+        medicamentos: [{ nombre: '', descripcion: '' }],
+
         // Tecnovigilancia (solo cuando la categoría es "Tecnovigilancia")
         tec_diagnostico_inicial: '',
         tec_nombre_dispositivo: '',
@@ -83,6 +87,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     const categoriaSeleccionada = categorias.find(c => c.id_categoria === data.fk_categoria);
     const esImplantable = categoriaSeleccionada?.nombre === 'Implantables';
     const esTecnovigilancia = categoriaSeleccionada?.nombre === 'Tecnovigilancia';
+    const esFarmacovigilancia = categoriaSeleccionada?.nombre === 'IAAS';
 
     // ── Selección de categoría ──
     const seleccionarCategoria = async (idCategoria) => {
@@ -176,6 +181,12 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
             if (!data.imp_serie) nuevosErrores.imp_serie = 'La serie es obligatoria';
             if (!data.imp_lote) nuevosErrores.imp_lote = 'El número de lote es obligatorio';
             if (!data.imp_fecha_vencimiento) nuevosErrores.imp_fecha_vencimiento = 'La fecha de vencimiento es obligatoria';
+        }
+
+        if (esFarmacovigilancia) {
+            const incompletos = data.medicamentos.some(m => !m.nombre.trim() || !m.descripcion.trim());
+            if (data.medicamentos.length === 0) nuevosErrores.medicamentos = 'Agrega al menos un medicamento';
+            else if (incompletos) nuevosErrores.medicamentos = 'Cada medicamento debe tener nombre y descripción';
         }
 
         if (esTecnovigilancia) {
@@ -327,7 +338,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                 {/* ── ETAPA 3: Formulario de 3 pasos ── */}
                 {etapa === 'formulario' && (
                     <div>
-                        <PasoIndicador pasoActual={paso} labelPaso3={esImplantable ? 'Implantable' : esTecnovigilancia ? 'Tecnovigilancia' : 'Evento'} />
+                        <PasoIndicador pasoActual={paso} labelPaso3={esImplantable ? 'Implantable' : esTecnovigilancia ? 'Tecnovigilancia' : esFarmacovigilancia ? 'Farmacovigilancia' : 'Evento'} />
 
                         <div className="bg-white rounded-card border border-gray-200 shadow-card p-8 mb-6">
                             {paso === 1 && <PasoReportante data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />}
@@ -337,7 +348,9 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
                                     ? <PasoImplantable data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
                                     : esTecnovigilancia
                                         ? <PasoTecnovigilancia data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
-                                        : <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
+                                        : esFarmacovigilancia
+                                            ? <PasoFarmacovigilancia data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
+                                            : <PasoEvento data={data} setData={setData} errors={{ ...errors, ...erroresPaso }} />
                             )}
                         </div>
 

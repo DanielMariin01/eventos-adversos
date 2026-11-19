@@ -103,4 +103,12 @@ class EventoAdverso extends Model
     {
         return $this->hasOne(Tecnovigilancia::class, 'fk_evento', 'id_eventoAdverso');
     }
+    public function farmacovigilancia()
+    {
+        return $this->hasOne(Farmacovigilancia::class, 'fk_evento', 'id_eventoAdverso');
+    }
+    public function medicamentos()
+    {
+        return $this->hasMany(Medicamento::class, 'fk_evento', 'id_eventoAdverso');
+    }
 }

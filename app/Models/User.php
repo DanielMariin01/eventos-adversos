@@ -35,6 +35,10 @@ class User extends Authenticatable
             return 'tecnovigilancia.index';
         }
 
+        if ($this->hasRole('farmacovigilancia')) {
+            return 'farmacovigilancia.index';
+        }
+
         return $this->hasRole('jefe') ? 'dashboard' : 'eventos.create';
     }
 

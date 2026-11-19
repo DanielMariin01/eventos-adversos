@@ -111,6 +111,8 @@
     @php
         $tecno = $evento->tecnovigilancia;
         $esTecno = $evento->categoria?->nombre === 'Tecnovigilancia' && $tecno;
+        $farma = $evento->farmacovigilancia;
+        $esFarma = $evento->categoria?->nombre === 'IAAS' && $farma;
         $siNo = fn($v) => is_null($v) ? '—' : ($v ? 'Sí' : 'No');
     @endphp
     <div class="container">
@@ -184,6 +186,30 @@
                 <div class="info-row">
                     <span class="info-label">DM enviado al fabricante/importador/distribuidor</span>
                     <span class="info-value">{{ $siNo($tecno->dm_enviado_fabricante) }}</span>
+                </div>
+            @endif
+
+            @if ($esFarma)
+                <p class="seccion">Análisis de farmacovigilancia</p>
+                @if ($evento->medicamentos && $evento->medicamentos->isNotEmpty())
+                    <div class="info-row">
+                        <span class="info-label">Medicamentos</span>
+                        @foreach ($evento->medicamentos as $medicamento)
+                            <span class="info-value" style="display: block;">{{ $medicamento->nombre }} <span style="font-weight: normal;">— {{ $medicamento->descripcion }}</span></span>
+                        @endforeach
+                    </div>
+                @endif
+                <div class="info-row">
+                    <span class="info-label">Categorización</span>
+                    <span class="info-value">{{ implode(', ', $farma->categorizacion ?? []) ?: '—' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Alergias</span>
+                    <span class="info-value">{{ implode(', ', $farma->alergias ?? []) ?: '—' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Factores contributivos</span>
+                    <span class="info-value">{{ $farma->factores_contributivos ?: '—' }}</span>
                 </div>
             @endif
 

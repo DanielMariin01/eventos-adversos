@@ -139,6 +139,39 @@ export default function ModalVerAnalisis({ evento, onClose }) {
                         </div>
                     )}
 
+                    {/* Análisis de farmacovigilancia */}
+                    {evento.categoria?.nombre === 'IAAS' && (
+                        <div className="space-y-1 border-t border-gray-200 pt-3">
+                            <p className="font-bold text-secondary-600 uppercase text-xs tracking-wide">Análisis de farmacovigilancia</p>
+                            {evento.medicamentos?.length > 0 && (
+                                <div>
+                                    <span className="font-bold text-gray-800">Medicamentos: </span>
+                                    <ul className="list-disc ml-5 text-gray-700">
+                                        {evento.medicamentos.map(m => (
+                                            <li key={m.id_medicamento}><span className="font-semibold">{m.nombre}:</span> {m.descripcion}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            {evento.farmacovigilancia && (
+                                <>
+                                    <p>
+                                        <span className="font-bold text-gray-800">Categorización: </span>
+                                        <span className="text-gray-700">{(evento.farmacovigilancia.categorizacion ?? []).join(', ') || '—'}</span>
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-gray-800">Alergias: </span>
+                                        <span className="text-gray-700">{(evento.farmacovigilancia.alergias ?? []).join(', ') || '—'}</span>
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-gray-800">Factores contributivos: </span>
+                                        <span className="text-gray-700">{evento.farmacovigilancia.factores_contributivos || '—'}</span>
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    )}
+
                     {/* Archivos */}
                     <div>
                         <span className="font-bold text-gray-800">Archivos Adjuntos: </span>

@@ -129,6 +129,16 @@
                 <p style="color: #6b7280; font-size: 13px; margin: 0 0 5px 0;"><strong>Descripción:</strong></p>
                 <p style="color: #111827; font-size: 13px; margin: 0;">{{ $evento->descripcion }}</p>
             </div>
+            @if ($evento->medicamentos && $evento->medicamentos->isNotEmpty())
+                <div style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                    <p style="color: #6b7280; font-size: 13px; margin: 0 0 8px 0;"><strong>Medicamentos:</strong></p>
+                    @foreach ($evento->medicamentos as $medicamento)
+                        <p style="color: #111827; font-size: 13px; margin: 0 0 6px 0;">
+                            <strong>{{ $medicamento->nombre }}</strong> — {{ $medicamento->descripcion }}
+                        </p>
+                    @endforeach
+                </div>
+            @endif
         </div>
         <div class="footer">
             <p>Clínica Central del Eje — Sistema de Eventos Adversos</p>

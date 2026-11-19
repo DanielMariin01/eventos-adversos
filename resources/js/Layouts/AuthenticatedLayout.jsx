@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu, Pill } from 'lucide-react';
 import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -43,10 +43,16 @@ export default function AuthenticatedLayout({ header, children }) {
             roles: ['administrador', 'calidad', 'tecnovigilancia'],
         },
         {
+            title: 'Farmacovigilancia',
+            url: route('farmacovigilancia.index'),
+            icon: Pill,
+            roles: ['administrador', 'farmacovigilancia'],
+        },
+        {
             title: 'Planes de Mejora',
             url: route('mejoras.index'),
             icon: ClipboardCheck,
-            roles: ['administrador', 'calidad', 'tecnovigilancia'],
+            roles: ['administrador', 'calidad', 'tecnovigilancia', 'farmacovigilancia'],
         },
         {
             title: 'Mis Eventos',
