@@ -110,9 +110,14 @@ export default function Index({ eventos, categorias, jefes, areas }) {
             render: (fila) => <span className="text-xs">{fila.created_at?.replace('T', ' ').slice(0, 16) ?? '—'}</span>,
         },
         {
-            label: 'Área',
-            key: 'area',
-            render: (fila) => <span className="text-xs">{fila.area?.nombre ?? '—'}</span>,
+            label: 'Detalle',
+            key: 'detalle',
+            render: (fila) => (
+                <div className="text-xs space-y-0.5">
+                    <p><span className="font-semibold">Área:</span> {fila.area?.nombre ?? '—'}</p>
+                    <p><span className="font-semibold">Tipo:</span> {fila.categoria?.nombre ?? '—'}</p>
+                </div>
+            ),
         },
         {
             label: 'Medicamentos',
