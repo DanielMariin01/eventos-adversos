@@ -25,72 +25,65 @@ use Illuminate\Validation\ValidationException;
 
 class EventoController extends Controller
 {
-    // ── Restricciones de los roles especializados (tecnovigilancia, farmacovigilancia) ──
-    // Un usuario sin administrador/calidad que solo tiene estos roles no puede usar las funciones de Calidad:
-    // solo gestiona eventos de la categoría de su rol (se suman si tiene varios).
-    private const CATEGORIAS_ESPECIALIZADAS = [
-        'tecnovigilancia'   => 'Tecnovigilancia',
-        'farmacovigilancia' => 'IAAS',
+    // ── Categorías que puede gestionar cada rol (administrador: todas) ──
+    // Con varios roles se suman las categorías de cada uno. Un usuario sin ninguno de estos roles
+    // (p. ej. solo jefe) no tiene restricción por categoría.
+    private const CATEGORIAS_POR_ROL = [
+        'calidad'           => ['Seguridad del Paciente', 'IAAS'],
+        'tecnovigilancia'   => ['Tecnovigilancia'],
+        'farmacovigilancia' => ['Farmacovigilancia'],
     ];
 
-    private function categoriasEspecializadas(): ?array
+    private function categoriasPermitidas(): ?array
     {
         $user = Auth::user();
 
-        if ($user->hasAnyRole(['administrador', 'calidad'])) {
+        if ($user->hasRole('administrador')) {
             return null;
         }
 
         $categorias = [];
-        foreach (self::CATEGORIAS_ESPECIALIZADAS as $rol => $categoria) {
+        foreach (self::CATEGORIAS_POR_ROL as $rol => $lista) {
             if ($user->hasRole($rol)) {
-                $categorias[] = $categoria;
+                $categorias = array_merge($categorias, $lista);
             }
         }
 
         return $categorias ?: null;
     }
 
-    // Un usuario con rol calidad (sin administrador, tecnovigilancia ni farmacovigilancia) solo gestiona eventos de Seguridad del Paciente.
-    private function esSoloCalidadSeguridad(): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('calidad') && !$user->hasAnyRole(['administrador', 'tecnovigilancia', 'farmacovigilancia']);
-    }
-
     private function filtrarPorRol($query)
     {
-        if ($this->esSoloCalidadSeguridad()) {
-            $query->whereHas('categoria', fn($q) => $q->where('nombre', 'Seguridad del Paciente'));
+        $categorias = $this->categoriasPermitidas();
+
+        if ($categorias !== null) {
+            $query->whereHas('categoria', fn($q) => $q->whereIn('nombre', $categorias));
         }
 
         return $query;
     }
 
-    private function soloCalidad(): void
-    {
-        abort_if($this->categoriasEspecializadas() !== null, 403);
-    }
-
-    // Acciones del jefe: permitidas también a un usuario especializado que además sea jefe.
+    // Acciones del jefe (Mis Eventos, subir evidencia): no disponibles para un usuario que solo
+    // tiene roles de tecnovigilancia/farmacovigilancia, salvo que además sea jefe.
     private function soloCalidadOJefe(): void
     {
-        abort_if($this->categoriasEspecializadas() !== null && !Auth::user()->hasRole('jefe'), 403);
+        $user = Auth::user();
+
+        abort_if(
+            $user->hasAnyRole(['tecnovigilancia', 'farmacovigilancia'])
+                && !$user->hasAnyRole(['administrador', 'calidad', 'jefe']),
+            403
+        );
     }
 
     private function autorizarEvento(EventoAdverso $evento): void
     {
+        $categorias = $this->categoriasPermitidas();
+
         abort_if(
-            $this->esSoloCalidadSeguridad() && $evento->categoria?->nombre !== 'Seguridad del Paciente',
+            $categorias !== null && !in_array($evento->categoria?->nombre, $categorias, true),
             403,
-            'Solo puedes gestionar eventos de Seguridad del Paciente.'
-        );
-        $especializadas = $this->categoriasEspecializadas();
-        abort_if(
-            $especializadas !== null && !in_array($evento->categoria?->nombre, $especializadas, true),
-            403,
-            'Solo puedes gestionar eventos de ' . implode(' / ', $especializadas ?? []) . '.'
+            'Solo puedes gestionar eventos de: ' . implode(', ', $categorias ?? []) . '.'
         );
     }
 
@@ -164,7 +157,7 @@ class EventoController extends Controller
         $categoriaSeleccionada = Categoria::find($request->fk_categoria);
         $esImplantable = $categoriaSeleccionada?->nombre === 'Implantables';
         $esTecnovigilancia = $categoriaSeleccionada?->nombre === 'Tecnovigilancia';
-        $esFarmacovigilancia = $categoriaSeleccionada?->nombre === 'IAAS';
+        $esFarmacovigilancia = $categoriaSeleccionada?->nombre === 'Farmacovigilancia';
         $reglaFarma = $esFarmacovigilancia ? 'required' : 'nullable';
         $reglaImplantable = $esImplantable ? 'required' : 'nullable';
         $reglaTecno = $esTecnovigilancia ? 'required' : 'nullable';
@@ -199,7 +192,7 @@ class EventoController extends Controller
             'imp_lote'                       => "{$reglaImplantable}|string|max:100",
             'imp_fecha_vencimiento'          => "{$reglaImplantable}|date",
 
-            // Farmacovigilancia (obligatorio mínimo un medicamento si la categoría es "IAAS")
+            // Farmacovigilancia (obligatorio mínimo un medicamento si la categoría es "Farmacovigilancia")
             'medicamentos'                => $esFarmacovigilancia ? 'required|array|min:1' : 'nullable|array',
             'medicamentos.*.nombre'       => "{$reglaFarma}|string|max:255",
             'medicamentos.*.descripcion'  => "{$reglaFarma}|string",
@@ -307,7 +300,7 @@ class EventoController extends Controller
 
         // Enviar correo de notificación
         $evento->load(['categoria', 'area', 'reportante', 'paciente', 'medicamentos']);
-        // Tecnovigilancia → líder biomédico. IAAS → químico farmacéutico.
+        // Tecnovigilancia → líder biomédico. Farmacovigilancia → químico farmacéutico.
         // Seguridad del Paciente (y cualquier otra categoría) → Calidad.
         $destinatario = match (true) {
             $esTecnovigilancia   => 'lider.biomedico@clinicacentraldeleje.com',
@@ -325,7 +318,6 @@ class EventoController extends Controller
     // ── Lista de eventos (calidad) ──
     public function index()
     {
-        $this->soloCalidad();
         $jefes  = \App\Models\User::role('jefe')->get(['id', 'name']);
         $eventos = $this->filtrarPorRol(EventoAdverso::query())
             ->with(['categoria', 'area', 'reportante', 'paciente', 'tecnovigilancia', 'farmacovigilancia', 'medicamentos'])
@@ -686,7 +678,6 @@ class EventoController extends Controller
     }
     public function cancelados()
     {
-        $this->soloCalidad();
         $eventos = $this->filtrarPorRol(EventoAdverso::query())->with([
             'categoria',
             'area',
@@ -706,7 +697,6 @@ class EventoController extends Controller
 
     public function reabrir(EventoAdverso $evento)
     {
-        $this->soloCalidad();
         $evento->update(['estado' => 'en_proceso']);
 
         Revision::create([
@@ -723,7 +713,6 @@ class EventoController extends Controller
 
     public function exportar()
     {
-        $this->soloCalidad();
         $eventos = $this->filtrarPorRol(EventoAdverso::query())
             ->with(['categoria', 'area', 'reportante', 'paciente'])
             ->whereIn('estado', ['en_proceso'])

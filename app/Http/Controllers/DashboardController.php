@@ -15,13 +15,21 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // ── Rol calidad (sin administrador/tecnovigilancia): solo eventos de Seguridad del Paciente ──
+        // ── Rol calidad (sin administrador): solo eventos de sus categorías ──
+        // Seguridad del Paciente e IAAS (más las de tecnovigilancia/farmacovigilancia si también tiene esos roles).
         // El scope global afecta todas las consultas de EventoAdverso, incluidas las relaciones (whereHas('evento')).
         $user = $request->user();
-        $soloSeguridad = $user->hasRole('calidad') && !$user->hasAnyRole(['administrador', 'tecnovigilancia']);
-        if ($soloSeguridad) {
-            EventoAdverso::addGlobalScope('seguridad_paciente', function ($q) {
-                $q->whereHas('categoria', fn($c) => $c->where('nombre', 'Seguridad del Paciente'));
+        $categoriasRol = null;
+        if ($user->hasRole('calidad') && !$user->hasRole('administrador')) {
+            $categoriasRol = ['Seguridad del Paciente', 'IAAS'];
+            if ($user->hasRole('tecnovigilancia')) {
+                $categoriasRol[] = 'Tecnovigilancia';
+            }
+            if ($user->hasRole('farmacovigilancia')) {
+                $categoriasRol[] = 'Farmacovigilancia';
+            }
+            EventoAdverso::addGlobalScope('categorias_rol', function ($q) use ($categoriasRol) {
+                $q->whereHas('categoria', fn($c) => $c->whereIn('nombre', $categoriasRol));
             });
         }
 
@@ -360,7 +368,7 @@ class DashboardController extends Controller
                 'porClasificacionRaw'        => $porClasificacionMes,
                 'clasificaciones'            => $todasClasificaciones,
                 'categorias'                 => Categoria::where('activo', 1)
-                    ->when($soloSeguridad, fn($q) => $q->where('nombre', 'Seguridad del Paciente'))
+                    ->when($categoriasRol, fn($q) => $q->whereIn('nombre', $categoriasRol))
                     ->get(['id_categoria', 'nombre']),
                 'areas'                      => Area::where('activo', 1)->get(['id_area', 'nombre']),
                 'aniosDisponibles'           => $aniosDisponibles,

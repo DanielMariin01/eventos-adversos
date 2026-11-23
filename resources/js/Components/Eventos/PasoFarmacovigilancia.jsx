@@ -1,6 +1,6 @@
 /**
  * PasoFarmacovigilancia
- * Paso 3 del formulario para la categoría IAAS — información del evento adverso
+ * Paso 3 del formulario para la categoría Farmacovigilancia — información del evento adverso
  * (igual a PasoEvento) más los medicamentos involucrados.
  *
  * Props:

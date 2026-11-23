@@ -18,7 +18,7 @@ use Inertia\Inertia;
 
 class FarmacovigilanciaController extends Controller
 {
-    private const CATEGORIA = 'IAAS';
+    private const CATEGORIA = 'Farmacovigilancia';
 
     // Catálogos del análisis (deben coincidir con ModalAnalisisFarmacovigilancia.jsx)
     private const CATEGORIZACIONES = [
@@ -41,7 +41,7 @@ class FarmacovigilanciaController extends Controller
         'Prurito',
     ];
 
-    // ── Consulta base: solo eventos de la categoría IAAS en proceso ──
+    // ── Consulta base: solo eventos de la categoría Farmacovigilancia en proceso ──
     private function consulta()
     {
         return EventoAdverso::with(['categoria', 'area', 'reportante', 'paciente', 'medicamentos', 'farmacovigilancia'])
@@ -65,7 +65,7 @@ class FarmacovigilanciaController extends Controller
     // Igual que Calidad: el evento pasa a 'analizado', se asigna al jefe y se le avisa por correo.
     public function guardarAnalisis(Request $request, EventoAdverso $evento)
     {
-        abort_if($evento->categoria?->nombre !== self::CATEGORIA, 403, 'Solo eventos de IAAS (farmacovigilancia).');
+        abort_if($evento->categoria?->nombre !== self::CATEGORIA, 403, 'Solo eventos de la categoría Farmacovigilancia.');
 
         $datos = $request->validate([
             'categorizacion'         => 'required|array|min:1',

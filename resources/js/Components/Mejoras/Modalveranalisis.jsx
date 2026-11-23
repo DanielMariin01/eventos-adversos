@@ -140,7 +140,7 @@ export default function ModalVerAnalisis({ evento, onClose }) {
                     )}
 
                     {/* Análisis de farmacovigilancia */}
-                    {evento.categoria?.nombre === 'IAAS' && (
+                    {evento.categoria?.nombre === 'Farmacovigilancia' && (
                         <div className="space-y-1 border-t border-gray-200 pt-3">
                             <p className="font-bold text-secondary-600 uppercase text-xs tracking-wide">Análisis de farmacovigilancia</p>
                             {evento.medicamentos?.length > 0 && (

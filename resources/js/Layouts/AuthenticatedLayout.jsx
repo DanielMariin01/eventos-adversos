@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu, Pill } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu, Pill, Tags } from 'lucide-react';
 import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -17,6 +17,12 @@ export default function AuthenticatedLayout({ header, children }) {
             url: route('dashboard'),
             icon: LayoutDashboard,
             roles: ['administrador', 'calidad'],
+        },
+        {
+            title: 'Categorías',
+            url: route('categorias.index'),
+            icon: Tags,
+            roles: ['administrador'],
         },
         {
             title: 'Áreas',
@@ -34,7 +40,7 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Eventos Adversos',
             url: route('eventos.index'),
             icon: FileText,
-            roles: ['administrador', 'calidad'],
+            roles: ['administrador', 'calidad', 'farmacovigilancia'],
         },
         {
             title: 'Tecnovigilancia',

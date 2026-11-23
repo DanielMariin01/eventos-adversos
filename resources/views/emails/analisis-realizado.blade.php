@@ -112,7 +112,7 @@
         $tecno = $evento->tecnovigilancia;
         $esTecno = $evento->categoria?->nombre === 'Tecnovigilancia' && $tecno;
         $farma = $evento->farmacovigilancia;
-        $esFarma = $evento->categoria?->nombre === 'IAAS' && $farma;
+        $esFarma = $evento->categoria?->nombre === 'Farmacovigilancia' && $farma;
         $siNo = fn($v) => is_null($v) ? '—' : ($v ? 'Sí' : 'No');
     @endphp
     <div class="container">
