@@ -1,6 +1,6 @@
 /**
  * ModalAnalisisFarmacovigilancia
- * Análisis propio de los eventos de la categoría IAAS (farmacovigilancia).
+ * Análisis propio de los eventos de la categoría Farmacovigilancia.
  * Guarda en la tabla farmacovigilancias (ruta farmacovigilancia.analisis).
  */
 

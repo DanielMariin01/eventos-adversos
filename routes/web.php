@@ -11,6 +11,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TecnovigilanciaController;
 use App\Http\Controllers\FarmacovigilanciaController;
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\Auth\PortalSsoController;
 
 Route::get('/', function () {
@@ -100,6 +101,11 @@ Route::middleware(['auth', 'role:administrador|farmacovigilancia'])->group(funct
 
 // ── Rutas de áreas (solo administrador) ──
 Route::middleware(['auth', 'role:administrador'])->group(function () {
+    Route::get('/categorias', [CategoriaController::class, 'index'])->name('categorias.index');
+    Route::post('/categorias', [CategoriaController::class, 'store'])->name('categorias.store');
+    Route::patch('/categorias/{categoria}', [CategoriaController::class, 'update'])->name('categorias.update');
+    Route::patch('/categorias/{categoria}/activo', [CategoriaController::class, 'toggleActivo'])->name('categorias.activo');
+
     Route::get('/areas', [AreaController::class, 'index'])->name('areas.index');
     Route::post('/areas', [AreaController::class, 'store'])->name('areas.store');
     Route::patch('/areas/{area}', [AreaController::class, 'update'])->name('areas.update');

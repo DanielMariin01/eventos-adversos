@@ -419,7 +419,7 @@ export default function Index({ eventos, categorias, jefes, areas }) {
                             jefes={jefes}
                             onClose={() => setModalAnalisis(false)}
                         />
-                    ) : eventoSeleccionado?.categoria?.nombre === 'IAAS' ? (
+                    ) : eventoSeleccionado?.categoria?.nombre === 'Farmacovigilancia' ? (
                         <ModalAnalisisFarmacovigilancia
                             evento={eventoSeleccionado}
                             jefes={jefes}

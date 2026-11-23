@@ -517,7 +517,7 @@ export default function Index({ eventos, jefes, areas = [], categorias, filtros 
                         jefes={jefes}
                         onClose={() => setModalEditarAnalisis(false)}
                     />
-                ) : eventoSeleccionado?.categoria?.nombre === 'IAAS' ? (
+                ) : eventoSeleccionado?.categoria?.nombre === 'Farmacovigilancia' ? (
                     <ModalAnalisisFarmacovigilancia
                         evento={eventoSeleccionado}
                         jefes={jefes}

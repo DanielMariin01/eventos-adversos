@@ -302,7 +302,7 @@ export default function Index({ eventos, categorias, jefes, areas }) {
                 <Tabla
                     columnas={columnas}
                     datos={eventosFiltrados}
-                    mensajeVacio="No hay eventos de farmacovigilancia (IAAS) registrados."
+                    mensajeVacio="No hay eventos de farmacovigilancia registrados."
                     onRowClick={(fila) => setEventoSeleccionado(
                         eventoSeleccionado?.id_eventoAdverso === fila.id_eventoAdverso ? null : fila
                     )}

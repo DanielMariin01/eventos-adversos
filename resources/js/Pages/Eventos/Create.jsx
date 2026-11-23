@@ -67,7 +67,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
         imp_lote: '',
         imp_fecha_vencimiento: '',
 
-        // Farmacovigilancia (solo cuando la categoría es "IAAS")
+        // Farmacovigilancia (solo cuando la categoría es "Farmacovigilancia")
         medicamentos: [{ nombre: '', descripcion: '' }],
 
         // Tecnovigilancia (solo cuando la categoría es "Tecnovigilancia")
@@ -87,7 +87,7 @@ export default function Create({ categorias, areas: areasProp = null, fk_categor
     const categoriaSeleccionada = categorias.find(c => c.id_categoria === data.fk_categoria);
     const esImplantable = categoriaSeleccionada?.nombre === 'Implantables';
     const esTecnovigilancia = categoriaSeleccionada?.nombre === 'Tecnovigilancia';
-    const esFarmacovigilancia = categoriaSeleccionada?.nombre === 'IAAS';
+    const esFarmacovigilancia = categoriaSeleccionada?.nombre === 'Farmacovigilancia';
 
     // ── Selección de categoría ──
     const seleccionarCategoria = async (idCategoria) => {

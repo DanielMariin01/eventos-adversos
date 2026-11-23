@@ -11,6 +11,7 @@
 const ICONOS = {
     'Biotecnología': '/imagenes/iconos/biotecnologia.svg',
     'Farmacia': '/imagenes/iconos/farmacia.svg',
+    'Farmacovigilancia': '/imagenes/iconos/farmacia.svg',
     'IAAS': '/imagenes/iconos/iaas.svg',
     'Seguridad del Paciente': '/imagenes/iconos/seguridad.svg',
     'Implantables': '/imagenes/iconos/implantables.svg',
