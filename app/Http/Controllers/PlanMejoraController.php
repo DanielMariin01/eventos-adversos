@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Mail;
 class PlanMejoraController extends Controller
 {
     // ── Categorías que puede gestionar el usuario según su rol ──
-    // administrador: todas (null). calidad: Seguridad del Paciente e IAAS. tecnovigilancia: Tecnovigilancia. farmacovigilancia: Farmacovigilancia.
+    // administrador: todas (null). calidad: Seguridad del Paciente e IAAS. tecnovigilancia: Tecnovigilancia e Implantables. farmacovigilancia: Farmacovigilancia.
     // Con varios roles se suman las categorías de cada uno.
     private function categoriasPermitidas(): ?array
     {
@@ -36,6 +36,7 @@ class PlanMejoraController extends Controller
         }
         if ($user->hasRole('tecnovigilancia')) {
             $categorias[] = 'Tecnovigilancia';
+            $categorias[] = 'Implantables';
         }
         if ($user->hasRole('farmacovigilancia')) {
             $categorias[] = 'Farmacovigilancia';

@@ -30,7 +30,7 @@ class EventoController extends Controller
     // (p. ej. solo jefe) no tiene restricción por categoría.
     private const CATEGORIAS_POR_ROL = [
         'calidad'           => ['Seguridad del Paciente', 'IAAS'],
-        'tecnovigilancia'   => ['Tecnovigilancia'],
+        'tecnovigilancia'   => ['Tecnovigilancia', 'Implantables'],
         'farmacovigilancia' => ['Farmacovigilancia'],
     ];
 
@@ -52,9 +52,24 @@ class EventoController extends Controller
         return $categorias ?: null;
     }
 
+    // Categorías visibles en las LISTAS de Eventos Adversos, Cancelados y Excel.
+    // Si el usuario tiene rol calidad, ahí solo ve Seguridad del Paciente e IAAS aunque tenga otros roles
+    // (los eventos de Tecnovigilancia/Farmacovigilancia se atienden en sus módulos). Las acciones sobre un
+    // evento concreto (autorizarEvento) siguen sumando las categorías de todos sus roles.
+    private function categoriasListado(): ?array
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('administrador') && $user->hasRole('calidad')) {
+            return self::CATEGORIAS_POR_ROL['calidad'];
+        }
+
+        return $this->categoriasPermitidas();
+    }
+
     private function filtrarPorRol($query)
     {
-        $categorias = $this->categoriasPermitidas();
+        $categorias = $this->categoriasListado();
 
         if ($categorias !== null) {
             $query->whereHas('categoria', fn($q) => $q->whereIn('nombre', $categorias));

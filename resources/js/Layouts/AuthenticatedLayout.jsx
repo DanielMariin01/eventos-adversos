@@ -40,7 +40,7 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Eventos Adversos',
             url: route('eventos.index'),
             icon: FileText,
-            roles: ['administrador', 'calidad', 'farmacovigilancia'],
+            roles: ['administrador', 'calidad', 'tecnovigilancia', 'farmacovigilancia'],
         },
         {
             title: 'Tecnovigilancia',
@@ -70,7 +70,7 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Eventos Cancelados',
             url: route('eventos.cancelados'),
             icon: XCircle,
-            roles: ['administrador', 'calidad'],
+            roles: ['administrador', 'calidad', 'tecnovigilancia'],
         },
     ];
 
