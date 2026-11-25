@@ -6,6 +6,7 @@ import InputLabel from '@/Components/InputLabel';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
 import { useState } from 'react';
+import { Search } from 'lucide-react';
 
 // ── Agregar o quitar un rol de la selección ──
 const alternarRol = (actuales, rol) =>
@@ -16,6 +17,7 @@ export default function Index({ usuarios, roles }) {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [modalEditar, setModalEditar] = useState(false);
     const [usuarioEditar, setUsuarioEditar] = useState(null);
+    const [busqueda, setBusqueda] = useState('');
 
     const { data: dataEditar, setData: setDataEditar, put, processing: processingEditar, errors: errorsEditar, reset: resetEditar } = useForm({
         name: '',
@@ -150,10 +152,26 @@ export default function Index({ usuarios, roles }) {
             cancelButtonText: 'Cancelar',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('usuarios.destroy', id));
+                router.delete(route('usuarios.destroy', id), {
+                    onError: (errores) => Swal.fire({
+                        icon: 'error',
+                        title: 'No se pudo eliminar',
+                        text: errores.usuario ?? 'Ocurrió un error al eliminar el usuario.',
+                    }),
+                });
             }
         });
     };
+
+    // ── Filtro por nombre, correo o rol ──
+    const texto = busqueda.trim().toLowerCase();
+    const usuariosFiltrados = texto === ''
+        ? usuarios
+        : usuarios.filter(u =>
+            u.name?.toLowerCase().includes(texto) ||
+            u.email?.toLowerCase().includes(texto) ||
+            (u.roles ?? []).some(rol => rol.toLowerCase().includes(texto))
+        );
 
     // ── Columnas de la tabla ──
     const columnas = [
@@ -190,8 +208,18 @@ export default function Index({ usuarios, roles }) {
 
             <div className="max-w-6xl mx-auto py-12 px-6">
 
-                {/* Botón crear */}
-                <div className="flex justify-end mb-6">
+                {/* Buscador y botón crear */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div className="flex items-center border-2 border-primary-300 rounded-lg overflow-hidden focus-within:border-primary-500 bg-white sm:w-96">
+                        <input
+                            type="text"
+                            value={busqueda}
+                            onChange={e => setBusqueda(e.target.value)}
+                            placeholder="Buscar por nombre, correo o rol..."
+                            className="flex-1 px-4 py-3 text-sm focus:outline-none"
+                        />
+                        <div className="bg-secondary-500 px-3 py-2.5"><Search className="w-4 h-4 text-white" /></div>
+                    </div>
                     <button
                         onClick={() => setModalAbierto(true)}
                         className="bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
@@ -203,9 +231,9 @@ export default function Index({ usuarios, roles }) {
                 {/* Tabla */}
                 <Tabla
                     columnas={columnas}
-                    datos={usuarios}
+                    datos={usuariosFiltrados}
                     acciones={acciones}
-                    mensajeVacio="No hay usuarios registrados."
+                    mensajeVacio={texto === '' ? 'No hay usuarios registrados.' : 'No hay usuarios que coincidan con la búsqueda.'}
                 />
             </div>
 

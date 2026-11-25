@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\Auditoria;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,12 +29,21 @@ class AreaController extends Controller
             'fk_jefe'     => 'nullable|exists:users,id',
         ]);
 
-        Area::create([
+        $area = Area::create([
             'nombre'      => $data['nombre'],
             'responsable' => $data['responsable'] ?? null,
             'fk_jefe'     => $data['fk_jefe'] ?? null,
             'activo'      => 1,
         ]);
+
+        Auditoria::registrar(
+            'crear',
+            'area',
+            $area->id_area,
+            'Creó el área ' . $area->nombre,
+            null,
+            ['nombre' => $area->nombre, 'responsable' => $area->responsable, 'jefe' => $area->jefe?->name]
+        );
 
         return redirect()->route('areas.index')
             ->with('success', 'Área creada correctamente.');
@@ -45,9 +55,20 @@ class AreaController extends Controller
             'fk_jefe' => 'nullable|exists:users,id',
         ]);
 
+        $jefeAnterior = $area->jefe?->name;
+
         $area->update([
             'fk_jefe' => $request->fk_jefe,
         ]);
+
+        Auditoria::registrar(
+            'editar',
+            'area',
+            $area->id_area,
+            'Cambió el jefe del área ' . $area->nombre,
+            ['jefe' => $jefeAnterior],
+            ['jefe' => $area->fresh('jefe')->jefe?->name]
+        );
 
         return redirect()->route('areas.index')
             ->with('success', 'Jefe asignado correctamente.');
