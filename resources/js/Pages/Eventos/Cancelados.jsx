@@ -1,5 +1,5 @@
 import { COLORS } from '@/theme';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
@@ -16,12 +16,12 @@ const LABEL_ESTADO = {
     cancelado: 'Cancelado',
 };
 
-export default function Cancelados({ eventos }) {
+export default function Cancelados({ eventos, filtros = {} }) {
 
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-    const [busquedaEvento, setBusquedaEvento] = useState('');
-    const [busquedaReportante, setBusquedaReportante] = useState('');
-    const [busquedaPaciente, setBusquedaPaciente] = useState('');
+    const [busquedaEvento, setBusquedaEvento] = useState(filtros.evento ?? '');
+    const [busquedaReportante, setBusquedaReportante] = useState(filtros.reportante ?? '');
+    const [busquedaPaciente, setBusquedaPaciente] = useState(filtros.paciente ?? '');
     const [cargando, setCargando] = useState(false);
     const [modalCancelacion, setModalCancelacion] = useState(false);
 
@@ -151,18 +151,23 @@ export default function Cancelados({ eventos }) {
         },
     ];
 
-    const eventosFiltrados = {
-        ...eventos,
-        data: eventos.data.filter(e =>
-            (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
-            (busquedaReportante === '' ||
-                e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
-                e.reportante?.cedula?.includes(busquedaReportante)) &&
-            (busquedaPaciente === '' ||
-                e.paciente?.nombres?.toLowerCase().includes(busquedaPaciente.toLowerCase()) ||
-                e.paciente?.cedula?.includes(busquedaPaciente))
-        ),
-    };
+    // ── Búsqueda en servidor (a través de todas las páginas; el resultado vuelve a la primera) ──
+    const eventosFiltrados = eventos;
+    const esPrimerRender = useRef(true);
+    useEffect(() => {
+        if (esPrimerRender.current) {
+            esPrimerRender.current = false;
+            return;
+        }
+        const timeout = setTimeout(() => {
+            router.get(route('eventos.cancelados'), {
+                evento: busquedaEvento || undefined,
+                reportante: busquedaReportante || undefined,
+                paciente: busquedaPaciente || undefined,
+            }, { preserveState: true, preserveScroll: true, replace: true });
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [busquedaEvento, busquedaReportante, busquedaPaciente]);
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Eventos Cancelados</h2>}>

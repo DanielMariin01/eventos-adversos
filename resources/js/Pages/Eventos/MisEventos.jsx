@@ -1,6 +1,6 @@
 import { COLORS } from '@/theme';
-import { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { useState, useEffect, useRef } from 'react';
+import { Head, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
 import Swal from 'sweetalert2';
@@ -33,18 +33,18 @@ const LABEL_ESTADO = {
     cerrado: 'Cerrado',
 };
 
-export default function MisEventos({ eventos, proximosVencer, vencidos }) {
+export default function MisEventos({ eventos, proximosVencer, vencidos, filtros = {} }) {
 
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-    const [busquedaEvento, setBusquedaEvento] = useState('');
-    const [busquedaReportante, setBusquedaReportante] = useState('');
-    const [busquedaPaciente, setBusquedaPaciente] = useState('');
+    const [busquedaEvento, setBusquedaEvento] = useState(filtros.evento ?? '');
+    const [busquedaReportante, setBusquedaReportante] = useState(filtros.reportante ?? '');
+    const [busquedaPaciente, setBusquedaPaciente] = useState(filtros.paciente ?? '');
     const [modalAnalisis, setModalAnalisis] = useState(false);
     const [modalPlan, setModalPlan] = useState(false);
     const [modalRevisiones, setModalRevisiones] = useState(false);
     const [modalEvidencia, setModalEvidencia] = useState(false);
     const [cargando, setCargando] = useState(false);
-    const [filtroEstado, setFiltroEstado] = useState('');
+    const [filtroEstado, setFiltroEstado] = useState(filtros.estado ?? '');
     const [modalCancelacion, setModalCancelacion] = useState(false);
 
     const alertSeleccionar = () => {
@@ -190,19 +190,24 @@ export default function MisEventos({ eventos, proximosVencer, vencidos }) {
     ];
 
     // ── Filtro ──
-    const eventosFiltrados = {
-        ...eventos,
-        data: eventos.data.filter(e =>
-            (filtroEstado === '' || e.estado === filtroEstado) &&
-            (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
-            (busquedaReportante === '' ||
-                e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
-                e.reportante?.cedula?.includes(busquedaReportante)) &&
-            (busquedaPaciente === '' ||
-                e.paciente?.nombres?.toLowerCase().includes(busquedaPaciente.toLowerCase()) ||
-                e.paciente?.cedula?.includes(busquedaPaciente))
-        ),
-    };
+    // ── Búsqueda en servidor (a través de todas las páginas; el resultado vuelve a la primera) ──
+    const eventosFiltrados = eventos;
+    const esPrimerRender = useRef(true);
+    useEffect(() => {
+        if (esPrimerRender.current) {
+            esPrimerRender.current = false;
+            return;
+        }
+        const timeout = setTimeout(() => {
+            router.get(route('eventos.mis'), {
+                evento: busquedaEvento || undefined,
+                reportante: busquedaReportante || undefined,
+                paciente: busquedaPaciente || undefined,
+                estado: filtroEstado || undefined,
+            }, { preserveState: true, preserveScroll: true, replace: true });
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [busquedaEvento, busquedaReportante, busquedaPaciente, filtroEstado]);
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-white uppercase">Mis Eventos Asignados</h2>}>

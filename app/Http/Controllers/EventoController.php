@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Revision;
 use App\Mail\EventoReportado;
+use App\Http\Controllers\Concerns\BuscaEventos;
 use App\Mail\AnalisisRealizado;
 use App\Mail\EventoRedirigidoTecnovigilancia;
 use Illuminate\Support\Facades\Mail;
@@ -25,6 +26,8 @@ use Illuminate\Validation\ValidationException;
 
 class EventoController extends Controller
 {
+    use BuscaEventos;
+
     // ── Categorías que puede gestionar cada rol (administrador: todas) ──
     // Con varios roles se suman las categorías de cada uno. Un usuario sin ninguno de estos roles
     // (p. ej. solo jefe) no tiene restricción por categoría.
@@ -331,14 +334,15 @@ class EventoController extends Controller
     }
 
     // ── Lista de eventos (calidad) ──
-    public function index()
+    public function index(Request $request)
     {
         $jefes  = \App\Models\User::role('jefe')->get(['id', 'name']);
-        $eventos = $this->filtrarPorRol(EventoAdverso::query())
+        $eventos = $this->aplicarBusqueda($this->filtrarPorRol(EventoAdverso::query()), $request)
             ->with(['categoria', 'area', 'reportante', 'paciente', 'tecnovigilancia', 'farmacovigilancia', 'medicamentos'])
             ->whereIn('estado', ['en_proceso'])
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         $categorias = Categoria::where('activo', 1)->get();
         $areas      = Area::where('activo', 1)->get(['id_area', 'nombre']);
@@ -348,6 +352,7 @@ class EventoController extends Controller
             'categorias' => $categorias,
             'jefes'      => $jefes,
             'areas'      => $areas,   // ← esta línea es la clave
+            'filtros'    => $this->filtrosBusqueda($request),
         ]);
     }
 
@@ -587,12 +592,12 @@ class EventoController extends Controller
 
 
     // ── Eventos del jefe ──
-    public function misEventos()
+    public function misEventos(Request $request)
     {
         $this->soloCalidadOJefe();
         $user = Auth::user();
 
-        $eventos = EventoAdverso::with([
+        $eventos = $this->aplicarBusqueda(EventoAdverso::query(), $request)->with([
             'categoria',
             'area',
             'reportante',
@@ -610,7 +615,8 @@ class EventoController extends Controller
                     ->orWhere('fk_jefe', $user->id);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         // Eventos próximos a vencer (plan con fecha ejecución en los próximos 7 días)
         $proximosVencer = EventoAdverso::with(['area', 'planMejora'])
@@ -647,6 +653,7 @@ class EventoController extends Controller
             'eventos'        => $eventos,
             'proximosVencer' => $proximosVencer,
             'vencidos'       => $vencidos,
+            'filtros'        => $this->filtrosBusqueda($request),
         ]);
     }
     // ── Subir evidencia jefe ──
@@ -691,9 +698,9 @@ class EventoController extends Controller
         return redirect()->back()
             ->with('success', 'Evidencia subida correctamente.');
     }
-    public function cancelados()
+    public function cancelados(Request $request)
     {
-        $eventos = $this->filtrarPorRol(EventoAdverso::query())->with([
+        $eventos = $this->aplicarBusqueda($this->filtrarPorRol(EventoAdverso::query()), $request)->with([
             'categoria',
             'area',
             'reportante',
@@ -703,10 +710,12 @@ class EventoController extends Controller
         ])
             ->where('estado', 'cancelado')
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Eventos/Cancelados', [
             'eventos' => $eventos,
+            'filtros' => $this->filtrosBusqueda($request),
         ]);
     }
 
