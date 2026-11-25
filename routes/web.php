@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TecnovigilanciaController;
 use App\Http\Controllers\FarmacovigilanciaController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\Auth\PortalSsoController;
 
 Route::get('/', function () {
@@ -36,8 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ── Rutas de gestión de usuarios (solo administrador) ──
-Route::middleware(['auth', 'role:administrador'])->group(function () {
+// ── Rutas de gestión de usuarios (administrador y gestor_usuarios) ──
+Route::middleware(['auth', 'role:administrador|gestor_usuarios'])->group(function () {
     Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
     Route::get('/usuarios/crear', [UserController::class, 'create'])->name('usuarios.create');
     Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
@@ -99,8 +100,8 @@ Route::middleware(['auth', 'role:administrador|farmacovigilancia'])->group(funct
     Route::post('/farmacovigilancia/{evento}/analisis', [FarmacovigilanciaController::class, 'guardarAnalisis'])->name('farmacovigilancia.analisis');
 });
 
-// ── Rutas de áreas (solo administrador) ──
-Route::middleware(['auth', 'role:administrador'])->group(function () {
+// ── Rutas de categorías y áreas (administrador y gestor_usuarios) ──
+Route::middleware(['auth', 'role:administrador|gestor_usuarios'])->group(function () {
     Route::get('/categorias', [CategoriaController::class, 'index'])->name('categorias.index');
     Route::post('/categorias', [CategoriaController::class, 'store'])->name('categorias.store');
     Route::patch('/categorias/{categoria}', [CategoriaController::class, 'update'])->name('categorias.update');
@@ -109,6 +110,11 @@ Route::middleware(['auth', 'role:administrador'])->group(function () {
     Route::get('/areas', [AreaController::class, 'index'])->name('areas.index');
     Route::post('/areas', [AreaController::class, 'store'])->name('areas.store');
     Route::patch('/areas/{area}', [AreaController::class, 'update'])->name('areas.update');
+});
+
+// ── Auditoría (solo administrador) ──
+Route::middleware(['auth', 'role:administrador'])->group(function () {
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
 });
 
 require __DIR__ . '/auth.php';

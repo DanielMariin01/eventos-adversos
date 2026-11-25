@@ -22,5 +22,24 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // ── 403: pantalla informativa (los usuarios lo confundían con "página caída") ──
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $e, \Illuminate\Http\Request $request) {
+            if ($response->getStatusCode() !== 403 || $request->expectsJson()) {
+                return $response;
+            }
+
+            // Solo se muestra el mensaje si lo escribimos nosotros (los de Laravel/Spatie vienen en inglés)
+            $mensaje = trim($e->getMessage());
+            if ($mensaje === '' || preg_match('/^(this action is unauthorized|user does not have|user is not logged in|forbidden)/i', $mensaje)) {
+                $mensaje = null;
+            }
+
+            $user = $request->user();
+
+            return \Inertia\Inertia::render('Errors/Forbidden', [
+                'mensaje' => $mensaje,
+                'ruta'    => '/' . ltrim($request->path(), '/'),
+                'inicio'  => $user ? route($user->rutaDeInicio()) : route('login'),
+            ])->toResponse($request)->setStatusCode(403);
+        });
     })->create();

@@ -24,6 +24,7 @@ class DashboardController extends Controller
             $categoriasRol = ['Seguridad del Paciente', 'IAAS'];
             if ($user->hasRole('tecnovigilancia')) {
                 $categoriasRol[] = 'Tecnovigilancia';
+                $categoriasRol[] = 'Implantables';
             }
             if ($user->hasRole('farmacovigilancia')) {
                 $categoriasRol[] = 'Farmacovigilancia';

@@ -1,5 +1,5 @@
 import { COLORS } from '@/theme';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
@@ -41,18 +41,18 @@ function Buscador({ value, onChange, placeholder }) {
     );
 }
 
-export default function Index({ eventos, categorias, jefes, areas }) {
+export default function Index({ eventos, categorias, jefes, areas, filtros = {} }) {
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [modalAnalisis, setModalAnalisis] = useState(false);
     const [modalTipo, setModalTipo] = useState(false);
     const [modalArea, setModalArea] = useState(false);
     const [modalCancelar, setModalCancelar] = useState(false);
     const [cargando, setCargando] = useState(false);
-    const [busquedaEvento, setBusquedaEvento] = useState('');
-    const [busquedaReportante, setBusquedaReportante] = useState('');
-    const [busquedaPaciente, setBusquedaPaciente] = useState('');
-    const [busquedaMedicamento, setBusquedaMedicamento] = useState('');
-    const [filtroEstado, setFiltroEstado] = useState('');
+    const [busquedaEvento, setBusquedaEvento] = useState(filtros.evento ?? '');
+    const [busquedaReportante, setBusquedaReportante] = useState(filtros.reportante ?? '');
+    const [busquedaPaciente, setBusquedaPaciente] = useState(filtros.paciente ?? '');
+    const [busquedaMedicamento, setBusquedaMedicamento] = useState(filtros.medicamento ?? '');
+    const [filtroEstado, setFiltroEstado] = useState(filtros.estado ?? '');
 
     // ── Acciones ──
     const alertSeleccionar = () => {
@@ -195,21 +195,25 @@ export default function Index({ eventos, categorias, jefes, areas }) {
     // ── Filtros (sobre la página actual) ──
     const incluye = (texto, busqueda) => String(texto ?? '').toLowerCase().includes(busqueda.toLowerCase());
 
-    const eventosFiltrados = {
-        ...eventos,
-        data: eventos.data.filter(e =>
-            (filtroEstado === '' || e.estado === filtroEstado) &&
-            (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
-            (busquedaReportante === '' ||
-                incluye(e.reportante?.nombres, busquedaReportante) ||
-                incluye(e.reportante?.cedula, busquedaReportante)) &&
-            (busquedaPaciente === '' ||
-                incluye(e.paciente?.nombres, busquedaPaciente) ||
-                incluye(e.paciente?.cedula, busquedaPaciente)) &&
-            (busquedaMedicamento === '' ||
-                (e.medicamentos ?? []).some(m => incluye(m.nombre, busquedaMedicamento)))
-        ),
-    };
+    // ── Búsqueda en servidor (a través de todas las páginas; el resultado vuelve a la primera) ──
+    const eventosFiltrados = eventos;
+    const esPrimerRender = useRef(true);
+    useEffect(() => {
+        if (esPrimerRender.current) {
+            esPrimerRender.current = false;
+            return;
+        }
+        const timeout = setTimeout(() => {
+            router.get(route('farmacovigilancia.index'), {
+                evento: busquedaEvento || undefined,
+                reportante: busquedaReportante || undefined,
+                paciente: busquedaPaciente || undefined,
+                estado: filtroEstado || undefined,
+                medicamento: busquedaMedicamento || undefined,
+            }, { preserveState: true, preserveScroll: true, replace: true });
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [busquedaEvento, busquedaReportante, busquedaPaciente, filtroEstado, busquedaMedicamento]);
 
     const exportarExcel = async () => {
         const response = await fetch(route('farmacovigilancia.exportar'));

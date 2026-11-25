@@ -68,7 +68,7 @@ export default function Tabla({
                             </tr>
                         ) : (
                             filas.map((fila, index) => {
-                                const idFila = fila.id ?? fila.id_eventoAdverso ?? fila.id_usuario ?? index;
+                                const idFila = fila.id ?? fila.id_eventoAdverso ?? fila.id_usuario ?? fila.id_auditoria ?? index;
                                 const seleccionada = filaSeleccionada === idFila;
 
                                 return (

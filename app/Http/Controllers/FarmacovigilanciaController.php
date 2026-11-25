@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\BuscaEventos;
 use App\Mail\AnalisisRealizado;
 use App\Models\Archivo;
 use App\Models\Area;
@@ -18,6 +19,8 @@ use Inertia\Inertia;
 
 class FarmacovigilanciaController extends Controller
 {
+    use BuscaEventos;
+
     private const CATEGORIA = 'Farmacovigilancia';
 
     // Catálogos del análisis (deben coincidir con ModalAnalisisFarmacovigilancia.jsx)
@@ -51,13 +54,14 @@ class FarmacovigilanciaController extends Controller
     }
 
     // ── Lista de eventos de farmacovigilancia ──
-    public function index()
+    public function index(Request $request)
     {
         return Inertia::render('Farmacovigilancia/Index', [
-            'eventos'    => $this->consulta()->paginate(10),
+            'eventos'    => $this->aplicarBusqueda($this->consulta(), $request)->paginate(10)->withQueryString(),
             'categorias' => Categoria::where('activo', 1)->get(),
             'jefes'      => User::role('jefe')->get(['id', 'name']),
             'areas'      => Area::where('activo', 1)->get(['id_area', 'nombre']),
+            'filtros'    => $this->filtrosBusqueda($request),
         ]);
     }
 

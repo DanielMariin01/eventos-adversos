@@ -20,6 +20,7 @@ export default function Hero() {
         if (roles.includes('administrador') || roles.includes('calidad')) return route('dashboard');
         if (roles.includes('tecnovigilancia')) return route('tecnovigilancia.index');
         if (roles.includes('farmacovigilancia')) return route('farmacovigilancia.index');
+        if (roles.includes('gestor_usuarios') && !roles.includes('jefe')) return route('usuarios.index');
         if (roles.includes('jefe')) return route('dashboard');
         return route('eventos.create');
     };

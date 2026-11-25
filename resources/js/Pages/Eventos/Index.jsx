@@ -1,5 +1,5 @@
 import { COLORS } from '@/theme';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Tabla from '@/Components/Tabla';
@@ -34,17 +34,17 @@ const LABEL_ESTADO = {
 };
 
 
-export default function Index({ eventos, categorias, jefes, areas }) {
+export default function Index({ eventos, categorias, jefes, areas, filtros = {} }) {
     const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
     const [busqueda, setBusqueda] = useState('');
     const [modalAnalisis, setModalAnalisis] = useState(false);
     const [modalTipo, setModalTipo] = useState(false);
-    const [busquedaEvento, setBusquedaEvento] = useState('');
-    const [busquedaReportante, setBusquedaReportante] = useState('');
-    const [busquedaPaciente, setBusquedaPaciente] = useState('');
+    const [busquedaEvento, setBusquedaEvento] = useState(filtros.evento ?? '');
+    const [busquedaReportante, setBusquedaReportante] = useState(filtros.reportante ?? '');
+    const [busquedaPaciente, setBusquedaPaciente] = useState(filtros.paciente ?? '');
     const [cargando, setCargando] = useState(false);
     const [modalArea, setModalArea] = useState(false);
-    const [filtroEstado, setFiltroEstado] = useState('');
+    const [filtroEstado, setFiltroEstado] = useState(filtros.estado ?? '');
     const [modalCancelar, setModalCancelar] = useState(false);
 
     // ── Acciones ──
@@ -199,19 +199,24 @@ export default function Index({ eventos, categorias, jefes, areas }) {
     ];
 
     // Filtra por búsqueda
-    const eventosFiltrados = {
-        ...eventos,
-        data: eventos.data.filter(e =>
-            (filtroEstado === '' || e.estado === filtroEstado) &&
-            (busquedaEvento === '' || String(e.id_eventoAdverso).includes(busquedaEvento)) &&
-            (busquedaReportante === '' ||
-                e.reportante?.nombres?.toLowerCase().includes(busquedaReportante.toLowerCase()) ||
-                e.reportante?.cedula?.includes(busquedaReportante)) &&
-            (busquedaPaciente === '' ||
-                e.paciente?.nombres?.toLowerCase().includes(busquedaPaciente.toLowerCase()) ||
-                e.paciente?.cedula?.includes(busquedaPaciente))
-        ),
-    };
+    // ── Búsqueda en servidor (a través de todas las páginas; el resultado vuelve a la primera) ──
+    const eventosFiltrados = eventos;
+    const esPrimerRender = useRef(true);
+    useEffect(() => {
+        if (esPrimerRender.current) {
+            esPrimerRender.current = false;
+            return;
+        }
+        const timeout = setTimeout(() => {
+            router.get(route('eventos.index'), {
+                evento: busquedaEvento || undefined,
+                reportante: busquedaReportante || undefined,
+                paciente: busquedaPaciente || undefined,
+                estado: filtroEstado || undefined,
+            }, { preserveState: true, preserveScroll: true, replace: true });
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [busquedaEvento, busquedaReportante, busquedaPaciente, filtroEstado]);
 
     const exportarExcel = async () => {
         const response = await fetch(route('eventos.exportar'));

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use App\Models\Categoria;
+use App\Http\Controllers\Concerns\BuscaEventos;
 use App\Mail\AnalisisRealizado;
 use App\Models\Archivo;
 use App\Models\EventoAdverso;
@@ -17,6 +18,8 @@ use Inertia\Inertia;
 
 class TecnovigilanciaController extends Controller
 {
+    use BuscaEventos;
+
     private const CATEGORIA = 'Tecnovigilancia';
 
     // Catálogo de causas probables (debe coincidir con CAUSAS_PROBABLES en ModalAnalisisTecnovigilancia.jsx)
@@ -78,13 +81,14 @@ class TecnovigilanciaController extends Controller
     }
 
     // ── Lista de eventos de tecnovigilancia ──
-    public function index()
+    public function index(Request $request)
     {
         return Inertia::render('Tecnovigilancia/Index', [
-            'eventos'    => $this->consulta()->paginate(10),
+            'eventos'    => $this->aplicarBusqueda($this->consulta(), $request)->paginate(10)->withQueryString(),
             'categorias' => Categoria::where('activo', 1)->get(),
             'jefes'      => User::role('jefe')->get(['id', 'name']),
             'areas'      => Area::where('activo', 1)->get(['id_area', 'nombre']),
+            'filtros'    => $this->filtrosBusqueda($request),
         ]);
     }
 

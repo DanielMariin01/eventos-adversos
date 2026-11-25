@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auditoria;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,11 +25,20 @@ class CategoriaController extends Controller
             'descripcion' => 'nullable|string|max:500',
         ]);
 
-        Categoria::create([
+        $categoria = Categoria::create([
             'nombre'      => trim($datos['nombre']),
             'descripcion' => $datos['descripcion'] ?? null,
             'activo'      => 1,
         ]);
+
+        Auditoria::registrar(
+            'crear',
+            'categoria',
+            $categoria->id_categoria,
+            'Creó la categoría ' . $categoria->nombre,
+            null,
+            ['nombre' => $categoria->nombre, 'descripcion' => $categoria->descripcion]
+        );
 
         return redirect()->route('categorias.index')
             ->with('success', 'Categoría creada correctamente.');
@@ -44,10 +54,21 @@ class CategoriaController extends Controller
             'descripcion' => 'nullable|string|max:500',
         ]);
 
+        $antes = ['nombre' => $categoria->nombre, 'descripcion' => $categoria->descripcion];
+
         $categoria->update([
             'nombre'      => trim($datos['nombre']),
             'descripcion' => $datos['descripcion'] ?? null,
         ]);
+
+        Auditoria::registrar(
+            'editar',
+            'categoria',
+            $categoria->id_categoria,
+            'Editó la categoría ' . $categoria->nombre,
+            $antes,
+            ['nombre' => $categoria->nombre, 'descripcion' => $categoria->descripcion]
+        );
 
         return redirect()->route('categorias.index')
             ->with('success', 'Categoría actualizada correctamente.');
@@ -57,6 +78,15 @@ class CategoriaController extends Controller
     public function toggleActivo(Categoria $categoria)
     {
         $categoria->update(['activo' => $categoria->activo ? 0 : 1]);
+
+        Auditoria::registrar(
+            $categoria->activo ? 'activar' : 'desactivar',
+            'categoria',
+            $categoria->id_categoria,
+            ($categoria->activo ? 'Activó' : 'Desactivó') . ' la categoría ' . $categoria->nombre,
+            ['activo' => !$categoria->activo],
+            ['activo' => (bool) $categoria->activo]
+        );
 
         return redirect()->route('categorias.index')
             ->with('success', $categoria->activo ? 'Categoría activada.' : 'Categoría desactivada.');

@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu, Pill, Tags } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Menu, X, LogOut, ClipboardCheck, MapPin, ClipboardList, XCircle, Cpu, Pill, Tags, History } from 'lucide-react';
 import ChatBot from '@/Components/ChatBot';
 
 export default function AuthenticatedLayout({ header, children }) {
@@ -22,25 +22,31 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Categorías',
             url: route('categorias.index'),
             icon: Tags,
-            roles: ['administrador'],
+            roles: ['administrador', 'gestor_usuarios'],
         },
         {
             title: 'Áreas',
             url: route('areas.index'),
             icon: MapPin,
-            roles: ['administrador'],
+            roles: ['administrador', 'gestor_usuarios'],
         },
         {
             title: 'Usuarios',
             url: route('usuarios.index'),
             icon: Users,
+            roles: ['administrador', 'gestor_usuarios'],
+        },
+        {
+            title: 'Auditoría',
+            url: route('auditoria.index'),
+            icon: History,
             roles: ['administrador'],
         },
         {
             title: 'Eventos Adversos',
             url: route('eventos.index'),
             icon: FileText,
-            roles: ['administrador', 'calidad', 'farmacovigilancia'],
+            roles: ['administrador', 'calidad', 'tecnovigilancia', 'farmacovigilancia'],
         },
         {
             title: 'Tecnovigilancia',
@@ -70,7 +76,7 @@ export default function AuthenticatedLayout({ header, children }) {
             title: 'Eventos Cancelados',
             url: route('eventos.cancelados'),
             icon: XCircle,
-            roles: ['administrador', 'calidad'],
+            roles: ['administrador', 'calidad', 'tecnovigilancia'],
         },
     ];
 
