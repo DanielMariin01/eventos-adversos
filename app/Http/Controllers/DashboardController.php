@@ -16,19 +16,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         // ── Rol calidad (sin administrador): solo eventos de sus categorías ──
-        // Seguridad del Paciente e IAAS (más las de tecnovigilancia/farmacovigilancia si también tiene esos roles).
+        // Seguridad del Paciente e IAAS (aunque tenga otros roles; esas categorías se atienden en sus módulos).
         // El scope global afecta todas las consultas de EventoAdverso, incluidas las relaciones (whereHas('evento')).
         $user = $request->user();
         $categoriasRol = null;
         if ($user->hasRole('calidad') && !$user->hasRole('administrador')) {
             $categoriasRol = ['Seguridad del Paciente', 'IAAS'];
-            if ($user->hasRole('tecnovigilancia')) {
-                $categoriasRol[] = 'Tecnovigilancia';
-                $categoriasRol[] = 'Implantables';
-            }
-            if ($user->hasRole('farmacovigilancia')) {
-                $categoriasRol[] = 'Farmacovigilancia';
-            }
             EventoAdverso::addGlobalScope('categorias_rol', function ($q) use ($categoriasRol) {
                 $q->whereHas('categoria', fn($c) => $c->whereIn('nombre', $categoriasRol));
             });

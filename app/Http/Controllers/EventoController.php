@@ -33,7 +33,8 @@ class EventoController extends Controller
     // (p. ej. solo jefe) no tiene restricción por categoría.
     private const CATEGORIAS_POR_ROL = [
         'calidad'           => ['Seguridad del Paciente', 'IAAS'],
-        'tecnovigilancia'   => ['Tecnovigilancia', 'Implantables'],
+        'tecnovigilancia'   => ['Tecnovigilancia'],
+        'implantables'      => ['Implantables'],
         'farmacovigilancia' => ['Farmacovigilancia'],
     ];
 

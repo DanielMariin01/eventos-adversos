@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Mail;
 class PlanMejoraController extends Controller
 {
     // ── Categorías que puede gestionar el usuario según su rol ──
-    // administrador: todas (null). calidad: Seguridad del Paciente e IAAS. tecnovigilancia: Tecnovigilancia e Implantables. farmacovigilancia: Farmacovigilancia.
+    // administrador: todas (null). calidad: Seguridad del Paciente e IAAS. tecnovigilancia: Tecnovigilancia. farmacovigilancia: Farmacovigilancia.
     // Con varios roles se suman las categorías de cada uno.
     private function categoriasPermitidas(): ?array
     {
@@ -36,7 +36,6 @@ class PlanMejoraController extends Controller
         }
         if ($user->hasRole('tecnovigilancia')) {
             $categorias[] = 'Tecnovigilancia';
-            $categorias[] = 'Implantables';
         }
         if ($user->hasRole('farmacovigilancia')) {
             $categorias[] = 'Farmacovigilancia';
@@ -45,9 +44,23 @@ class PlanMejoraController extends Controller
         return $categorias;
     }
 
+    // Categorías visibles en la LISTA y el Excel: con rol calidad solo Seguridad del Paciente e IAAS,
+    // aunque tenga otros roles (los de Tecnovigilancia/Farmacovigilancia se gestionan con su rol propio).
+    // Las acciones sobre un plan concreto (autorizarEvento) siguen sumando las categorías de todos sus roles.
+    private function categoriasListado(): ?array
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('administrador') && $user->hasRole('calidad')) {
+            return ['Seguridad del Paciente', 'IAAS'];
+        }
+
+        return $this->categoriasPermitidas();
+    }
+
     private function filtrarPorRol($query)
     {
-        $categorias = $this->categoriasPermitidas();
+        $categorias = $this->categoriasListado();
 
         if ($categorias !== null) {
             $query->whereHas('categoria', fn($q) => $q->whereIn('nombre', $categorias));

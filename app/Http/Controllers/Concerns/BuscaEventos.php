@@ -14,7 +14,7 @@ trait BuscaEventos
     // Filtros que viajan en la URL y se devuelven a la página
     protected function filtrosBusqueda(Request $request): array
     {
-        return $request->only(['evento', 'reportante', 'paciente', 'estado', 'dispositivo', 'medicamento']);
+        return $request->only(['evento', 'reportante', 'paciente', 'estado', 'dispositivo', 'medicamento', 'implantable']);
     }
 
     protected function aplicarBusqueda($query, Request $request)
@@ -39,6 +39,16 @@ trait BuscaEventos
                         ->orWhere('marca', 'like', $texto)
                         ->orWhere('modelo', 'like', $texto)
                         ->orWhere('serie', 'like', $texto);
+                });
+            })
+            ->when($request->filled('implantable'), function ($q) use ($request) {
+                $texto = '%' . trim($request->implantable) . '%';
+                $q->whereHas('implantable', function ($i) use ($texto) {
+                    $i->where('marca', 'like', $texto)
+                        ->orWhere('serie', 'like', $texto)
+                        ->orWhere('lote', 'like', $texto)
+                        ->orWhere('registro_invima', 'like', $texto)
+                        ->orWhere('descripcion_material', 'like', $texto);
                 });
             })
             ->when($request->filled('medicamento'), function ($q) use ($request) {

@@ -39,6 +39,10 @@ class User extends Authenticatable
             return 'farmacovigilancia.index';
         }
 
+        if ($this->hasRole('implantables')) {
+            return 'implantables.index';
+        }
+
         if ($this->hasRole('gestor_usuarios') && !$this->hasRole('jefe')) {
             return 'usuarios.index';
         }
