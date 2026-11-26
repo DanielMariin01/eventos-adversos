@@ -11,6 +11,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TecnovigilanciaController;
 use App\Http\Controllers\FarmacovigilanciaController;
+use App\Http\Controllers\ImplantablesController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\Auth\PortalSsoController;
@@ -98,6 +99,12 @@ Route::middleware(['auth', 'role:administrador|farmacovigilancia'])->group(funct
     Route::get('/farmacovigilancia', [FarmacovigilanciaController::class, 'index'])->name('farmacovigilancia.index');
     Route::get('/farmacovigilancia/exportar', [FarmacovigilanciaController::class, 'exportar'])->name('farmacovigilancia.exportar');
     Route::post('/farmacovigilancia/{evento}/analisis', [FarmacovigilanciaController::class, 'guardarAnalisis'])->name('farmacovigilancia.analisis');
+});
+
+// ── Rutas de implantables (sin análisis: solo ver datos, cambiar tipo y área) ──
+Route::middleware(['auth', 'role:administrador|implantables'])->group(function () {
+    Route::get('/implantables', [ImplantablesController::class, 'index'])->name('implantables.index');
+    Route::get('/implantables/exportar', [ImplantablesController::class, 'exportar'])->name('implantables.exportar');
 });
 
 // ── Rutas de categorías y áreas (administrador y gestor_usuarios) ──
